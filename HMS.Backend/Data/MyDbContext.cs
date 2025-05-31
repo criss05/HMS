@@ -19,6 +19,7 @@ namespace HMS.Backend.Data
         public DbSet<Log> Logs { get; set; } = null!;
         public DbSet<Notification> Notifications { get; set; } = null!;
         public DbSet<Procedure> Procedures { get; set; }
+        public DbSet<MedicalRecord> MedicalRecords { get; set; }
 
         public MyDbContext(DbContextOptions<MyDbContext> options)
                 : base(options) { }
@@ -35,6 +36,7 @@ namespace HMS.Backend.Data
             modelBuilder.Entity<Log>().ToTable("Logs");
             modelBuilder.Entity<Notification>().ToTable("Notifications");
             modelBuilder.Entity<Procedure>().ToTable("Procedures");
+            modelBuilder.Entity<MedicalRecord>().ToTable("MedicalRecords");
 
             // Configure discriminator for TPT inheritance - stores user roles in Users table
             modelBuilder.Entity<User>()
@@ -67,6 +69,24 @@ namespace HMS.Backend.Data
                 .HasOne(p => p.Department)
                 .WithMany() // or .WithMany(d => d.Procedures) if you add navigation collection on Department
                 .HasForeignKey(p => p.DepartmentId)
+                .IsRequired();
+
+            modelBuilder.Entity<MedicalRecord>()
+                .HasOne(m => m.Patient)
+                .WithMany() // or .WithMany(p => p.MedicalRecords) if you add navigation property
+                .HasForeignKey(m => m.PatientId)
+                .IsRequired();
+
+            modelBuilder.Entity<MedicalRecord>()
+                .HasOne(m => m.Doctor)
+                .WithMany() // or .WithMany(d => d.MedicalRecords)
+                .HasForeignKey(m => m.DoctorId)
+                .IsRequired();
+
+            modelBuilder.Entity<MedicalRecord>()
+                .HasOne(m => m.Procedure)
+                .WithMany() // or .WithMany(pr => pr.MedicalRecords)
+                .HasForeignKey(m => m.ProcedureId)
                 .IsRequired();
 
             // voodoo ^^^
