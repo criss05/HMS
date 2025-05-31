@@ -3,31 +3,25 @@ TODO:
 - [ ] Backend
 
 DATABASE STRUCTURE:
-Objections:
-- singula table names
-- self id's should be "id"
-- snake case
-
+These are subject to change (mainly EF related)
 User:
 - id
-- username
 - email
 - password
 - role
 - name
-- birth_date
 - cnp
-- address
 - phone_number
 - created_at
 
 Admin:
-- id
-- user_id
+- user_id (pk and fk)
+// maybe more in the future
 
 Patient:
-- id
-- user_id
+- user_id (pk and fk)
+- birth_date
+- address
 - blood_type
 - emergency_contact
 - allergies
@@ -35,10 +29,9 @@ Patient:
 - height
 
 Doctor:
-- id
-- user_id
+- user_id // pk and fk
 - department_id
-- years_of_experience
+- experience?? years_of_experience
 - license_number
 
 Department:
@@ -114,4 +107,5 @@ Review:
 - patient_id
 - doctor_id
 - value / ?? stars / good / bad
+
 
