@@ -9,6 +9,7 @@ using HMS.Shared.Enums;
 
 namespace HMS.Shared.Entities
 {
+    [Table("Users")]
     public class User
     {
         [Key]
