@@ -39,6 +39,7 @@ namespace HMS.Backend.Data
             modelBuilder.Entity<Procedure>().ToTable("Procedures");
             modelBuilder.Entity<MedicalRecord>().ToTable("MedicalRecords");
             modelBuilder.Entity<Room>().ToTable("Rooms");
+            modelBuilder.Entity<Equipment>().ToTable("Equipments");
 
             // Configure discriminator for TPT inheritance - stores user roles in Users table
             modelBuilder.Entity<User>()

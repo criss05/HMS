@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 
 namespace HMS.Shared.Entities
 {
+    [Table("MedicalRecords")]
     public class MedicalRecord
     {
         [Key]
