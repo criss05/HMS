@@ -50,11 +50,11 @@ namespace HMS.Backend.Data
                 .HasKey(s => new { s.ShiftId, s.DoctorId });  // composite PK
 
             // Configure discriminator for TPT inheritance - stores user roles in Users table
-            modelBuilder.Entity<User>()
-                .HasDiscriminator<UserRole>("Role")
-                .HasValue<User>(UserRole.Admin)    // base User can be Admin or generic user
-                .HasValue<Patient>(UserRole.Patient)
-                .HasValue<Doctor>(UserRole.Doctor);
+            //modelBuilder.Entity<User>()
+            //    .HasDiscriminator<UserRole>("Role")
+            //    .HasValue<User>(UserRole.Admin)    // base User can be Admin or generic user
+            //    .HasValue<Patient>(UserRole.Patient)
+            //    .HasValue<Doctor>(UserRole.Doctor);
             // I'm not sure about this ^^^ TODO: FIX THIS (look into it)
 
             // Configure relationships if needed explicitly (optional if conventions suffice)
@@ -62,73 +62,108 @@ namespace HMS.Backend.Data
                 .HasOne(d => d.Department)
                 .WithMany()  // Or .WithMany(dep => dep.Doctors) if you add collection to Department
                 .HasForeignKey(d => d.DepartmentId)
-                .IsRequired();
+                .IsRequired()
+                .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<Log>()
                 .HasOne(l => l.User)
                 .WithMany()  // Or .WithMany(u => u.Logs) if you add Logs collection to User
                 .HasForeignKey(l => l.UserId)
-                .IsRequired();
+                .IsRequired()
+                .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<Notification>()
                 .HasOne(n => n.User)
                 .WithMany() // optionally .WithMany(u => u.Notifications) if you add navigation collection
                 .HasForeignKey(n => n.UserId)
-                .IsRequired();
+                .IsRequired()
+                .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<Procedure>()
                 .HasOne(p => p.Department)
                 .WithMany() // or .WithMany(d => d.Procedures) if you add navigation collection on Department
                 .HasForeignKey(p => p.DepartmentId)
-                .IsRequired();
-
-            modelBuilder.Entity<MedicalRecord>()
-                .HasOne(m => m.Patient)
-                .WithMany() // or .WithMany(p => p.MedicalRecords) if you add navigation property
-                .HasForeignKey(m => m.PatientId)
-                .IsRequired();
+                .IsRequired()
+                .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<MedicalRecord>()
                 .HasOne(m => m.Doctor)
                 .WithMany() // or .WithMany(d => d.MedicalRecords)
                 .HasForeignKey(m => m.DoctorId)
-                .IsRequired();
+                .IsRequired()
+                .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<MedicalRecord>()
                 .HasOne(m => m.Procedure)
                 .WithMany() // or .WithMany(pr => pr.MedicalRecords)
                 .HasForeignKey(m => m.ProcedureId)
-                .IsRequired();
+                .IsRequired()
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<MedicalRecord>()
+                .HasOne(m => m.Patient)
+                .WithMany(p => p.MedicalRecords)
+                .HasForeignKey(m => m.PatientId)
+                .OnDelete(DeleteBehavior.Restrict); // prevents cascade cycles
 
             modelBuilder.Entity<Room>()
                 .HasOne(r => r.Department)
                 .WithMany() // Or .WithMany(d => d.Rooms) if you want to add navigation collection
                 .HasForeignKey(r => r.DepartmentId)
-                .IsRequired();
+                .IsRequired()
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Appointment>()
+                .HasOne(a => a.Patient)
+                .WithMany(p => p.Appointments)
+                .HasForeignKey(a => a.PatientId)
+                .OnDelete(DeleteBehavior.Restrict); // <- no cascade
+
+            modelBuilder.Entity<Appointment>()
+                .HasOne(a => a.Doctor)
+                .WithMany(d => d.Appointments)
+                .HasForeignKey(a => a.DoctorId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            //modelBuilder.Entity<Appointment>()
+            //    .HasOne(a => a.Procedure)
+            //    .WithMany(p => p.Appointments)
+            //    .HasForeignKey(a => a.ProcedureId)
+            //    .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Appointment>()
+                .HasOne(a => a.Room)
+                .WithMany(r => r.Appointments)
+                .HasForeignKey(a => a.RoomId)
+                .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<Schedule>()
                 .HasOne(s => s.Shift)
                 .WithMany(sh => sh.Schedules)
                 .HasForeignKey(s => s.ShiftId)
-                .IsRequired();
+                .IsRequired()
+                .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<Schedule>()
                 .HasOne(s => s.Doctor)
                 .WithMany(d => d.Schedules)
                 .HasForeignKey(s => s.DoctorId)
-                .IsRequired();
+                .IsRequired()
+                .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<Review>()
                 .HasOne(r => r.Patient)
                 .WithMany() // or .WithMany(p => p.Reviews) if you add a collection in Patient
                 .HasForeignKey(r => r.PatientId)
-                .IsRequired();
+                .IsRequired()
+                .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<Review>()
                 .HasOne(r => r.Doctor)
                 .WithMany() // or .WithMany(d => d.Reviews) if you add a collection in Doctor
                 .HasForeignKey(r => r.DoctorId)
-                .IsRequired();
+                .IsRequired()
+                .OnDelete(DeleteBehavior.Restrict);
 
             // voodoo ^^^
             // some of them might not be required
