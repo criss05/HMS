@@ -18,6 +18,7 @@ namespace HMS.Backend.Data
         public DbSet<Department> Departments { get; set; } = null!;
         public DbSet<Log> Logs { get; set; } = null!;
         public DbSet<Notification> Notifications { get; set; } = null!;
+        public DbSet<Procedure> Procedures { get; set; }
 
         public MyDbContext(DbContextOptions<MyDbContext> options)
                 : base(options) { }
@@ -32,7 +33,8 @@ namespace HMS.Backend.Data
 
             modelBuilder.Entity<Department>().ToTable("Departments");
             modelBuilder.Entity<Log>().ToTable("Logs");
-            modelBuilder.Entity<Notification>().ToTable("Notifications")
+            modelBuilder.Entity<Notification>().ToTable("Notifications");
+            modelBuilder.Entity<Procedure>().ToTable("Procedures");
 
             // Configure discriminator for TPT inheritance - stores user roles in Users table
             modelBuilder.Entity<User>()
@@ -59,6 +61,12 @@ namespace HMS.Backend.Data
                 .HasOne(n => n.User)
                 .WithMany() // optionally .WithMany(u => u.Notifications) if you add navigation collection
                 .HasForeignKey(n => n.UserId)
+                .IsRequired();
+
+            modelBuilder.Entity<Procedure>()
+                .HasOne(p => p.Department)
+                .WithMany() // or .WithMany(d => d.Procedures) if you add navigation collection on Department
+                .HasForeignKey(p => p.DepartmentId)
                 .IsRequired();
 
             // voodoo ^^^
