@@ -18,8 +18,10 @@ namespace HMS.Backend
             // Table-per-Type mapping
             modelBuilder.Entity<User>().ToTable("Users");
             modelBuilder.Entity<Patient>().ToTable("Patients");
-            //modelBuilder.Entity<Admin>().ToTable("Admins");
-            //modelBuilder.Entity<Doctor>().ToTable("Doctors");
+            modelBuilder.Entity<Admin>().ToTable("Admins");
+            modelBuilder.Entity<Doctor>().ToTable("Doctors");
+
+            modelBuilder.Entity<Department>().ToTable("Departments");
 
             base.OnModelCreating(modelBuilder);
         }
