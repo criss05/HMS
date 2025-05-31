@@ -25,5 +25,7 @@ namespace HMS.Shared.Entities
 
         [Required]
         public int Stock { get; set; }
+
+        public ICollection<Room> Rooms { get; set; } = new List<Room>();
     }
 }

@@ -20,5 +20,7 @@ namespace HMS.Shared.Entities
 
         [Required]
         public int Capacity { get; set; }
+
+        public ICollection<Equipment> Equipments { get; set; } = new List<Equipment>();
     }
 }
