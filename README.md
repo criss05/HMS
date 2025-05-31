@@ -1,5 +1,9 @@
 TODO: 
 - [ ] Models (with Entity)
+  - [X] User
+  - [X] Patient
+  - [X] Admin
+  - [ ] Doctor  
 - [ ] Backend
 
 DATABASE STRUCTURE:
