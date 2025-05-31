@@ -1,4 +1,3 @@
-![image](https://github.com/user-attachments/assets/897c1ded-f2d3-4760-9f2c-cf16ac5b38f2)
 ![image](https://github.com/user-attachments/assets/0503699d-3ce2-4b29-a75b-5bfb11c58eb7)
 
 The migrations are somewhat working, tho a lot of the setup code is redundant, and I set most of them to not delete on cascade!
@@ -71,7 +70,7 @@ MedicalRecord:
 - patient_id
 - doctor_id
 - procedure_id
-- conclusion ? diagnosis
+- diagnosis
 - created_at
 
 Appointment:
@@ -79,19 +78,18 @@ Appointment:
 - patient_id
 - doctor_id
 - procedure_id
+- room_id
 - date_time
 // finished can be date_time + procedure.duration < current_time
-// should this have room?
 
 Room:
 - id
 - department_id
-- capacity ?
+- capacity 
 
 RoomEquipment:
 - room_id
 - equipment_id
-- quantity / stock ?
 
 Equipment:
 - id
@@ -114,6 +112,6 @@ Review:
 - id
 - patient_id
 - doctor_id
-- value / ?? stars / good / bad
+- value int
 
-
+![image](https://github.com/user-attachments/assets/897c1ded-f2d3-4760-9f2c-cf16ac5b38f2)
