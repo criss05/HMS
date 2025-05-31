@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "HMS.DesktopClient (Package)": {
+      "commandName": "MsixPackage"
+    },
+    "HMS.DesktopClient (Unpackaged)": {
+      "commandName": "Project"
+    }
+  }
+}
