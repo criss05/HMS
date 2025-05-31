@@ -21,5 +21,7 @@ namespace HMS.Shared.Entities
 
         [Required]
         public string LicenseNumber { get; set; } = "";
+
+        public ICollection<Schedule> Schedules { get; set; } = new List<Schedule>();
     }
 }

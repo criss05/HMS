@@ -23,6 +23,7 @@ namespace HMS.Backend.Data
         public DbSet<Room> Rooms { get; set; }
         public DbSet<Appointment> Appointments { get; set; }
         public DbSet<Shift> Shifts { get; set; } = null!;
+        public DbSet<Schedule> Schedules { get; set; } = null!;
 
         public MyDbContext(DbContextOptions<MyDbContext> options)
                 : base(options) { }
@@ -44,6 +45,8 @@ namespace HMS.Backend.Data
             modelBuilder.Entity<Equipment>().ToTable("Equipments");
             modelBuilder.Entity<Appointment>().ToTable("Appointments");
             modelBuilder.Entity<Shift>().ToTable("Shifts");
+            modelBuilder.Entity<Schedule>()
+                .HasKey(s => new { s.ShiftId, s.DoctorId });  // composite PK
 
             // Configure discriminator for TPT inheritance - stores user roles in Users table
             modelBuilder.Entity<User>()
@@ -100,6 +103,18 @@ namespace HMS.Backend.Data
                 .HasOne(r => r.Department)
                 .WithMany() // Or .WithMany(d => d.Rooms) if you want to add navigation collection
                 .HasForeignKey(r => r.DepartmentId)
+                .IsRequired();
+
+            modelBuilder.Entity<Schedule>()
+                .HasOne(s => s.Shift)
+                .WithMany(sh => sh.Schedules)
+                .HasForeignKey(s => s.ShiftId)
+                .IsRequired();
+
+            modelBuilder.Entity<Schedule>()
+                .HasOne(s => s.Doctor)
+                .WithMany(d => d.Schedules)
+                .HasForeignKey(s => s.DoctorId)
                 .IsRequired();
 
             // voodoo ^^^
