@@ -1,3 +1,6 @@
+![image](https://github.com/user-attachments/assets/0503699d-3ce2-4b29-a75b-5bfb11c58eb7)
+
+
 TODO: 
 - [ ] Models (with Entity)
   - [X] User
