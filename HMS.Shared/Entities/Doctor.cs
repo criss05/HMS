@@ -10,10 +10,9 @@ namespace HMS.Shared.Entities
 {
     public class Doctor : User
     {
-        [Required]
-        public int DepartmentId { get; set; }
 
-        [ForeignKey("DepartmentId")]
+        [ForeignKey(nameof(Department))]
+        public int DepartmentId { get; set; }
         public Department Department { get; set; } = null!;
 
         [Required]

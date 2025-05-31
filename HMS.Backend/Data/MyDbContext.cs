@@ -10,8 +10,12 @@ namespace HMS.Backend.Data
     // The voices are getting louder, I need to stop talking to myself in comments.
     public class MyDbContext : DbContext
     {
-        public DbSet<User> Users { get; set; }
-        public DbSet<Patient> Patients { get; set; }
+        public DbSet<User> Users { get; set; } = null!;
+        public DbSet<Patient> Patients { get; set; } = null!;
+        public DbSet<Admin> Admins { get; set; } = null!;
+        public DbSet<Doctor> Doctors { get; set; } = null!;
+        public DbSet<Department> Departments { get; set; } = null!;
+        public DbSet<Log> Logs { get; set; } = null!;
 
         public MyDbContext(DbContextOptions<MyDbContext> options)
                 : base(options) { }
@@ -25,6 +29,30 @@ namespace HMS.Backend.Data
             modelBuilder.Entity<Doctor>().ToTable("Doctors");
 
             modelBuilder.Entity<Department>().ToTable("Departments");
+            modelBuilder.Entity<Log>().ToTable("Logs");
+
+            // Configure discriminator for TPT inheritance - stores user roles in Users table
+            modelBuilder.Entity<User>()
+                .HasDiscriminator<UserRole>("Role")
+                .HasValue<User>(UserRole.Admin)    // base User can be Admin or generic user
+                .HasValue<Patient>(UserRole.Patient)
+                .HasValue<Doctor>(UserRole.Doctor);
+            // I'm not sure about this ^^^ TODO: FIX THIS (look into it)
+
+            // Configure relationships if needed explicitly (optional if conventions suffice)
+            modelBuilder.Entity<Doctor>()
+                .HasOne(d => d.Department)
+                .WithMany()  // Or .WithMany(dep => dep.Doctors) if you add collection to Department
+                .HasForeignKey(d => d.DepartmentId)
+                .IsRequired();
+
+            modelBuilder.Entity<Log>()
+                .HasOne(l => l.User)
+                .WithMany()  // Or .WithMany(u => u.Logs) if you add Logs collection to User
+                .HasForeignKey(l => l.UserId)
+                .IsRequired();
+
+            // voodoo ^^^
 
             base.OnModelCreating(modelBuilder);
         }
