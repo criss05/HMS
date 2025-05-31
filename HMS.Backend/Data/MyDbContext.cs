@@ -20,8 +20,9 @@ namespace HMS.Backend.Data
         public DbSet<Notification> Notifications { get; set; } = null!;
         public DbSet<Procedure> Procedures { get; set; }
         public DbSet<MedicalRecord> MedicalRecords { get; set; }
-        public DbSet<Appointment> Appointments { get; set; }
         public DbSet<Room> Rooms { get; set; }
+        public DbSet<Appointment> Appointments { get; set; }
+        public DbSet<Shift> Shifts { get; set; } = null!;
 
         public MyDbContext(DbContextOptions<MyDbContext> options)
                 : base(options) { }
@@ -42,6 +43,7 @@ namespace HMS.Backend.Data
             modelBuilder.Entity<Room>().ToTable("Rooms");
             modelBuilder.Entity<Equipment>().ToTable("Equipments");
             modelBuilder.Entity<Appointment>().ToTable("Appointments");
+            modelBuilder.Entity<Shift>().ToTable("Shifts");
 
             // Configure discriminator for TPT inheritance - stores user roles in Users table
             modelBuilder.Entity<User>()
