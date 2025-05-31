@@ -6,7 +6,8 @@ TODO:
   - [X] User
   - [X] Patient
   - [X] Admin
-  - [ ] Doctor  
+  - [X] Doctor
+  - [X] Department   
 - [ ] Backend
 
 DATABASE STRUCTURE:
