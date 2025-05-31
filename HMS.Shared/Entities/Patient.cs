@@ -32,5 +32,7 @@ namespace HMS.Shared.Entities
 
         [Required]
         public string Address { get; set; }
+
+        public ICollection<Review> Reviews { get; set; } = new List<Review>();
     }
 }

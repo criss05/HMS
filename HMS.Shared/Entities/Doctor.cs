@@ -23,5 +23,7 @@ namespace HMS.Shared.Entities
         public string LicenseNumber { get; set; } = "";
 
         public ICollection<Schedule> Schedules { get; set; } = new List<Schedule>();
+
+        public ICollection<Review> Reviews { get; set; } = new List<Review>();
     }
 }

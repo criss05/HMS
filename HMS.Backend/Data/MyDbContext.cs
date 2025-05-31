@@ -24,6 +24,7 @@ namespace HMS.Backend.Data
         public DbSet<Appointment> Appointments { get; set; }
         public DbSet<Shift> Shifts { get; set; } = null!;
         public DbSet<Schedule> Schedules { get; set; } = null!;
+        public DbSet<Review> Reviews { get; set; } = null!;
 
         public MyDbContext(DbContextOptions<MyDbContext> options)
                 : base(options) { }
@@ -115,6 +116,18 @@ namespace HMS.Backend.Data
                 .HasOne(s => s.Doctor)
                 .WithMany(d => d.Schedules)
                 .HasForeignKey(s => s.DoctorId)
+                .IsRequired();
+
+            modelBuilder.Entity<Review>()
+                .HasOne(r => r.Patient)
+                .WithMany() // or .WithMany(p => p.Reviews) if you add a collection in Patient
+                .HasForeignKey(r => r.PatientId)
+                .IsRequired();
+
+            modelBuilder.Entity<Review>()
+                .HasOne(r => r.Doctor)
+                .WithMany() // or .WithMany(d => d.Reviews) if you add a collection in Doctor
+                .HasForeignKey(r => r.DoctorId)
                 .IsRequired();
 
             // voodoo ^^^
