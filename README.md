@@ -1,14 +1,9 @@
 ![image](https://github.com/user-attachments/assets/0503699d-3ce2-4b29-a75b-5bfb11c58eb7)
 
-
-TODO: 
-- [ ] Models (with Entity)
-  - [X] User
-  - [X] Patient
-  - [X] Admin
-  - [X] Doctor
-  - [X] Department   
-- [ ] Backend
+The migrations are somewhat working tho a lot of the setup code is redundant and i set most of them to not delete on cascade!
+TODO: Make someone look into this cuz i'm too tired.
+Atleast it works to create the database..
+TODO: Seed the database
 
 DATABASE STRUCTURE:
 These are subject to change (mainly EF related)
