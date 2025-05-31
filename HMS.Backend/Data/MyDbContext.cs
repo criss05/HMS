@@ -3,14 +3,17 @@ using HMS.Shared.Entities;
 using HMS.Shared.Enums;
 using Microsoft.EntityFrameworkCore;
 
-namespace HMS.Backend
+namespace HMS.Backend.Data
 {
-    public class AppDbContext : DbContext
+    // It's funny cuz it looks like a beginner tutorial name, but it's actually a design choice.
+    // Ah, you dont find it funny? Well, I do.
+    // The voices are getting louder, I need to stop talking to myself in comments.
+    public class MyDbContext : DbContext
     {
         public DbSet<User> Users { get; set; }
         public DbSet<Patient> Patients { get; set; }
 
-        public AppDbContext(DbContextOptions<AppDbContext> options)
+        public MyDbContext(DbContextOptions<MyDbContext> options)
                 : base(options) { }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
