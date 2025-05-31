@@ -8,8 +8,8 @@ using System.Threading.Tasks;
 
 namespace HMS.Shared.Entities
 {
-    [Table("Logs")]
-    public class Log
+    [Table("Notifications")]
+    public class Notification
     {
         [Key]
         public int Id { get; set; }
@@ -19,8 +19,9 @@ namespace HMS.Shared.Entities
         public User User { get; set; } = null!;
 
         [Required]
-        public string Action { get; set; } = null!;
+        public string Message { get; set; } = null!;
 
-        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+        [Required]
+        public DateTime DeliveryDateTime { get; set; }
     }
 }
