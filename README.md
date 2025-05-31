@@ -1,3 +1,4 @@
+![image](https://github.com/user-attachments/assets/897c1ded-f2d3-4760-9f2c-cf16ac5b38f2)
 ![image](https://github.com/user-attachments/assets/0503699d-3ce2-4b29-a75b-5bfb11c58eb7)
 
 The migrations are somewhat working, tho a lot of the setup code is redundant, and I set most of them to not delete on cascade!
