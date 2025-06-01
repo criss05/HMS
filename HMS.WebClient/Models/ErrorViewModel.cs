@@ -1,4 +1,4 @@
-namespace WebClient.Models
+namespace HMS.WebClient.Models
 {
     public class ErrorViewModel
     {

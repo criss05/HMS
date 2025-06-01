@@ -1,8 +1,8 @@
 using System.Diagnostics;
+using HMS.WebClient.Models;
 using Microsoft.AspNetCore.Mvc;
-using WebClient.Models;
 
-namespace WebClient.Controllers
+namespace HMS.WebClient.Controllers
 {
     public class HomeController : Controller
     {
