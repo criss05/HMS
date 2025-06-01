@@ -1,29 +1,29 @@
 using HMS.Backend.Data;
 using Microsoft.EntityFrameworkCore;
-using DotNetEnv; // Make sure DotNetEnv is installed
+using DotNetEnv;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Load environment variables from .env
+// Load .env variables
 DotNetEnv.Env.Load();
 
-// Read and replace {DB_HOST} in connection string
-var rawConnString = builder.Configuration.GetConnectionString("DefaultConnection") ?? "";
-var dbHost = Environment.GetEnvironmentVariable("DB_HOST") ?? "";
-var connString = rawConnString.Replace("{DB_HOST}", dbHost);
+// Get DB_HOST, make sure to escape backslash if needed
+var dbHost = Environment.GetEnvironmentVariable("DB_HOST") ?? "localhost\\SQLEXPRESS";
 
-// Register services
+// Build the connection string dynamically
+var connectionString = $"Server={dbHost};Database=HMS_DB_01;Trusted_Connection=True;MultipleActiveResultSets=true;TrustServerCertificate=True";
+
+// Use connection string for DbContext
+builder.Services.AddDbContext<MyDbContext>(options =>
+    options.UseSqlServer(connectionString));
+
+// Other services
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-// Register DbContext using the resolved connection string
-builder.Services.AddDbContext<MyDbContext>(options =>
-    options.UseSqlServer(connString));
-
 var app = builder.Build();
 
-// Configure the HTTP request pipeline
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
