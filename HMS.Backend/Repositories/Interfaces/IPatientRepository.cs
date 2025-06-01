@@ -1,44 +1,46 @@
-﻿using System.Collections.Generic;
+﻿using HMS.Shared.Entities;
+using System.Collections.Generic;
 using System.Threading.Tasks;
-using HMS.Shared.Entities;
 
 namespace HMS.Backend.Repositories.Interfaces
 {
     /// <summary>
-    /// Interface for managing Patient entity data access operations.
-    /// Defines asynchronous CRUD methods.
+    /// Interface for managing Patient entities in the data store.
     /// </summary>
     public interface IPatientRepository
     {
         /// <summary>
-        /// Retrieves all patients from the database.
+        /// Gets all patients asynchronously.
         /// </summary>
-        /// <returns>A list of patients.</returns>
+        /// <returns>A collection of all patients.</returns>
         Task<IEnumerable<Patient>> GetAllAsync();
 
         /// <summary>
-        /// Retrieves a patient by their unique ID.
+        /// Gets a patient by their unique identifier asynchronously.
         /// </summary>
-        /// <param name="id">The ID of the patient.</param>
+        /// <param name="id">The unique identifier of the patient.</param>
         /// <returns>The patient if found, otherwise null.</returns>
         Task<Patient?> GetByIdAsync(int id);
 
         /// <summary>
-        /// Adds a new patient to the database.
+        /// Adds a new patient asynchronously.
         /// </summary>
         /// <param name="patient">The patient to add.</param>
-        Task AddAsync(Patient patient);
+        /// <returns>The added patient.</returns>
+        Task<Patient> AddAsync(Patient patient);
 
         /// <summary>
-        /// Updates an existing patient's data.
+        /// Updates an existing patient asynchronously.
         /// </summary>
-        /// <param name="patient">The patient with updated values.</param>
-        Task UpdateAsync(Patient patient);
+        /// <param name="patient">The patient with updated data.</param>
+        /// <returns>True if update succeeded, false otherwise.</returns>
+        Task<bool> UpdateAsync(Patient patient);
 
         /// <summary>
-        /// Deletes a patient by their ID.
+        /// Deletes a patient by their unique identifier asynchronously.
         /// </summary>
-        /// <param name="id">The ID of the patient to delete.</param>
-        Task DeleteAsync(int id);
+        /// <param name="id">The unique identifier of the patient to delete.</param>
+        /// <returns>True if deletion succeeded, false otherwise.</returns>
+        Task<bool> DeleteAsync(int id);
     }
 }

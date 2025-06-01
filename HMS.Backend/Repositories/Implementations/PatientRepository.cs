@@ -1,12 +1,15 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
-using HMS.Shared.Entities;
-using HMS.Backend.Data;
+﻿using HMS.Backend.Data;
 using HMS.Backend.Repositories.Interfaces;
+using HMS.Shared.Entities;
 using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace HMS.Backend.Repositories.Implementations
 {
+    /// <summary>
+    /// Repository implementation for managing Patient entities.
+    /// </summary>
     public class PatientRepository : IPatientRepository
     {
         private readonly MyDbContext _context;
@@ -19,38 +22,51 @@ namespace HMS.Backend.Repositories.Implementations
         /// <inheritdoc />
         public async Task<IEnumerable<Patient>> GetAllAsync()
         {
-            return await _context.Patients.ToListAsync();
+            return await _context.Patients
+                .Include(p => p.Reviews)
+                .Include(p => p.Appointments)
+                .Include(p => p.MedicalRecords)
+                .ToListAsync();
         }
 
         /// <inheritdoc />
         public async Task<Patient?> GetByIdAsync(int id)
         {
-            return await _context.Patients.FindAsync(id);
+            return await _context.Patients
+                .Include(p => p.Reviews)
+                .Include(p => p.Appointments)
+                .Include(p => p.MedicalRecords)
+                .FirstOrDefaultAsync(p => p.Id == id);
         }
 
         /// <inheritdoc />
-        public async Task AddAsync(Patient patient)
+        public async Task<Patient> AddAsync(Patient patient)
         {
-            await _context.Patients.AddAsync(patient);
+            _context.Patients.Add(patient);
             await _context.SaveChangesAsync();
+            return patient;
         }
 
         /// <inheritdoc />
-        public async Task UpdateAsync(Patient patient)
+        public async Task<bool> UpdateAsync(Patient patient)
         {
-            _context.Patients.Update(patient);
+            var existingPatient = await _context.Patients.FindAsync(patient.Id);
+            if (existingPatient == null) return false;
+
+            _context.Entry(existingPatient).CurrentValues.SetValues(patient);
             await _context.SaveChangesAsync();
+            return true;
         }
 
         /// <inheritdoc />
-        public async Task DeleteAsync(int id)
+        public async Task<bool> DeleteAsync(int id)
         {
             var patient = await _context.Patients.FindAsync(id);
-            if (patient != null)
-            {
-                _context.Patients.Remove(patient);
-                await _context.SaveChangesAsync();
-            }
+            if (patient == null) return false;
+
+            _context.Patients.Remove(patient);
+            await _context.SaveChangesAsync();
+            return true;
         }
     }
 }
