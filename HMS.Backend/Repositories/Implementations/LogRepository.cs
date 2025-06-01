@@ -19,22 +19,26 @@ namespace HMS.Backend.Repositories.Implementations
             _context = context;
         }
 
+        /// <inheritdoc />
         public async Task<IEnumerable<Log>> GetAllAsync()
         {
             return await _context.Logs.Include(l => l.User).ToListAsync();
         }
 
+        /// <inheritdoc />
         public async Task<Log?> GetByIdAsync(int id)
         {
             return await _context.Logs.Include(l => l.User).FirstOrDefaultAsync(l => l.Id == id);
         }
 
+        /// <inheritdoc />
         public async Task AddAsync(Log log)
         {
             _context.Logs.Add(log);
             await _context.SaveChangesAsync();
         }
 
+        /// <inheritdoc />
         public async Task DeleteAsync(int id)
         {
             var log = await _context.Logs.FindAsync(id);

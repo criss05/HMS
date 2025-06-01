@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using HMS.Backend.Repositories;
 using HMS.Backend.Repositories.Interfaces;
 using HMS.Shared.Entities;
 using Microsoft.AspNetCore.Mvc;
@@ -55,7 +54,7 @@ namespace HMS.Backend.Controllers
         /// <param name="user">User object to create.</param>
         /// <returns>Newly created user.</returns>
         /// <response code="201">Returns the newly created user.</response>
-        /// <response code="400">If the user data is invalid.</response>
+        /// <response code="400">If the user data is invalid or email is already taken.</response>
         [HttpPost]
         [ProducesResponseType(typeof(User), 201)]
         [ProducesResponseType(400)]
@@ -63,6 +62,11 @@ namespace HMS.Backend.Controllers
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
+
+            // Check for existing email to avoid unique constraint violation
+            var existingUserWithEmail = await _repository.GetByEmailAsync(user.Email);
+            if (existingUserWithEmail != null)
+                return BadRequest($"Email '{user.Email}' is already in use.");
 
             await _repository.AddAsync(user);
             return CreatedAtAction(nameof(GetById), new { id = user.Id }, user);
@@ -74,7 +78,7 @@ namespace HMS.Backend.Controllers
         /// <param name="id">ID of the user to update.</param>
         /// <param name="user">Updated user object.</param>
         /// <response code="204">If update is successful (No Content).</response>
-        /// <response code="400">If the input data is invalid or id mismatch.</response>
+        /// <response code="400">If the input data is invalid, id mismatch, or email is already taken by another user.</response>
         /// <response code="404">If user with specified id is not found.</response>
         [HttpPut("{id}")]
         [ProducesResponseType(204)]
@@ -91,6 +95,11 @@ namespace HMS.Backend.Controllers
             var existingUser = await _repository.GetByIdAsync(id);
             if (existingUser == null)
                 return NotFound();
+
+            // Check if the new email is already used by another user
+            var userWithEmail = await _repository.GetByEmailAsync(user.Email);
+            if (userWithEmail != null && userWithEmail.Id != id)
+                return BadRequest($"Email '{user.Email}' is already in use by another user.");
 
             await _repository.UpdateAsync(user);
             return NoContent();

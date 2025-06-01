@@ -19,6 +19,7 @@ namespace HMS.Backend.Repositories.Implementations
             _context = context;
         }
 
+        /// <inheritdoc />
         public async Task<IEnumerable<Doctor>> GetAllAsync()
         {
             return await _context.Doctors
@@ -29,6 +30,7 @@ namespace HMS.Backend.Repositories.Implementations
                 .ToListAsync();
         }
 
+        /// <inheritdoc />
         public async Task<Doctor?> GetByIdAsync(int id)
         {
             return await _context.Doctors
@@ -39,6 +41,7 @@ namespace HMS.Backend.Repositories.Implementations
                 .FirstOrDefaultAsync(d => d.Id == id);
         }
 
+        /// <inheritdoc />
         public async Task<Doctor> AddAsync(Doctor doctor)
         {
             _context.Doctors.Add(doctor);
@@ -46,6 +49,7 @@ namespace HMS.Backend.Repositories.Implementations
             return doctor;
         }
 
+        /// <inheritdoc />
         public async Task<bool> UpdateAsync(Doctor doctor)
         {
             var existingDoctor = await _context.Doctors.FindAsync(doctor.Id);
@@ -56,6 +60,7 @@ namespace HMS.Backend.Repositories.Implementations
             return true;
         }
 
+        /// <inheritdoc />
         public async Task<bool> DeleteAsync(int id)
         {
             var doctor = await _context.Doctors.FindAsync(id);

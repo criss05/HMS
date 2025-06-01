@@ -23,6 +23,13 @@ namespace HMS.Backend.Repositories.Interfaces
         Task<User?> GetByIdAsync(int id);
 
         /// <summary>
+        /// Retrieves a user by their email address asynchronously.
+        /// </summary>
+        /// <param name="email">The email address of the user.</param>
+        /// <returns>The user if found; otherwise, null.</returns>
+        Task<User?> GetByEmailAsync(string email);
+
+        /// <summary>
         /// Adds a new user asynchronously.
         /// </summary>
         /// <param name="user">The user to add.</param>
