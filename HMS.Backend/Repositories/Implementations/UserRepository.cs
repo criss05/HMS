@@ -5,7 +5,7 @@ using HMS.Backend.Repositories.Interfaces;
 using HMS.Shared.Entities;
 using Microsoft.EntityFrameworkCore;
 
-namespace HMS.Backend.Repositories
+namespace HMS.Backend.Repositories.Implementations
 {
     public class UserRepository : IUserRepository
     {
