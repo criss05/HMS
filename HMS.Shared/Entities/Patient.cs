@@ -34,5 +34,7 @@ namespace HMS.Shared.Entities
         public string Address { get; set; }
 
         public ICollection<Review> Reviews { get; set; } = new List<Review>();
+        public ICollection<Appointment> Appointments { get; set; } = new List<Appointment>();
+        public ICollection<MedicalRecord> MedicalRecords { get; set; } = new List<MedicalRecord>();
     }
 }

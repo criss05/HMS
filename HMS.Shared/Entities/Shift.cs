@@ -21,7 +21,7 @@ namespace HMS.Shared.Entities
         public TimeOnly StartTime { get; set; }  // Use TimeOnly for time (C# 10+)
 
         [Required]
-        public TimeOnly EndTime { get; set; 
+        public TimeOnly EndTime { get; set; }
 
         public ICollection<Schedule> Schedules { get; set; } = new List<Schedule>();
     }

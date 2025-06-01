@@ -22,5 +22,6 @@ namespace HMS.Shared.Entities
         public int Capacity { get; set; }
 
         public ICollection<Equipment> Equipments { get; set; } = new List<Equipment>();
+        public ICollection<Appointment> Appointments { get; set; } = new List<Appointment>();
     }
 }
