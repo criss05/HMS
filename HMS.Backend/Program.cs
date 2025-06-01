@@ -1,6 +1,8 @@
 using HMS.Backend.Data;
 using Microsoft.EntityFrameworkCore;
 using DotNetEnv;
+using HMS.Backend.Repositories.Interfaces;
+using HMS.Backend.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -21,6 +23,9 @@ builder.Services.AddDbContext<MyDbContext>(options =>
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+// DI
+builder.Services.AddScoped<IUserRepository, UserRepository>();
 
 var app = builder.Build();
 
