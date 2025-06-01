@@ -57,6 +57,10 @@ namespace HMS.Backend.Data
             //    .HasValue<Doctor>(UserRole.Doctor);
             // I'm not sure about this ^^^ TODO: FIX THIS (look into it)
 
+            modelBuilder.Entity<User>()
+                .HasIndex(u => u.Email)
+                .IsUnique();
+
             // Configure relationships if needed explicitly (optional if conventions suffice)
             modelBuilder.Entity<Doctor>()
                 .HasOne(d => d.Department)
