@@ -1,6 +1,7 @@
 ﻿using HMS.Backend.Repositories.Interfaces;
 using HMS.Shared.DTOs;
 using HMS.Shared.Entities;
+using HMS.Shared.Enums;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -20,11 +21,6 @@ namespace HMS.Backend.Controllers
             _departmentRepository = departmentRepository;
         }
 
-        /// <summary>
-        /// Retrieves all doctors.
-        /// </summary>
-        /// <returns>List of doctors.</returns>
-        /// <response code="200">Returns the list of doctors.</response>
         [HttpGet]
         [ProducesResponseType(typeof(IEnumerable<Doctor>), 200)]
         public async Task<IActionResult> GetAll()
@@ -33,13 +29,6 @@ namespace HMS.Backend.Controllers
             return Ok(doctors);
         }
 
-        /// <summary>
-        /// Retrieves a specific doctor by id.
-        /// </summary>
-        /// <param name="id">Doctor's id.</param>
-        /// <returns>The requested doctor.</returns>
-        /// <response code="200">Returns the requested doctor.</response>
-        /// <response code="404">If the doctor is not found.</response>
         [HttpGet("{id}")]
         [ProducesResponseType(typeof(Doctor), 200)]
         [ProducesResponseType(404)]
@@ -50,13 +39,6 @@ namespace HMS.Backend.Controllers
             return Ok(doctor);
         }
 
-        /// <summary>
-        /// Creates a new doctor.
-        /// </summary>
-        /// <param name="dto">Doctor DTO to create.</param>
-        /// <returns>The created doctor.</returns>
-        /// <response code="201">Returns the newly created doctor.</response>
-        /// <response code="400">If the doctor object is invalid.</response>
         [HttpPost]
         [ProducesResponseType(typeof(Doctor), 201)]
         [ProducesResponseType(400)]
@@ -68,26 +50,26 @@ namespace HMS.Backend.Controllers
 
             var doctor = new Doctor
             {
+                Email = dto.Email,
+                Password = dto.Password,
+                Role = dto.Role,
+                Name = dto.Name,
+                CNP = dto.CNP,
+                PhoneNumber = dto.PhoneNumber,
+                CreatedAt = dto.CreatedAt, // Usually set by the system, adjust if needed
+
                 DepartmentId = dto.DepartmentId,
                 Department = department,
                 YearsOfExperience = dto.YearsOfExperience,
-                LicenseNumber = dto.LicenseNumber
-                // Add User properties if needed
+                LicenseNumber = dto.LicenseNumber,
+
+                // You might want to initialize collections here if needed, or in the entity constructor
             };
 
             var createdDoctor = await _doctorRepository.AddAsync(doctor);
             return CreatedAtAction(nameof(GetById), new { id = createdDoctor.Id }, createdDoctor);
         }
 
-        /// <summary>
-        /// Updates an existing doctor.
-        /// </summary>
-        /// <param name="id">Doctor's id.</param>
-        /// <param name="dto">Doctor DTO with updated data.</param>
-        /// <returns>No content.</returns>
-        /// <response code="204">Update was successful.</response>
-        /// <response code="400">If input is invalid.</response>
-        /// <response code="404">If doctor not found.</response>
         [HttpPut("{id}")]
         [ProducesResponseType(204)]
         [ProducesResponseType(400)]
@@ -102,22 +84,28 @@ namespace HMS.Backend.Controllers
             if (department == null)
                 return BadRequest($"Department with ID {dto.DepartmentId} not found.");
 
+            // Update user fields
+            existing.Email = dto.Email;
+            existing.Password = dto.Password;
+            existing.Role = dto.Role;
+            existing.Name = dto.Name;
+            existing.CNP = dto.CNP;
+            existing.PhoneNumber = dto.PhoneNumber;
+            existing.CreatedAt = dto.CreatedAt; // Usually not updated manually
+
+            // Update doctor fields
             existing.DepartmentId = dto.DepartmentId;
             existing.Department = department;
             existing.YearsOfExperience = dto.YearsOfExperience;
             existing.LicenseNumber = dto.LicenseNumber;
 
-            await _doctorRepository.UpdateAsync(existing);
+            var success = await _doctorRepository.UpdateAsync(existing);
+            if (!success)
+                return BadRequest("Failed to update the doctor.");
+
             return NoContent();
         }
 
-        /// <summary>
-        /// Deletes a doctor.
-        /// </summary>
-        /// <param name="id">Doctor's id.</param>
-        /// <returns>No content.</returns>
-        /// <response code="204">Deletion was successful.</response>
-        /// <response code="404">If doctor not found.</response>
         [HttpDelete("{id}")]
         [ProducesResponseType(204)]
         [ProducesResponseType(404)]

@@ -101,6 +101,15 @@ namespace HMS.Backend.Controllers
 
             var patient = new Patient
             {
+                // User properties
+                Email = dto.Email,
+                Password = dto.Password,
+                Name = dto.Name,
+                CNP = dto.CNP,
+                PhoneNumber = dto.PhoneNumber,
+                Role = dto.Role,
+
+                // Patient-specific properties
                 BloodType = Enum.Parse<HMS.Shared.Enums.BloodType>(dto.BloodType),
                 EmergencyContact = dto.EmergencyContact,
                 Allergies = dto.Allergies,
@@ -108,6 +117,7 @@ namespace HMS.Backend.Controllers
                 Height = dto.Height,
                 BirthDate = dto.BirthDate,
                 Address = dto.Address,
+
                 Reviews = reviews,
                 Appointments = appointments,
                 MedicalRecords = medicalRecords
@@ -162,6 +172,15 @@ namespace HMS.Backend.Controllers
                 medicalRecords.Add(medicalRecord);
             }
 
+            // Update User properties
+            existing.Email = dto.Email;
+            existing.Password = dto.Password;
+            existing.Name = dto.Name;
+            existing.CNP = dto.CNP;
+            existing.PhoneNumber = dto.PhoneNumber;
+            existing.Role = dto.Role;
+
+            // Update Patient-specific properties
             existing.BloodType = Enum.Parse<HMS.Shared.Enums.BloodType>(dto.BloodType);
             existing.EmergencyContact = dto.EmergencyContact;
             existing.Allergies = dto.Allergies;
@@ -169,6 +188,7 @@ namespace HMS.Backend.Controllers
             existing.Height = dto.Height;
             existing.BirthDate = dto.BirthDate;
             existing.Address = dto.Address;
+
             existing.Reviews = reviews;
             existing.Appointments = appointments;
             existing.MedicalRecords = medicalRecords;

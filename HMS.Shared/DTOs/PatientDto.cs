@@ -3,11 +3,9 @@ using System.Collections.Generic;
 
 namespace HMS.Shared.DTOs
 {
-    public class PatientDto
+    public class PatientDto : UserDto
     {
-        public int Id { get; set; } 
-
-        public string BloodType { get; set; } = null!; 
+        public string BloodType { get; set; } = null!;
 
         public string EmergencyContact { get; set; } = null!;
 
