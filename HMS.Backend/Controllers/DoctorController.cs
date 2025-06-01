@@ -8,11 +8,11 @@ namespace HMS.Backend.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class DoctorsController : ControllerBase
+    public class DoctorController : ControllerBase
     {
         private readonly IDoctorRepository _doctorRepository;
 
-        public DoctorsController(IDoctorRepository doctorRepository)
+        public DoctorController(IDoctorRepository doctorRepository)
         {
             _doctorRepository = doctorRepository;
         }

@@ -8,11 +8,11 @@ namespace HMS.Backend.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class UsersController : ControllerBase
+    public class UserController : ControllerBase
     {
         private readonly IUserRepository _repository;
 
-        public UsersController(IUserRepository repository)
+        public UserController(IUserRepository repository)
         {
             _repository = repository;
         }

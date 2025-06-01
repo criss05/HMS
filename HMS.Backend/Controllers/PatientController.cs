@@ -11,14 +11,14 @@ namespace HMS.Backend.Controllers
     /// </summary>
     [ApiController]
     [Route("api/[controller]")]
-    public class PatientsController : ControllerBase
+    public class PatientController : ControllerBase
     {
         private readonly IPatientRepository _patientRepository;
 
         /// <summary>
         /// Constructor that injects the patient repository.
         /// </summary>
-        public PatientsController(IPatientRepository patientRepository)
+        public PatientController(IPatientRepository patientRepository)
         {
             _patientRepository = patientRepository;
         }

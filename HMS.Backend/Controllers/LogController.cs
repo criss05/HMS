@@ -8,11 +8,11 @@ namespace HMS.Backend.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class LogsController : ControllerBase
+    public class LogController : ControllerBase
     {
         private readonly ILogRepository _logRepository;
 
-        public LogsController(ILogRepository logRepository)
+        public LogController(ILogRepository logRepository)
         {
             _logRepository = logRepository;
         }
