@@ -3,8 +3,17 @@ using Microsoft.EntityFrameworkCore;
 using DotNetEnv;
 using HMS.Backend.Repositories.Interfaces;
 using HMS.Backend.Repositories;
+using HMS.Backend.Repositories.Implementations;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Transform the enums
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+    });
 
 // Load .env variables
 DotNetEnv.Env.Load();
@@ -26,6 +35,7 @@ builder.Services.AddSwaggerGen();
 
 // DI
 builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IDoctorRepository, DoctorRepository>();
 
 var app = builder.Build();
 
