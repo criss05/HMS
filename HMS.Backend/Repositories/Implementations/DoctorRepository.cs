@@ -1,0 +1,69 @@
+﻿using HMS.Backend.Data;
+using HMS.Backend.Repositories.Interfaces;
+using HMS.Shared.Entities;
+using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+
+namespace HMS.Backend.Repositories.Implementations
+{
+    /// <summary>
+    /// Repository implementation for managing Doctor entities.
+    /// </summary>
+    public class DoctorRepository : IDoctorRepository
+    {
+        private readonly MyDbContext _context;
+
+        public DoctorRepository(MyDbContext context)
+        {
+            _context = context;
+        }
+
+        public async Task<IEnumerable<Doctor>> GetAllAsync()
+        {
+            return await _context.Doctors
+                .Include(d => d.Department)
+                .Include(d => d.Schedules)
+                .Include(d => d.Reviews)
+                .Include(d => d.Appointments)
+                .ToListAsync();
+        }
+
+        public async Task<Doctor?> GetByIdAsync(int id)
+        {
+            return await _context.Doctors
+                .Include(d => d.Department)
+                .Include(d => d.Schedules)
+                .Include(d => d.Reviews)
+                .Include(d => d.Appointments)
+                .FirstOrDefaultAsync(d => d.Id == id);
+        }
+
+        public async Task<Doctor> AddAsync(Doctor doctor)
+        {
+            _context.Doctors.Add(doctor);
+            await _context.SaveChangesAsync();
+            return doctor;
+        }
+
+        public async Task<bool> UpdateAsync(Doctor doctor)
+        {
+            var existingDoctor = await _context.Doctors.FindAsync(doctor.Id);
+            if (existingDoctor == null) return false;
+
+            _context.Entry(existingDoctor).CurrentValues.SetValues(doctor);
+            await _context.SaveChangesAsync();
+            return true;
+        }
+
+        public async Task<bool> DeleteAsync(int id)
+        {
+            var doctor = await _context.Doctors.FindAsync(id);
+            if (doctor == null) return false;
+
+            _context.Doctors.Remove(doctor);
+            await _context.SaveChangesAsync();
+            return true;
+        }
+    }
+}
