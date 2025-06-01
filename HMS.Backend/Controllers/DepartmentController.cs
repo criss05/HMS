@@ -1,4 +1,5 @@
 ﻿using HMS.Backend.Repositories.Interfaces;
+using HMS.Shared.DTOs;
 using HMS.Shared.Entities;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
@@ -51,17 +52,23 @@ namespace HMS.Backend.Controllers
         /// <summary>
         /// Creates a new department.
         /// </summary>
-        /// <param name="department">Department object to create.</param>
+        /// <param name="dto">Department DTO object to create.</param>
         /// <returns>Newly created department.</returns>
         /// <response code="201">Returns the newly created department.</response>
         /// <response code="400">If the department data is invalid.</response>
         [HttpPost]
         [ProducesResponseType(typeof(Department), 201)]
         [ProducesResponseType(400)]
-        public async Task<ActionResult<Department>> Create([FromBody] Department department)
+        public async Task<ActionResult<Department>> Create([FromBody] DepartmentDto dto)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
+
+            var department = new Department
+            {
+                Name = dto.Name
+                // If needed, you can map DoctorIds to Doctor entities here in the future
+            };
 
             var createdDepartment = await _repository.AddAsync(department);
             return CreatedAtAction(nameof(GetById), new { id = createdDepartment.Id }, createdDepartment);
@@ -71,7 +78,7 @@ namespace HMS.Backend.Controllers
         /// Updates an existing department.
         /// </summary>
         /// <param name="id">ID of the department to update.</param>
-        /// <param name="department">Updated department object.</param>
+        /// <param name="dto">Updated department DTO object.</param>
         /// <response code="204">If update is successful (No Content).</response>
         /// <response code="400">If the input data is invalid or id mismatch.</response>
         /// <response code="404">If department with specified id is not found.</response>
@@ -79,19 +86,19 @@ namespace HMS.Backend.Controllers
         [ProducesResponseType(204)]
         [ProducesResponseType(400)]
         [ProducesResponseType(404)]
-        public async Task<IActionResult> Update(int id, [FromBody] Department department)
+        public async Task<IActionResult> Update(int id, [FromBody] DepartmentDto dto)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            if (id != department.Id)
-                return BadRequest("Id in URL and payload do not match");
-
-            var exists = await _repository.GetByIdAsync(id);
-            if (exists == null)
+            var existing = await _repository.GetByIdAsync(id);
+            if (existing == null)
                 return NotFound();
 
-            var updated = await _repository.UpdateAsync(department);
+            existing.Name = dto.Name;
+            // Updating Doctors based on DoctorIds is not included here but can be added if needed
+
+            var updated = await _repository.UpdateAsync(existing);
             if (!updated)
                 return NotFound();
 

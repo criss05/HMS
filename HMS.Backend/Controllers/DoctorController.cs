@@ -1,4 +1,5 @@
 ﻿using HMS.Backend.Repositories.Interfaces;
+using HMS.Shared.DTOs;
 using HMS.Shared.Entities;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
@@ -11,10 +12,12 @@ namespace HMS.Backend.Controllers
     public class DoctorController : ControllerBase
     {
         private readonly IDoctorRepository _doctorRepository;
+        private readonly IDepartmentRepository _departmentRepository;
 
-        public DoctorController(IDoctorRepository doctorRepository)
+        public DoctorController(IDoctorRepository doctorRepository, IDepartmentRepository departmentRepository)
         {
             _doctorRepository = doctorRepository;
+            _departmentRepository = departmentRepository;
         }
 
         /// <summary>
@@ -50,17 +53,27 @@ namespace HMS.Backend.Controllers
         /// <summary>
         /// Creates a new doctor.
         /// </summary>
-        /// <param name="doctor">Doctor object to create.</param>
+        /// <param name="dto">Doctor DTO to create.</param>
         /// <returns>The created doctor.</returns>
         /// <response code="201">Returns the newly created doctor.</response>
         /// <response code="400">If the doctor object is invalid.</response>
         [HttpPost]
         [ProducesResponseType(typeof(Doctor), 201)]
         [ProducesResponseType(400)]
-        public async Task<IActionResult> Create([FromBody] Doctor doctor)
+        public async Task<IActionResult> Create([FromBody] DoctorDto dto)
         {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
+            var department = await _departmentRepository.GetByIdAsync(dto.DepartmentId);
+            if (department == null)
+                return BadRequest($"Department with ID {dto.DepartmentId} not found.");
+
+            var doctor = new Doctor
+            {
+                DepartmentId = dto.DepartmentId,
+                Department = department,
+                YearsOfExperience = dto.YearsOfExperience,
+                LicenseNumber = dto.LicenseNumber
+                // Add User properties if needed
+            };
 
             var createdDoctor = await _doctorRepository.AddAsync(doctor);
             return CreatedAtAction(nameof(GetById), new { id = createdDoctor.Id }, createdDoctor);
@@ -70,7 +83,7 @@ namespace HMS.Backend.Controllers
         /// Updates an existing doctor.
         /// </summary>
         /// <param name="id">Doctor's id.</param>
-        /// <param name="doctor">Doctor object with updated data.</param>
+        /// <param name="dto">Doctor DTO with updated data.</param>
         /// <returns>No content.</returns>
         /// <response code="204">Update was successful.</response>
         /// <response code="400">If input is invalid.</response>
@@ -79,17 +92,22 @@ namespace HMS.Backend.Controllers
         [ProducesResponseType(204)]
         [ProducesResponseType(400)]
         [ProducesResponseType(404)]
-        public async Task<IActionResult> Update(int id, [FromBody] Doctor doctor)
+        public async Task<IActionResult> Update(int id, [FromBody] DoctorDto dto)
         {
-            if (id != doctor.Id)
-                return BadRequest("Doctor ID mismatch");
+            var existing = await _doctorRepository.GetByIdAsync(id);
+            if (existing == null)
+                return NotFound();
 
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
+            var department = await _departmentRepository.GetByIdAsync(dto.DepartmentId);
+            if (department == null)
+                return BadRequest($"Department with ID {dto.DepartmentId} not found.");
 
-            var result = await _doctorRepository.UpdateAsync(doctor);
-            if (!result) return NotFound();
+            existing.DepartmentId = dto.DepartmentId;
+            existing.Department = department;
+            existing.YearsOfExperience = dto.YearsOfExperience;
+            existing.LicenseNumber = dto.LicenseNumber;
 
+            await _doctorRepository.UpdateAsync(existing);
             return NoContent();
         }
 

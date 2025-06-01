@@ -15,6 +15,8 @@ namespace HMS.Backend.Data
         public DbSet<Admin> Admins { get; set; } = null!;
         public DbSet<Doctor> Doctors { get; set; } = null!;
 
+        public DbSet<Equipment> Equipments { get; set; } = null;
+
         public DbSet<Department> Departments { get; set; } = null!;
         public DbSet<Log> Logs { get; set; } = null!;
         public DbSet<Notification> Notifications { get; set; } = null!;
