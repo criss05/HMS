@@ -32,21 +32,40 @@ namespace HMS.Backend.Repositories.Implementations
         }
 
         /// <inheritdoc />
-        public async Task AddAsync(Log log)
+        public async Task<Log> AddAsync(Log log)
         {
             _context.Logs.Add(log);
             await _context.SaveChangesAsync();
+            return log;
         }
 
         /// <inheritdoc />
-        public async Task DeleteAsync(int id)
+        public async Task<bool> UpdateAsync(Log log)
+        {
+            var existingLog = await _context.Logs.FindAsync(log.Id);
+            if (existingLog == null)
+                return false;
+
+            existingLog.Action = log.Action;
+            existingLog.UserId = log.UserId;
+            existingLog.CreatedAt = log.CreatedAt;
+
+            _context.Logs.Update(existingLog);
+            await _context.SaveChangesAsync();
+
+            return true;
+        }
+
+        /// <inheritdoc />
+        public async Task<bool> DeleteAsync(int id)
         {
             var log = await _context.Logs.FindAsync(id);
-            if (log != null)
-            {
-                _context.Logs.Remove(log);
-                await _context.SaveChangesAsync();
-            }
+            if (log == null)
+                return false;
+
+            _context.Logs.Remove(log);
+            await _context.SaveChangesAsync();
+            return true;
         }
     }
 }

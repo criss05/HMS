@@ -1,79 +1,133 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using HMS.Backend.Repositories.Interfaces;
+﻿using HMS.Backend.Repositories.Interfaces;
+using HMS.Shared.DTOs;
 using HMS.Shared.Entities;
+using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace HMS.Backend.Controllers
 {
-    [ApiController]
     [Route("api/[controller]")]
+    [ApiController]
     public class LogController : ControllerBase
     {
         private readonly ILogRepository _logRepository;
+        private readonly IUserRepository _userRepository;
 
-        public LogController(ILogRepository logRepository)
+        public LogController(ILogRepository logRepository, IUserRepository userRepository)
         {
             _logRepository = logRepository;
+            _userRepository = userRepository;
         }
 
         /// <summary>
-        /// Retrieves all log entries.
+        /// Retrieves all logs.
         /// </summary>
-        /// <returns>A list of logs.</returns>
-        /// <response code="200">Returns the list of logs</response>
+        /// <returns>List of logs.</returns>
+        /// <response code="200">Returns the list of logs.</response>
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Log>>> GetAll()
+        [ProducesResponseType(typeof(IEnumerable<Log>), 200)]
+        public async Task<IActionResult> GetAll()
         {
             var logs = await _logRepository.GetAllAsync();
             return Ok(logs);
         }
 
         /// <summary>
-        /// Retrieves a specific log entry by ID.
+        /// Retrieves a specific log by ID.
         /// </summary>
-        /// <param name="id">The ID of the log entry.</param>
-        /// <returns>The requested log entry.</returns>
-        /// <response code="200">Returns the log entry</response>
-        /// <response code="404">If the log is not found</response>
+        /// <param name="id">Log ID.</param>
+        /// <returns>The requested log.</returns>
+        /// <response code="200">Returns the requested log.</response>
+        /// <response code="404">If the log is not found.</response>
         [HttpGet("{id}")]
-        public async Task<ActionResult<Log>> GetById(int id)
+        [ProducesResponseType(typeof(Log), 200)]
+        [ProducesResponseType(404)]
+        public async Task<IActionResult> GetById(int id)
         {
             var log = await _logRepository.GetByIdAsync(id);
-            if (log == null)
-                return NotFound();
-
+            if (log == null) return NotFound();
             return Ok(log);
         }
 
         /// <summary>
-        /// Creates a new log entry.
+        /// Creates a new log.
         /// </summary>
-        /// <param name="log">The log to create.</param>
-        /// <returns>The created log entry with its location.</returns>
-        /// <response code="201">Returns the newly created log</response>
-        /// <response code="400">If the log is invalid</response>
+        /// <param name="dto">Log DTO to create.</param>
+        /// <returns>The created log.</returns>
+        /// <response code="201">Returns the newly created log.</response>
+        /// <response code="400">If input data is invalid.</response>
         [HttpPost]
-        public async Task<IActionResult> Create(Log log)
+        [ProducesResponseType(typeof(Log), 201)]
+        [ProducesResponseType(400)]
+        public async Task<IActionResult> Create([FromBody] LogDto dto)
         {
-            await _logRepository.AddAsync(log);
-            return CreatedAtAction(nameof(GetById), new { id = log.Id }, log);
+            // Validate user existence
+            var user = await _userRepository.GetByIdAsync(dto.UserId);
+            if (user == null)
+                return BadRequest($"User with ID {dto.UserId} not found.");
+
+            var log = new Log
+            {
+                UserId = dto.UserId,
+                User = user,
+                Action = dto.Action,
+                CreatedAt = dto.CreatedAt == default ? System.DateTime.UtcNow : dto.CreatedAt
+            };
+
+            var createdLog = await _logRepository.AddAsync(log);
+            return CreatedAtAction(nameof(GetById), new { id = createdLog.Id }, createdLog);
         }
 
         /// <summary>
-        /// Deletes a log entry by ID.
+        /// Updates an existing log.
         /// </summary>
-        /// <param name="id">The ID of the log to delete.</param>
-        /// <response code="204">Log successfully deleted</response>
-        /// <response code="404">If the log is not found</response>
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete(int id)
+        /// <param name="id">Log ID.</param>
+        /// <param name="dto">Log DTO with updated data.</param>
+        /// <returns>No content.</returns>
+        /// <response code="204">Update was successful.</response>
+        /// <response code="400">If input data is invalid.</response>
+        /// <response code="404">If log is not found.</response>
+        [HttpPut("{id}")]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(404)]
+        public async Task<IActionResult> Update(int id, [FromBody] LogDto dto)
         {
             var existing = await _logRepository.GetByIdAsync(id);
-            if (existing == null)
-                return NotFound();
+            if (existing == null) return NotFound();
 
-            await _logRepository.DeleteAsync(id);
+            var user = await _userRepository.GetByIdAsync(dto.UserId);
+            if (user == null)
+                return BadRequest($"User with ID {dto.UserId} not found.");
+
+            existing.UserId = dto.UserId;
+            existing.User = user;
+            existing.Action = dto.Action;
+            existing.CreatedAt = dto.CreatedAt == default ? existing.CreatedAt : dto.CreatedAt;
+
+            var success = await _logRepository.UpdateAsync(existing);
+            if (!success)
+                return BadRequest("Failed to update the log.");
+
+            return NoContent();
+        }
+
+        /// <summary>
+        /// Deletes a log.
+        /// </summary>
+        /// <param name="id">Log ID.</param>
+        /// <returns>No content.</returns>
+        /// <response code="204">Deletion was successful.</response>
+        /// <response code="404">If log is not found.</response>
+        [HttpDelete("{id}")]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(404)]
+        public async Task<IActionResult> Delete(int id)
+        {
+            var result = await _logRepository.DeleteAsync(id);
+            if (!result) return NotFound();
+
             return NoContent();
         }
     }

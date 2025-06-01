@@ -5,33 +5,42 @@ using System.Threading.Tasks;
 namespace HMS.Backend.Repositories.Interfaces
 {
     /// <summary>
-    /// Interface for performing CRUD operations on logs.
+    /// Interface for Log repository handling CRUD operations.
     /// </summary>
     public interface ILogRepository
     {
         /// <summary>
-        /// Retrieves all logs from the database.
+        /// Gets all logs.
         /// </summary>
-        /// <returns>A list of log entries.</returns>
+        /// <returns>A collection of all Log entities.</returns>
         Task<IEnumerable<Log>> GetAllAsync();
 
         /// <summary>
-        /// Retrieves a specific log by its ID.
+        /// Gets a log by ID.
         /// </summary>
-        /// <param name="id">The ID of the log to retrieve.</param>
-        /// <returns>The log entry if found; otherwise, null.</returns>
+        /// <param name="id">The ID of the log.</param>
+        /// <returns>The log with the specified ID or null if not found.</returns>
         Task<Log?> GetByIdAsync(int id);
 
         /// <summary>
-        /// Adds a new log entry to the database.
+        /// Adds a new log.
         /// </summary>
-        /// <param name="log">The log entry to add.</param>
-        Task AddAsync(Log log);
+        /// <param name="log">The log entity to add.</param>
+        /// <returns>The added log entity.</returns>
+        Task<Log> AddAsync(Log log);
 
         /// <summary>
-        /// Deletes a log entry by its ID.
+        /// Updates an existing log.
+        /// </summary>
+        /// <param name="log">The log entity with updated information.</param>
+        /// <returns>True if the update was successful; otherwise, false.</returns>
+        Task<bool> UpdateAsync(Log log);
+
+        /// <summary>
+        /// Deletes a log by ID.
         /// </summary>
         /// <param name="id">The ID of the log to delete.</param>
-        Task DeleteAsync(int id);
+        /// <returns>True if the deletion was successful; otherwise, false.</returns>
+        Task<bool> DeleteAsync(int id);
     }
 }
