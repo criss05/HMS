@@ -16,7 +16,7 @@ namespace HMS.Backend.Data
                 .Build();
 
             var rawConnectionString = configuration.GetConnectionString("DefaultConnection") ?? "";
-            var dbHost = Environment.GetEnvironmentVariable("DB_HOST") ?? "localhost\\SQLEXPRESS";
+            var dbHost = Environment.GetEnvironmentVariable("DB_HOST") ?? "IF_YOU_DONT_HAVE_.ENV_SETUP_THIS_CRASHES";
             var connectionString = rawConnectionString.Replace("{DB_HOST}", dbHost);
 
             var builder = new DbContextOptionsBuilder<MyDbContext>();

@@ -19,11 +19,11 @@ builder.Services.AddControllers()
 DotNetEnv.Env.Load();
 
 // Get DB_HOST, make sure to escape backslash if needed
-var dbHost = Environment.GetEnvironmentVariable("DB_HOST") ?? "localhost\\SQLEXPRESS";
+var dbHost = Environment.GetEnvironmentVariable("DB_HOST") ?? "IF_YOU_DONT_HAVE_.ENV_SETUP_THIS_CRASHES";
 
 // Build the connection string dynamically
-var connectionString = $"Server={dbHost};Database=HMS_DB_01;Trusted_Connection=True;MultipleActiveResultSets=true;TrustServerCertificate=True";
-
+var connectionString = $"{dbHost}";
+Console.WriteLine($"[DEBUG] Final connection string: {connectionString}");
 // Use connection string for DbContext
 builder.Services.AddDbContext<MyDbContext>(options =>
     options.UseSqlServer(connectionString));
