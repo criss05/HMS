@@ -10,6 +10,8 @@ namespace HMS.Backend.Data
     {
         public MyDbContext CreateDbContext(string[] args)
         {
+            DotNetEnv.Env.Load(); // this line took 30mins to find out it was an issue
+
             IConfigurationRoot configuration = new ConfigurationBuilder()
                 .SetBasePath(Directory.GetCurrentDirectory())
                 .AddJsonFile("appsettings.json")
