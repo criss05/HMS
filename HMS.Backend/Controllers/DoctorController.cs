@@ -2,6 +2,7 @@
 using HMS.Shared.DTOs;
 using HMS.Shared.Entities;
 using HMS.Shared.Enums;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -22,6 +23,7 @@ namespace HMS.Backend.Controllers
         }
 
         [HttpGet]
+        [Authorize]
         [ProducesResponseType(typeof(IEnumerable<Doctor>), 200)]
         public async Task<IActionResult> GetAll()
         {
@@ -30,6 +32,7 @@ namespace HMS.Backend.Controllers
         }
 
         [HttpGet("{id}")]
+        [Authorize]
         [ProducesResponseType(typeof(Doctor), 200)]
         [ProducesResponseType(404)]
         public async Task<IActionResult> GetById(int id)
@@ -40,6 +43,7 @@ namespace HMS.Backend.Controllers
         }
 
         [HttpPost]
+        [Authorize]
         [ProducesResponseType(typeof(Doctor), 201)]
         [ProducesResponseType(400)]
         public async Task<IActionResult> Create([FromBody] DoctorDto dto)
@@ -71,6 +75,7 @@ namespace HMS.Backend.Controllers
         }
 
         [HttpPut("{id}")]
+        [Authorize]
         [ProducesResponseType(204)]
         [ProducesResponseType(400)]
         [ProducesResponseType(404)]
@@ -107,6 +112,7 @@ namespace HMS.Backend.Controllers
         }
 
         [HttpDelete("{id}")]
+        [Authorize]
         [ProducesResponseType(204)]
         [ProducesResponseType(404)]
         public async Task<IActionResult> Delete(int id)

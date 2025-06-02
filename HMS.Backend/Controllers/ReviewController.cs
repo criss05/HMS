@@ -1,6 +1,7 @@
 ﻿using HMS.Backend.Repositories.Interfaces;
 using HMS.Shared.DTOs;
 using HMS.Shared.Entities;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -28,6 +29,7 @@ namespace HMS.Backend.Controllers
         /// <returns>A list of reviews.</returns>
         /// <response code="200">Returns the list of reviews</response>
         [HttpGet]
+        [Authorize]
         [ProducesResponseType(typeof(IEnumerable<Review>), 200)]
         public async Task<IActionResult> GetAll()
         {
@@ -43,6 +45,7 @@ namespace HMS.Backend.Controllers
         /// <response code="200">Returns the review</response>
         /// <response code="404">If the review is not found</response>
         [HttpGet("{id}")]
+        [Authorize]
         [ProducesResponseType(typeof(Review), 200)]
         [ProducesResponseType(404)]
         public async Task<IActionResult> GetById(int id)
@@ -62,6 +65,7 @@ namespace HMS.Backend.Controllers
         /// <response code="201">Returns the newly created review</response>
         /// <response code="400">If the request data is invalid</response>
         [HttpPost]
+        [Authorize]
         [ProducesResponseType(typeof(Review), 201)]
         [ProducesResponseType(400)]
         public async Task<IActionResult> Create([FromBody] ReviewDto dto)
@@ -96,6 +100,7 @@ namespace HMS.Backend.Controllers
         /// <response code="400">If input data is invalid</response>
         /// <response code="404">If the review is not found</response>
         [HttpPut("{id}")]
+        [Authorize]
         [ProducesResponseType(204)]
         [ProducesResponseType(400)]
         [ProducesResponseType(404)]
@@ -130,6 +135,7 @@ namespace HMS.Backend.Controllers
         /// <response code="204">Successfully deleted</response>
         /// <response code="404">If the review is not found</response>
         [HttpDelete("{id}")]
+        [Authorize]
         [ProducesResponseType(204)]
         [ProducesResponseType(404)]
         public async Task<IActionResult> Delete(int id)

@@ -1,6 +1,7 @@
 ﻿using HMS.Backend.Repositories.Interfaces;
 using HMS.Shared.DTOs;
 using HMS.Shared.Entities;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -37,6 +38,7 @@ namespace HMS.Backend.Controllers
         /// <returns>List of appointments.</returns>
         /// <response code="200">Returns the list of appointments.</response>
         [HttpGet]
+        [Authorize]
         [ProducesResponseType(typeof(IEnumerable<Appointment>), 200)]
         public async Task<IActionResult> GetAll()
         {
@@ -52,6 +54,7 @@ namespace HMS.Backend.Controllers
         /// <response code="200">Returns the requested appointment.</response>
         /// <response code="404">If the appointment is not found.</response>
         [HttpGet("{id}")]
+        [Authorize]
         [ProducesResponseType(typeof(Appointment), 200)]
         [ProducesResponseType(404)]
         public async Task<IActionResult> GetById(int id)
@@ -69,6 +72,7 @@ namespace HMS.Backend.Controllers
         /// <response code="201">Returns the newly created appointment.</response>
         /// <response code="400">If the appointment object is invalid.</response>
         [HttpPost]
+        [Authorize]
         [ProducesResponseType(typeof(Appointment), 201)]
         [ProducesResponseType(400)]
         public async Task<IActionResult> Create([FromBody] AppointmentDto dto)
@@ -116,6 +120,7 @@ namespace HMS.Backend.Controllers
         /// <response code="400">If input is invalid.</response>
         /// <response code="404">If appointment not found.</response>
         [HttpPut("{id}")]
+        [Authorize]
         [ProducesResponseType(204)]
         [ProducesResponseType(400)]
         [ProducesResponseType(404)]
@@ -163,6 +168,7 @@ namespace HMS.Backend.Controllers
         /// <response code="204">Deletion was successful.</response>
         /// <response code="404">If appointment not found.</response>
         [HttpDelete("{id}")]
+        [Authorize]
         [ProducesResponseType(204)]
         [ProducesResponseType(404)]
         public async Task<IActionResult> Delete(int id)

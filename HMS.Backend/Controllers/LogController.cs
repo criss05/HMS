@@ -1,6 +1,7 @@
 ﻿using HMS.Backend.Repositories.Interfaces;
 using HMS.Shared.DTOs;
 using HMS.Shared.Entities;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -26,6 +27,7 @@ namespace HMS.Backend.Controllers
         /// <returns>List of logs.</returns>
         /// <response code="200">Returns the list of logs.</response>
         [HttpGet]
+        [Authorize]
         [ProducesResponseType(typeof(IEnumerable<Log>), 200)]
         public async Task<IActionResult> GetAll()
         {
@@ -41,6 +43,7 @@ namespace HMS.Backend.Controllers
         /// <response code="200">Returns the requested log.</response>
         /// <response code="404">If the log is not found.</response>
         [HttpGet("{id}")]
+        [Authorize]
         [ProducesResponseType(typeof(Log), 200)]
         [ProducesResponseType(404)]
         public async Task<IActionResult> GetById(int id)
@@ -58,6 +61,7 @@ namespace HMS.Backend.Controllers
         /// <response code="201">Returns the newly created log.</response>
         /// <response code="400">If input data is invalid.</response>
         [HttpPost]
+        [Authorize]
         [ProducesResponseType(typeof(Log), 201)]
         [ProducesResponseType(400)]
         public async Task<IActionResult> Create([FromBody] LogDto dto)
@@ -89,6 +93,7 @@ namespace HMS.Backend.Controllers
         /// <response code="400">If input data is invalid.</response>
         /// <response code="404">If log is not found.</response>
         [HttpPut("{id}")]
+        [Authorize]
         [ProducesResponseType(204)]
         [ProducesResponseType(400)]
         [ProducesResponseType(404)]
@@ -121,6 +126,7 @@ namespace HMS.Backend.Controllers
         /// <response code="204">Deletion was successful.</response>
         /// <response code="404">If log is not found.</response>
         [HttpDelete("{id}")]
+        [Authorize]
         [ProducesResponseType(204)]
         [ProducesResponseType(404)]
         public async Task<IActionResult> Delete(int id)

@@ -1,6 +1,7 @@
 ﻿using HMS.Backend.Repositories.Interfaces;
 using HMS.Shared.DTOs;
 using HMS.Shared.Entities;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -28,6 +29,7 @@ namespace HMS.Backend.Controllers
         /// <returns>List of schedules.</returns>
         /// <response code="200">Returns the list of schedules.</response>
         [HttpGet]
+        [Authorize]
         [ProducesResponseType(typeof(IEnumerable<Schedule>), 200)]
         public async Task<IActionResult> GetAll()
         {
@@ -44,6 +46,7 @@ namespace HMS.Backend.Controllers
         /// <response code="200">Returns the requested schedule.</response>
         /// <response code="404">If the schedule is not found.</response>
         [HttpGet("{doctorId}/{shiftId}")]
+        [Authorize]
         [ProducesResponseType(typeof(Schedule), 200)]
         [ProducesResponseType(404)]
         public async Task<IActionResult> GetByIds(int doctorId, int shiftId)
@@ -61,6 +64,7 @@ namespace HMS.Backend.Controllers
         /// <response code="201">Returns the newly created schedule.</response>
         /// <response code="400">If the schedule object is invalid.</response>
         [HttpPost]
+        [Authorize]
         [ProducesResponseType(typeof(Schedule), 201)]
         [ProducesResponseType(400)]
         public async Task<IActionResult> Create([FromBody] ScheduleDto dto)
@@ -96,6 +100,7 @@ namespace HMS.Backend.Controllers
         /// <response code="400">If input is invalid.</response>
         /// <response code="404">If schedule not found.</response>
         [HttpPut("{doctorId}/{shiftId}")]
+        [Authorize]
         [ProducesResponseType(204)]
         [ProducesResponseType(400)]
         [ProducesResponseType(404)]
@@ -134,6 +139,7 @@ namespace HMS.Backend.Controllers
         /// <response code="204">Deletion was successful.</response>
         /// <response code="404">If schedule not found.</response>
         [HttpDelete("{doctorId}/{shiftId}")]
+        [Authorize]
         [ProducesResponseType(204)]
         [ProducesResponseType(404)]
         public async Task<IActionResult> Delete(int doctorId, int shiftId)
