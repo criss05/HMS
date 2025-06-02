@@ -2,8 +2,8 @@
 using HMS.Shared.DTOs;
 using HMS.Shared.Entities;
 using Microsoft.AspNetCore.Mvc;
-using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace HMS.Backend.Controllers
@@ -13,20 +13,10 @@ namespace HMS.Backend.Controllers
     public class PatientController : ControllerBase
     {
         private readonly IPatientRepository _patientRepository;
-        private readonly IReviewRepository _reviewRepository;
-        private readonly IAppointmentRepository _appointmentRepository;
-        private readonly IMedicalRecordRepository _medicalRecordRepository;
 
-        public PatientController(
-            IPatientRepository patientRepository,
-            IReviewRepository reviewRepository,
-            IAppointmentRepository appointmentRepository,
-            IMedicalRecordRepository medicalRecordRepository)
+        public PatientController(IPatientRepository patientRepository)
         {
             _patientRepository = patientRepository;
-            _reviewRepository = reviewRepository;
-            _appointmentRepository = appointmentRepository;
-            _medicalRecordRepository = medicalRecordRepository;
         }
 
         /// <summary>
@@ -35,11 +25,32 @@ namespace HMS.Backend.Controllers
         /// <returns>List of patients.</returns>
         /// <response code="200">Returns the list of patients.</response>
         [HttpGet]
-        [ProducesResponseType(typeof(IEnumerable<Patient>), 200)]
+        [ProducesResponseType(typeof(IEnumerable<PatientDto>), 200)]
         public async Task<IActionResult> GetAll()
         {
             var patients = await _patientRepository.GetAllAsync();
-            return Ok(patients);
+            var dtos = patients.Select(p => new PatientDto
+            {
+                Id = p.Id,
+                Email = p.Email,
+                Password = p.Password,
+                Name = p.Name,
+                CNP = p.CNP,
+                PhoneNumber = p.PhoneNumber,
+                Role = p.Role,
+                BloodType = p.BloodType.ToString(),
+                EmergencyContact = p.EmergencyContact,
+                Allergies = p.Allergies,
+                Weight = p.Weight,
+                Height = p.Height,
+                BirthDate = p.BirthDate,
+                Address = p.Address,
+                ReviewIds = p.Reviews.Select(r => r.Id).ToList(),
+                AppointmentIds = p.Appointments.Select(a => a.Id).ToList(),
+                MedicalRecordIds = p.MedicalRecords.Select(m => m.Id).ToList()
+            });
+
+            return Ok(dtos);
         }
 
         /// <summary>
@@ -50,77 +61,64 @@ namespace HMS.Backend.Controllers
         /// <response code="200">Returns the requested patient.</response>
         /// <response code="404">If the patient is not found.</response>
         [HttpGet("{id}")]
-        [ProducesResponseType(typeof(Patient), 200)]
+        [ProducesResponseType(typeof(PatientDto), 200)]
         [ProducesResponseType(404)]
         public async Task<IActionResult> GetById(int id)
         {
             var patient = await _patientRepository.GetByIdAsync(id);
             if (patient == null) return NotFound();
-            return Ok(patient);
+
+            var dto = new PatientDto
+            {
+                Id = patient.Id,
+                Email = patient.Email,
+                Password = patient.Password,
+                Name = patient.Name,
+                CNP = patient.CNP,
+                PhoneNumber = patient.PhoneNumber,
+                Role = patient.Role,
+                BloodType = patient.BloodType.ToString(),
+                EmergencyContact = patient.EmergencyContact,
+                Allergies = patient.Allergies,
+                Weight = patient.Weight,
+                Height = patient.Height,
+                BirthDate = patient.BirthDate,
+                Address = patient.Address,
+                ReviewIds = patient.Reviews.Select(r => r.Id).ToList(),
+                AppointmentIds = patient.Appointments.Select(a => a.Id).ToList(),
+                MedicalRecordIds = patient.MedicalRecords.Select(m => m.Id).ToList()
+            };
+
+            return Ok(dto);
         }
 
         /// <summary>
         /// Creates a new patient.
         /// </summary>
-        /// <param name="dto">Patient DTO to create.</param>
+        /// <param name="dto">DTO containing patient data.</param>
         /// <returns>The created patient.</returns>
         /// <response code="201">Returns the newly created patient.</response>
         /// <response code="400">If the input data is invalid.</response>
         [HttpPost]
         [ProducesResponseType(typeof(Patient), 201)]
         [ProducesResponseType(400)]
-        public async Task<IActionResult> Create([FromBody] PatientDto dto)
+        public async Task<IActionResult> Create([FromBody] PatientCreateDto dto)
         {
-            // Validate related entities existence
-            var reviews = new List<Review>();
-            foreach (var reviewId in dto.ReviewIds)
-            {
-                var review = await _reviewRepository.GetByIdAsync(reviewId);
-                if (review == null)
-                    return BadRequest($"Review with ID {reviewId} not found.");
-                reviews.Add(review);
-            }
-
-            var appointments = new List<Appointment>();
-            foreach (var appointmentId in dto.AppointmentIds)
-            {
-                var appointment = await _appointmentRepository.GetByIdAsync(appointmentId);
-                if (appointment == null)
-                    return BadRequest($"Appointment with ID {appointmentId} not found.");
-                appointments.Add(appointment);
-            }
-
-            var medicalRecords = new List<MedicalRecord>();
-            foreach (var medicalRecordId in dto.MedicalRecordIds)
-            {
-                var medicalRecord = await _medicalRecordRepository.GetByIdAsync(medicalRecordId);
-                if (medicalRecord == null)
-                    return BadRequest($"MedicalRecord with ID {medicalRecordId} not found.");
-                medicalRecords.Add(medicalRecord);
-            }
-
             var patient = new Patient
             {
-                // User properties
                 Email = dto.Email,
                 Password = dto.Password,
                 Name = dto.Name,
                 CNP = dto.CNP,
                 PhoneNumber = dto.PhoneNumber,
                 Role = dto.Role,
-
-                // Patient-specific properties
                 BloodType = Enum.Parse<HMS.Shared.Enums.BloodType>(dto.BloodType),
                 EmergencyContact = dto.EmergencyContact,
                 Allergies = dto.Allergies,
                 Weight = dto.Weight,
                 Height = dto.Height,
                 BirthDate = dto.BirthDate,
-                Address = dto.Address,
-
-                Reviews = reviews,
-                Appointments = appointments,
-                MedicalRecords = medicalRecords
+                Address = dto.Address
             };
 
             var createdPatient = await _patientRepository.AddAsync(patient);
@@ -130,57 +128,27 @@ namespace HMS.Backend.Controllers
         /// <summary>
         /// Updates an existing patient.
         /// </summary>
-        /// <param name="id">Patient's ID.</param>
-        /// <param name="dto">Patient DTO with updated data.</param>
+        /// <param name="id">ID of the patient to update.</param>
+        /// <param name="dto">DTO containing updated patient data.</param>
         /// <returns>No content.</returns>
         /// <response code="204">Update was successful.</response>
-        /// <response code="400">If input data is invalid.</response>
-        /// <response code="404">If patient not found.</response>
+        /// <response code="400">If the input data is invalid.</response>
+        /// <response code="404">If the patient was not found.</response>
         [HttpPut("{id}")]
         [ProducesResponseType(204)]
         [ProducesResponseType(400)]
         [ProducesResponseType(404)]
-        public async Task<IActionResult> Update(int id, [FromBody] PatientDto dto)
+        public async Task<IActionResult> Update(int id, [FromBody] PatientUpdateDto dto)
         {
             var existing = await _patientRepository.GetByIdAsync(id);
             if (existing == null) return NotFound();
 
-            var reviews = new List<Review>();
-            foreach (var reviewId in dto.ReviewIds)
-            {
-                var review = await _reviewRepository.GetByIdAsync(reviewId);
-                if (review == null)
-                    return BadRequest($"Review with ID {reviewId} not found.");
-                reviews.Add(review);
-            }
-
-            var appointments = new List<Appointment>();
-            foreach (var appointmentId in dto.AppointmentIds)
-            {
-                var appointment = await _appointmentRepository.GetByIdAsync(appointmentId);
-                if (appointment == null)
-                    return BadRequest($"Appointment with ID {appointmentId} not found.");
-                appointments.Add(appointment);
-            }
-
-            var medicalRecords = new List<MedicalRecord>();
-            foreach (var medicalRecordId in dto.MedicalRecordIds)
-            {
-                var medicalRecord = await _medicalRecordRepository.GetByIdAsync(medicalRecordId);
-                if (medicalRecord == null)
-                    return BadRequest($"MedicalRecord with ID {medicalRecordId} not found.");
-                medicalRecords.Add(medicalRecord);
-            }
-
-            // Update User properties
             existing.Email = dto.Email;
             existing.Password = dto.Password;
             existing.Name = dto.Name;
             existing.CNP = dto.CNP;
             existing.PhoneNumber = dto.PhoneNumber;
             existing.Role = dto.Role;
-
-            // Update Patient-specific properties
             existing.BloodType = Enum.Parse<HMS.Shared.Enums.BloodType>(dto.BloodType);
             existing.EmergencyContact = dto.EmergencyContact;
             existing.Allergies = dto.Allergies;
@@ -189,15 +157,8 @@ namespace HMS.Backend.Controllers
             existing.BirthDate = dto.BirthDate;
             existing.Address = dto.Address;
 
-            existing.Reviews = reviews;
-            existing.Appointments = appointments;
-            existing.MedicalRecords = medicalRecords;
-
             var success = await _patientRepository.UpdateAsync(existing);
-            if (!success)
-            {
-                return BadRequest("Failed to update the patient.");
-            }
+            if (!success) return BadRequest("Failed to update the patient.");
 
             return NoContent();
         }
@@ -205,10 +166,10 @@ namespace HMS.Backend.Controllers
         /// <summary>
         /// Deletes a patient.
         /// </summary>
-        /// <param name="id">Patient's ID.</param>
+        /// <param name="id">ID of the patient to delete.</param>
         /// <returns>No content.</returns>
         /// <response code="204">Deletion was successful.</response>
-        /// <response code="404">If patient not found.</response>
+        /// <response code="404">If the patient was not found.</response>
         [HttpDelete("{id}")]
         [ProducesResponseType(204)]
         [ProducesResponseType(404)]
@@ -216,7 +177,6 @@ namespace HMS.Backend.Controllers
         {
             var result = await _patientRepository.DeleteAsync(id);
             if (!result) return NotFound();
-
             return NoContent();
         }
     }
