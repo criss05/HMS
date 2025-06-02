@@ -1,5 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore.Design;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using System;
+using System.IO;
 
 namespace HMS.Backend.Data
 {
@@ -7,17 +10,16 @@ namespace HMS.Backend.Data
     {
         public MyDbContext CreateDbContext(string[] args)
         {
-            // Build configuration to get the connection string
             IConfigurationRoot configuration = new ConfigurationBuilder()
-                .SetBasePath(Directory.GetCurrentDirectory())  // Adjust if needed
+                .SetBasePath(Directory.GetCurrentDirectory())
                 .AddJsonFile("appsettings.json")
                 .Build();
 
+            var rawConnectionString = configuration.GetConnectionString("DefaultConnection") ?? "";
+            var dbHost = Environment.GetEnvironmentVariable("DB_HOST") ?? "localhost\\SQLEXPRESS";
+            var connectionString = rawConnectionString.Replace("{DB_HOST}", dbHost);
+
             var builder = new DbContextOptionsBuilder<MyDbContext>();
-
-            // Use your provider and connection string here:
-            var connectionString = configuration.GetConnectionString("DefaultConnection");
-
             builder.UseSqlServer(connectionString);
 
             return new MyDbContext(builder.Options);
