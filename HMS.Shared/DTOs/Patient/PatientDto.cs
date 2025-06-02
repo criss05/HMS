@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace HMS.Shared.DTOs
+namespace HMS.Shared.DTOs.Patient
 {
     public class PatientDto : UserDto
     {

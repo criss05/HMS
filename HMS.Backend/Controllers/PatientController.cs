@@ -1,5 +1,5 @@
 ﻿using HMS.Backend.Repositories.Interfaces;
-using HMS.Shared.DTOs;
+using HMS.Shared.DTOs.Patient;
 using HMS.Shared.Entities;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
@@ -111,7 +111,7 @@ namespace HMS.Backend.Controllers
                 Name = dto.Name,
                 CNP = dto.CNP,
                 PhoneNumber = dto.PhoneNumber,
-                Role = dto.Role,
+                Role = Enum.Parse<HMS.Shared.Enums.UserRole>(dto.Role),
                 BloodType = Enum.Parse<HMS.Shared.Enums.BloodType>(dto.BloodType),
                 EmergencyContact = dto.EmergencyContact,
                 Allergies = dto.Allergies,
@@ -148,7 +148,7 @@ namespace HMS.Backend.Controllers
             existing.Name = dto.Name;
             existing.CNP = dto.CNP;
             existing.PhoneNumber = dto.PhoneNumber;
-            existing.Role = dto.Role;
+            existing.Role = Enum.Parse<HMS.Shared.Enums.UserRole>(dto.Role);
             existing.BloodType = Enum.Parse<HMS.Shared.Enums.BloodType>(dto.BloodType);
             existing.EmergencyContact = dto.EmergencyContact;
             existing.Allergies = dto.Allergies;
