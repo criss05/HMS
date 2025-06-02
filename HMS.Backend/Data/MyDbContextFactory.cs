@@ -3,6 +3,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.IO;
+using Microsoft.Extensions.Options;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 
 namespace HMS.Backend.Data
 {
@@ -23,6 +25,8 @@ namespace HMS.Backend.Data
 
             var builder = new DbContextOptionsBuilder<MyDbContext>();
             builder.UseSqlServer(connectionString);
+
+            builder.ConfigureWarnings(warnings => warnings.Ignore(RelationalEventId.PendingModelChangesWarning));
 
             return new MyDbContext(builder.Options);
         }
