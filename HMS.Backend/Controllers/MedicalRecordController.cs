@@ -1,6 +1,7 @@
 ﻿using HMS.Backend.Repositories.Interfaces;
 using HMS.Shared.DTOs;
 using HMS.Shared.Entities;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -34,6 +35,7 @@ namespace HMS.Backend.Controllers
         /// <returns>List of medical records.</returns>
         /// <response code="200">Returns the list of medical records.</response>
         [HttpGet]
+        [Authorize]
         [ProducesResponseType(typeof(IEnumerable<MedicalRecord>), 200)]
         public async Task<IActionResult> GetAll()
         {
@@ -49,6 +51,7 @@ namespace HMS.Backend.Controllers
         /// <response code="200">Returns the medical record.</response>
         /// <response code="404">If medical record is not found.</response>
         [HttpGet("{id}")]
+        [Authorize]
         [ProducesResponseType(typeof(MedicalRecord), 200)]
         [ProducesResponseType(404)]
         public async Task<IActionResult> GetById(int id)
@@ -66,6 +69,7 @@ namespace HMS.Backend.Controllers
         /// <response code="201">Returns the newly created medical record.</response>
         /// <response code="400">If the request data is invalid.</response>
         [HttpPost]
+        [Authorize]
         [ProducesResponseType(typeof(MedicalRecord), 201)]
         [ProducesResponseType(400)]
         public async Task<IActionResult> Create([FromBody] MedicalRecordDto dto)
@@ -108,6 +112,7 @@ namespace HMS.Backend.Controllers
         /// <response code="400">If input is invalid.</response>
         /// <response code="404">If medical record not found.</response>
         [HttpPut("{id}")]
+        [Authorize]
         [ProducesResponseType(204)]
         [ProducesResponseType(400)]
         [ProducesResponseType(404)]
@@ -149,6 +154,7 @@ namespace HMS.Backend.Controllers
         /// <response code="204">Deletion was successful.</response>
         /// <response code="404">If medical record not found.</response>
         [HttpDelete("{id}")]
+        [Authorize]
         [ProducesResponseType(204)]
         [ProducesResponseType(404)]
         public async Task<IActionResult> Delete(int id)

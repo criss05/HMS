@@ -1,10 +1,13 @@
 using HMS.Backend.Data;
 using Microsoft.EntityFrameworkCore;
-using DotNetEnv;
 using HMS.Backend.Repositories.Interfaces;
 using HMS.Backend.Repositories;
 using HMS.Backend.Repositories.Implementations;
+using HMS.Backend.Extensions;
 using System.Text.Json.Serialization;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -31,7 +34,7 @@ builder.Services.AddDbContext<MyDbContext>(options =>
 // Other services
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGenWithAuth();
 
 // DI
 builder.Services.AddScoped<IUserRepository, UserRepository>();
@@ -50,6 +53,27 @@ builder.Services.AddScoped<IProcedureRepository, ProcedureRepository>();
 builder.Services.AddScoped<IAdminRepository, AdminRepository>();
 builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
 
+
+string secretKey = Environment.GetEnvironmentVariable("JWT_SECRET") ?? throw new InvalidOperationException("JWT_SECRET environment variable is not set.");
+string issuer = Environment.GetEnvironmentVariable("ISSUER") ?? throw new InvalidOperationException("ISSUER environment variable is not set.");
+string audience = Environment.GetEnvironmentVariable("AUDIENCE") ?? throw new InvalidOperationException("AUDIENCE environment variable is not set.");
+
+
+
+builder.Services.AddAuthorization();
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(o =>
+    {
+        o.RequireHttpsMetadata = false;
+        o.TokenValidationParameters = new TokenValidationParameters
+        {
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey)),
+            ValidIssuer = issuer,
+            ValidAudience = audience,
+            ClockSkew = TimeSpan.Zero,
+        };
+    });
+
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
@@ -58,8 +82,10 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseAuthorization();
-
 app.MapControllers();
+
+app.UseAuthentication();
+
+app.UseAuthorization();
 
 app.Run();

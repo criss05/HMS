@@ -1,8 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using HMS.Backend.Repositories.Interfaces;
+using HMS.Backend.Utils;
 using HMS.Shared.DTOs;
 using HMS.Shared.Entities;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace HMS.Backend.Controllers
@@ -15,6 +17,7 @@ namespace HMS.Backend.Controllers
     public class UserController : ControllerBase
     {
         private readonly IUserRepository _repository;
+        private TokenProvider tokenProvider;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="UserController"/> class.
@@ -23,6 +26,7 @@ namespace HMS.Backend.Controllers
         public UserController(IUserRepository repository)
         {
             _repository = repository;
+            tokenProvider = new TokenProvider();
         }
 
         /// <summary>
@@ -31,6 +35,7 @@ namespace HMS.Backend.Controllers
         /// <returns>A list of <see cref="UserDto"/> objects.</returns>
         /// <response code="200">Returns the list of users.</response>
         [HttpGet]
+        [Authorize]
         [ProducesResponseType(typeof(IEnumerable<UserDto>), 200)]
         public async Task<ActionResult<IEnumerable<UserDto>>> GetAll()
         {
@@ -53,6 +58,7 @@ namespace HMS.Backend.Controllers
         /// <response code="200">Returns the requested user.</response>
         /// <response code="404">If the user is not found.</response>
         [HttpGet("{id}")]
+        [Authorize]
         [ProducesResponseType(typeof(UserDto), 200)]
         [ProducesResponseType(404)]
         public async Task<ActionResult<UserDto>> GetById(int id)
@@ -89,6 +95,21 @@ namespace HMS.Backend.Controllers
             return CreatedAtAction(nameof(GetById), new { id = user.Id }, MapToDto(user));
         }
 
+        // GET: api/user/login
+        [HttpGet("login")]
+        [ProducesResponseType(typeof(UserDto), 200)]
+        [ProducesResponseType(404)]
+        public async Task<ActionResult<UserWithTokenDto>> Login([FromQuery] string email, [FromQuery] string password)
+        {
+            User user = await _repository.GetByEmailAsync(email);
+            if (user == null)
+                return NotFound("User not found");
+
+            var token = tokenProvider.Create(user.Id);
+
+            return MapToDto(user, token);
+        }
+
         /// <summary>
         /// Updates an existing user.
         /// </summary>
@@ -99,6 +120,7 @@ namespace HMS.Backend.Controllers
         /// <response code="400">If the model state is invalid or ID mismatch occurs.</response>
         /// <response code="404">If the user is not found.</response>
         [HttpPut("{id}")]
+        [Authorize]
         [ProducesResponseType(204)]
         [ProducesResponseType(400)]
         [ProducesResponseType(404)]
@@ -138,6 +160,7 @@ namespace HMS.Backend.Controllers
         /// <response code="204">If the deletion was successful.</response>
         /// <response code="404">If the user is not found.</response>
         [HttpDelete("{id}")]
+        [Authorize]
         [ProducesResponseType(204)]
         [ProducesResponseType(404)]
         public async Task<IActionResult> Delete(int id)
@@ -166,6 +189,20 @@ namespace HMS.Backend.Controllers
                 CNP = user.CNP,
                 PhoneNumber = user.PhoneNumber,
                 CreatedAt = user.CreatedAt
+            };
+
+        private UserWithTokenDto MapToDto(User user, string token) =>
+            new UserWithTokenDto
+            {
+                Id = user.Id,
+                Email = user.Email,
+                Password = user.Password,
+                Role = user.Role,
+                Name = user.Name,
+                CNP = user.CNP,
+                PhoneNumber = user.PhoneNumber,
+                CreatedAt = user.CreatedAt,
+                Token = token
             };
 
         /// <summary>

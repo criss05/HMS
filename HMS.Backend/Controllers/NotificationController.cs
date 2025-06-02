@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using HMS.Backend.Repositories.Interfaces;
 using HMS.Shared.DTOs;
 using HMS.Shared.Entities;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace HMS.Backend.Controllers
@@ -31,6 +32,7 @@ namespace HMS.Backend.Controllers
         /// <returns>List of all notifications as NotificationDto.</returns>
         /// <response code="200">Returns list of notifications.</response>
         [HttpGet]
+        [Authorize]
         [ProducesResponseType(typeof(IEnumerable<NotificationDto>), 200)]
         public async Task<ActionResult<IEnumerable<NotificationDto>>> GetAll()
         {
@@ -51,6 +53,7 @@ namespace HMS.Backend.Controllers
         /// <response code="200">Returns the notification.</response>
         /// <response code="404">If notification not found.</response>
         [HttpGet("{id}")]
+        [Authorize]
         [ProducesResponseType(typeof(NotificationDto), 200)]
         [ProducesResponseType(404)]
         public async Task<ActionResult<NotificationDto>> GetById(int id)
@@ -70,6 +73,7 @@ namespace HMS.Backend.Controllers
         /// <response code="201">Returns the created notification.</response>
         /// <response code="400">If input data is invalid.</response>
         [HttpPost]
+        [Authorize]
         [ProducesResponseType(typeof(NotificationDto), 201)]
         [ProducesResponseType(400)]
         public async Task<ActionResult<NotificationDto>> Create([FromBody] NotificationDto dto)
@@ -92,6 +96,7 @@ namespace HMS.Backend.Controllers
         /// <response code="400">If data invalid or id mismatch.</response>
         /// <response code="404">If notification not found.</response>
         [HttpPut("{id}")]
+        [Authorize]
         [ProducesResponseType(204)]
         [ProducesResponseType(400)]
         [ProducesResponseType(404)]
@@ -123,6 +128,7 @@ namespace HMS.Backend.Controllers
         /// <response code="204">Deletion successful.</response>
         /// <response code="404">If notification not found.</response>
         [HttpDelete("{id}")]
+        [Authorize]
         [ProducesResponseType(204)]
         [ProducesResponseType(404)]
         public async Task<IActionResult> Delete(int id)

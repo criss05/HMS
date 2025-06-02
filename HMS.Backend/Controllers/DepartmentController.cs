@@ -1,6 +1,7 @@
 ﻿using HMS.Backend.Repositories.Interfaces;
 using HMS.Shared.DTOs;
 using HMS.Shared.Entities;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -24,6 +25,7 @@ namespace HMS.Backend.Controllers
         /// <returns>List of all departments.</returns>
         /// <response code="200">Returns the list of departments.</response>
         [HttpGet]
+        [Authorize]
         [ProducesResponseType(typeof(IEnumerable<Department>), 200)]
         public async Task<ActionResult<IEnumerable<Department>>> GetAll()
         {
@@ -39,6 +41,7 @@ namespace HMS.Backend.Controllers
         /// <response code="200">Returns the department.</response>
         /// <response code="404">If department with specified id is not found.</response>
         [HttpGet("{id}")]
+        [Authorize]
         [ProducesResponseType(typeof(Department), 200)]
         [ProducesResponseType(404)]
         public async Task<ActionResult<Department>> GetById(int id)
@@ -57,6 +60,7 @@ namespace HMS.Backend.Controllers
         /// <response code="201">Returns the newly created department.</response>
         /// <response code="400">If the department data is invalid.</response>
         [HttpPost]
+        [Authorize]
         [ProducesResponseType(typeof(Department), 201)]
         [ProducesResponseType(400)]
         public async Task<ActionResult<Department>> Create([FromBody] DepartmentDto dto)
@@ -83,6 +87,7 @@ namespace HMS.Backend.Controllers
         /// <response code="400">If the input data is invalid or id mismatch.</response>
         /// <response code="404">If department with specified id is not found.</response>
         [HttpPut("{id}")]
+        [Authorize]
         [ProducesResponseType(204)]
         [ProducesResponseType(400)]
         [ProducesResponseType(404)]
@@ -112,6 +117,7 @@ namespace HMS.Backend.Controllers
         /// <response code="204">If deletion is successful (No Content).</response>
         /// <response code="404">If department with specified id is not found.</response>
         [HttpDelete("{id}")]
+        [Authorize]
         [ProducesResponseType(204)]
         [ProducesResponseType(404)]
         public async Task<IActionResult> Delete(int id)
