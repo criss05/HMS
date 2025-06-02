@@ -8,6 +8,7 @@ using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
+using HMS.DesktopClient.Utils;
 using HMS.Shared.DTOs;
 using HMS.Shared.Entities;
 
@@ -22,18 +23,6 @@ namespace HMS.DesktopClient.APIClients
         {
             _httpClient = new HttpClient { BaseAddress = new Uri(BaseUrl) };
         }
-
-        // Helper method to create an HttpRequestMessage with the Authorization header
-        private HttpRequestMessage CreateRequest(HttpMethod method, string url)
-        {
-            if (string.IsNullOrEmpty(App.CurrentUser.Token))
-                throw new InvalidOperationException("JWT token is missing. Please log in first.");
-
-            var request = new HttpRequestMessage(method, url);
-            request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", App.CurrentUser.Token);
-            return request;
-        }
-
 
         public async Task<UserWithTokenDto> Login(string email, string password)
         {
@@ -66,7 +55,8 @@ namespace HMS.DesktopClient.APIClients
 
         public async Task<User> GetUserById(int id)
         {
-            var request = CreateRequest(HttpMethod.Get, $"User/{id}");
+            //TODO: Test this
+            var request = RequestHelper.CreateRequest(HttpMethod.Get, $"User/{id}");
             var response = await _httpClient.SendAsync(request);
             if (response.IsSuccessStatusCode)
             {
