@@ -13,7 +13,6 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
   <ItemGroup>
-    <None Remove="ViewResources\loginPageBackground.jpg" />
     <None Remove="Views\HomePage.xaml" />
     <None Remove="Views\LoginPage.xaml" />
   </ItemGroup>
@@ -48,16 +47,6 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\HMS.Shared\HMS.Shared.csproj" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="ViewResources\loginPageBackground.jpg">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Resource>
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Update="Views\LoginPage.xaml.cs">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Compile>
   </ItemGroup>
   <ItemGroup>
     <Page Update="Views\LoginPage.xaml">
