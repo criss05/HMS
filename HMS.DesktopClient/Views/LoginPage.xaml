@@ -10,10 +10,10 @@
    Title="LoginPage">  
 
    <Grid>  
-       <Image Source="D:\HMS\HMS.DesktopClient\ViewResources\loginPageBackground.jpg" Stretch="Fill"></Image>
+       <Image Source="D:\HMS\HMS.DesktopClient\ViewResources\loginPageBackground.png" Stretch="Fill"></Image>
 
         <Grid HorizontalAlignment="Center" VerticalAlignment="Center" Width="650" Height="400">
-            <Border Background="LightBlue" CornerRadius="100" Translation="0,0,52">  
+            <Border Background="LightGray" CornerRadius="10" Translation="0,0,52">  
                <Border.Shadow>  
                    <ThemeShadow />  
                </Border.Shadow>  
@@ -23,7 +23,7 @@
 
                    <!-- Email -->  
                    <TextBlock Text="Email:" FontWeight="Bold" FontSize="20" Margin="0,0,0,5" Foreground="Black"/>  
-                   <Border CornerRadius="20" Background="White" Margin="0,0,0,15" Translation="0,0,22">  
+                   <Border CornerRadius="5" Background="White" Margin="0,0,0,15" Translation="0,0,22">  
                        <TextBox x:Name="Email" PlaceholderText="Email" FontSize="14" Padding="15,4" BorderThickness="0" Background="White" Foreground="Black"/>
                         <Border.Shadow>
                             <ThemeShadow/>
@@ -32,7 +32,7 @@
 
                    <!-- Password -->  
                    <TextBlock Text="Password:" FontWeight="Bold" FontSize="20" Margin="0,0,0,5" Foreground="Black"/>  
-                   <Border CornerRadius="20" Background="White" Margin="0,0,0,20" Translation="0,0,22">  
+                   <Border CornerRadius="5" Background="White" Margin="0,0,0,20" Translation="0,0,22">  
                        <PasswordBox x:Name="Password" PlaceholderText="Password" FontSize="14" Padding="15,4" BorderThickness="0" Background="White" Foreground="Black"/>
                         <Border.Shadow>
                             <ThemeShadow/>
@@ -47,7 +47,7 @@
                            Width="140" >  
                        <Button.Template>  
                            <ControlTemplate TargetType="Button">  
-                               <Border Background="{TemplateBinding Background}" CornerRadius="20">  
+                               <Border Background="{TemplateBinding Background}" CornerRadius="5">  
                                    <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>  
                                </Border>  
                            </ControlTemplate> 
@@ -59,13 +59,13 @@
 
                    <!-- Register Section -->  
                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">  
-                       <TextBlock Text="Not a member yet? " FontSize="12" Foreground="Black" Margin="0,4,5,0"/>  
-                       <Button Content="REGISTER NOW" FontWeight="Bold" FontSize="12"  
+                       <TextBlock Text="Not a member yet? " FontSize="14" Foreground="Black" Margin="0,4,5,0"/>  
+                       <Button Content="REGISTER NOW" FontWeight="Bold" FontSize="14"  
                                Background="White" Foreground="#222" BorderBrush="White"  
                                Padding="8,0" Height="24" >  
                            <Button.Template>  
                                <ControlTemplate TargetType="Button">  
-                                   <Border Background="{TemplateBinding Background}" CornerRadius="12">  
+                                   <Border Background="{TemplateBinding Background}" CornerRadius="2" Padding="6, 0">  
                                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>  
                                    </Border>  
                                </ControlTemplate>  
