@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using HMS.Shared.DTOs;
 using HMS.Shared.Entities;
 
 namespace HMS.Shared.Repositories.Interfaces
@@ -13,7 +14,7 @@ namespace HMS.Shared.Repositories.Interfaces
         /// Retrieves all notifications asynchronously.
         /// </summary>
         /// <returns>A collection of all notifications.</returns>
-        Task<IEnumerable<Notification>> GetAllAsync();
+        Task<IEnumerable<NotificationDto>> GetAllAsync();
 
         /// <summary>
         /// Retrieves a notification by its unique identifier asynchronously.
@@ -26,18 +27,18 @@ namespace HMS.Shared.Repositories.Interfaces
         /// Adds a new notification asynchronously.
         /// </summary>
         /// <param name="notification">Notification entity to add.</param>
-        Task AddAsync(Notification notification);
+        Task<Notification> AddAsync(Notification notification);
 
         /// <summary>
         /// Updates an existing notification asynchronously.
         /// </summary>
         /// <param name="notification">Notification entity with updated data.</param>
-        Task UpdateAsync(Notification notification);
+        Task<bool> UpdateAsync(Notification notification);
 
         /// <summary>
         /// Deletes a notification by id asynchronously.
         /// </summary>
         /// <param name="id">The unique ID of the notification to delete.</param>
-        Task DeleteAsync(int id);
+        Task<bool> DeleteAsync(int id);
     }
 }
