@@ -5,6 +5,7 @@ using HMS.Shared.Entities;
 using System.Threading.Tasks;
 using System;
 using System.Linq;
+using System.Collections.Generic;
 
 namespace HMS.WebClient.Controllers
 {
@@ -45,6 +46,12 @@ namespace HMS.WebClient.Controllers
             {
                 // Log the error
                 Console.WriteLine($"Error in Profile action: {ex.Message}");
+                Console.WriteLine($"Stack trace: {ex.StackTrace}");
+                if (ex.InnerException != null)
+                {
+                    Console.WriteLine($"Inner exception: {ex.InnerException.Message}");
+                    Console.WriteLine($"Inner exception stack trace: {ex.InnerException.StackTrace}");
+                }
                 
                 // Add error message to be displayed to the user
                 ModelState.AddModelError("", "An error occurred while loading the profile. Please try again later.");
@@ -61,25 +68,39 @@ namespace HMS.WebClient.Controllers
                 // Get the current doctor's ID from the session/claims
                 var doctorId = 3; // TODO: Get from session/claims
                 var records = await _medicalRecordRepository.GetAllAsync();
-                var doctorRecords = records.Where(r => r.DoctorId == doctorId).ToList();
                 
-                return View(doctorRecords);
-            }
-            catch (KeyNotFoundException)
-            {
-                // Doctor not found
-                return NotFound("Doctor not found. Please make sure you are logged in with a valid doctor account.");
+                // Log the records for debugging
+                Console.WriteLine($"Retrieved {records?.Count() ?? 0} records");
+                foreach (var record in records ?? Enumerable.Empty<MedicalRecord>())
+                {
+                    Console.WriteLine($"Record ID: {record.Id}");
+                    Console.WriteLine($"Patient: {record.Patient?.Name ?? "null"}");
+                    Console.WriteLine($"Doctor: {record.Doctor?.Name ?? "null"}");
+                    Console.WriteLine($"Procedure: {record.Procedure?.Name ?? "null"}");
+                    Console.WriteLine("---");
+                }
+                
+                var doctorRecords = records?.Where(r => r.DoctorId == doctorId).ToList();
+                Console.WriteLine($"Filtered to {doctorRecords?.Count ?? 0} records for doctor {doctorId}");
+                
+                return View(doctorRecords ?? new List<MedicalRecord>());
             }
             catch (Exception ex)
             {
-                // Log the error
+                // Log the error in detail
                 Console.WriteLine($"Error in MedicalHistory action: {ex.Message}");
+                Console.WriteLine($"Stack trace: {ex.StackTrace}");
+                if (ex.InnerException != null)
+                {
+                    Console.WriteLine($"Inner exception: {ex.InnerException.Message}");
+                    Console.WriteLine($"Inner exception stack trace: {ex.InnerException.StackTrace}");
+                }
                 
                 // Add error message to be displayed to the user
                 ModelState.AddModelError("", "An error occurred while loading the medical history. Please try again later.");
                 
                 // Return to view with error message
-                return View(Array.Empty<MedicalRecord>());
+                return View(new List<MedicalRecord>());
             }
         }
 
@@ -123,8 +144,14 @@ namespace HMS.WebClient.Controllers
             }
             catch (Exception ex)
             {
-                // Log the error
+                // Log the error in detail
                 Console.WriteLine($"Error in UpdateProfile action: {ex.Message}");
+                Console.WriteLine($"Stack trace: {ex.StackTrace}");
+                if (ex.InnerException != null)
+                {
+                    Console.WriteLine($"Inner exception: {ex.InnerException.Message}");
+                    Console.WriteLine($"Inner exception stack trace: {ex.InnerException.StackTrace}");
+                }
                 
                 // Add error message to be displayed to the user
                 ModelState.AddModelError("", "An error occurred while updating the profile. Please try again later.");

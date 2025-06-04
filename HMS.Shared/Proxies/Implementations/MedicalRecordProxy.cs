@@ -24,7 +24,8 @@ namespace HMS.Shared.Proxies.Implementations
             {
                 PropertyNameCaseInsensitive = true,
                 ReferenceHandler = ReferenceHandler.Preserve,
-                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
+                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+                NumberHandling = JsonNumberHandling.AllowReadingFromString
             };
         }
 
@@ -98,28 +99,46 @@ namespace HMS.Shared.Proxies.Implementations
                 response.EnsureSuccessStatusCode();
 
                 string responseBody = await response.Content.ReadAsStringAsync();
+                Console.WriteLine($"Raw response: {responseBody}");
 
                 try
                 {
                     var result = JsonSerializer.Deserialize<MedicalRecordResponse>(responseBody, _jsonOptions);
+                    Console.WriteLine($"Deserialized response ID: {result?.Id}");
+                    Console.WriteLine($"Records object present: {result?.Records != null}");
+                    Console.WriteLine($"Values count: {result?.Records?.Values?.Count ?? 0}");
+
                     if (result?.Records?.Values == null)
                     {
                         throw new Exception("Failed to deserialize medical records data");
                     }
 
                     // Convert DTOs to MedicalRecord entities
-                    var records = result.Records.Values.Select(dto => new MedicalRecord
+                    var records = new List<MedicalRecord>();
+                    foreach (var dto in result.Records.Values)
                     {
-                        Id = dto.Id,
-                        PatientId = dto.PatientId,
-                        Patient = new Patient { Id = dto.PatientId, Name = dto.PatientName },
-                        DoctorId = dto.DoctorId,
-                        Doctor = new Doctor { Id = dto.DoctorId, Name = dto.DoctorName, Department = new Department { Name = dto.DoctorDepartment } },
-                        ProcedureId = dto.ProcedureId,
-                        Procedure = new Procedure { Id = dto.ProcedureId, Name = dto.ProcedureName, Department = new Department { Name = dto.ProcedureDepartment } },
-                        Diagnosis = dto.Diagnosis,
-                        CreatedAt = dto.CreatedAt
-                    });
+                        try
+                        {
+                            var record = new MedicalRecord
+                            {
+                                Id = dto.Id,
+                                PatientId = dto.PatientId,
+                                Patient = new Patient { Id = dto.PatientId, Name = dto.PatientName },
+                                DoctorId = dto.DoctorId,
+                                Doctor = new Doctor { Id = dto.DoctorId, Name = dto.DoctorName, Department = new Department { Name = dto.DoctorDepartment } },
+                                ProcedureId = dto.ProcedureId,
+                                Procedure = new Procedure { Id = dto.ProcedureId, Name = dto.ProcedureName, Department = new Department { Name = dto.ProcedureDepartment } },
+                                Diagnosis = dto.Diagnosis,
+                                CreatedAt = dto.CreatedAt
+                            };
+                            records.Add(record);
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine($"Error converting DTO to entity: {ex.Message}");
+                            Console.WriteLine($"DTO data: Id={dto.Id}, PatientId={dto.PatientId}, DoctorId={dto.DoctorId}");
+                        }
+                    }
 
                     return records;
                 }
@@ -131,6 +150,10 @@ namespace HMS.Shared.Proxies.Implementations
             catch (Exception ex)
             {
                 Console.WriteLine($"Error getting medical records: {ex.Message}");
+                if (ex.InnerException != null)
+                {
+                    Console.WriteLine($"Inner exception: {ex.InnerException.Message}");
+                }
                 throw;
             }
         }
