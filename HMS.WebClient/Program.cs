@@ -7,9 +7,6 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
-// Load .env variables
-DotNetEnv.Env.Load();
-
 // Configure HttpClient
 var token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIzIiwiYXVkIjoiYWNjb3VudCIsImlzcyI6ImFwcG9pbnRtZW50bWFuYWdlciIsImV4cCI6MTc0OTA0OTkwNiwiaWF0IjoxNzQ5MDQ2MzA2LCJuYmYiOjE3NDkwNDYzMDZ9.xB48ZldrA7A0wCK4Wl5SHi1Q6_YqfguJolkQRQaXCGc";
 builder.Services.AddHttpClient();
