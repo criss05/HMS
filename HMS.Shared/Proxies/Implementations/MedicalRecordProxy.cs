@@ -58,6 +58,11 @@ namespace HMS.Shared.Proxies.Implementations
             return true;
         }
 
+        private class MedicalRecordResponse
+        {
+            public IEnumerable<MedicalRecord> Records { get; set; } = new List<MedicalRecord>();
+        }
+
         public async Task<IEnumerable<MedicalRecord>> GetAllAsync()
         {
             try
@@ -70,17 +75,12 @@ namespace HMS.Shared.Proxies.Implementations
 
                 try
                 {
-                    var result = JsonSerializer.Deserialize<dynamic>(responseBody, _jsonOptions);
-                    if (result != null)
+                    var result = JsonSerializer.Deserialize<MedicalRecordResponse>(responseBody, _jsonOptions);
+                    if (result == null || result.Records == null)
                     {
-                        var records = JsonSerializer.Deserialize<IEnumerable<MedicalRecord>>(result.GetProperty("records"), _jsonOptions);
-                        if (records == null)
-                        {
-                            throw new Exception("Failed to deserialize medical records data");
-                        }
-                        return records;
+                        throw new Exception("Failed to deserialize medical records data");
                     }
-                    throw new Exception("Response was null");
+                    return result.Records;
                 }
                 catch (JsonException ex)
                 {
