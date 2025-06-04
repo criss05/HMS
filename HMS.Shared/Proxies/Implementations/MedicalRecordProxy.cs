@@ -70,6 +70,7 @@ namespace HMS.Shared.Proxies.Implementations
             [JsonPropertyName("$id")]
             public string Id { get; set; } = "";
 
+            [JsonPropertyName("records")]
             public RecordValues Records { get; set; } = new();
         }
 
@@ -103,10 +104,10 @@ namespace HMS.Shared.Proxies.Implementations
 
                 try
                 {
-                    var result = JsonSerializer.Deserialize<MedicalRecordResponse>(responseBody, _jsonOptions);
-                    Console.WriteLine($"Deserialized response ID: {result?.Id}");
-                    Console.WriteLine($"Records object present: {result?.Records != null}");
-                    Console.WriteLine($"Values count: {result?.Records?.Values?.Count ?? 0}");
+                    var result = JsonSerializer.Deserialize<MedicalRecordResponse>(responseBody, new JsonSerializerOptions
+                    {
+                        PropertyNameCaseInsensitive = true
+                    });
 
                     if (result?.Records?.Values == null)
                     {
