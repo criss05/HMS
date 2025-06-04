@@ -23,9 +23,7 @@ namespace HMS.Shared.Proxies.Implementations
             this._jsonOptions = new JsonSerializerOptions
             {
                 PropertyNameCaseInsensitive = true,
-                ReferenceHandler = ReferenceHandler.Preserve,
-                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
-                NumberHandling = JsonNumberHandling.AllowReadingFromString
+                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
             };
         }
 
@@ -93,104 +91,51 @@ namespace HMS.Shared.Proxies.Implementations
 
         public async Task<IEnumerable<MedicalRecord>> GetAllAsync()
         {
-            try
+            AddAuthorizationHeader();
+            HttpResponseMessage response = await _httpClient.GetAsync(_baseUrl + "medicalrecord");
+            response.EnsureSuccessStatusCode();
+
+            string responseBody = await response.Content.ReadAsStringAsync();
+            var result = JsonSerializer.Deserialize<MedicalRecordResponse>(responseBody, _jsonOptions);
+
+            if (result?.Records?.Values == null)
             {
-                AddAuthorizationHeader();
-                HttpResponseMessage response = await _httpClient.GetAsync(_baseUrl + "medicalrecord");
-                response.EnsureSuccessStatusCode();
-
-                string responseBody = await response.Content.ReadAsStringAsync();
-                Console.WriteLine($"Raw response: {responseBody}");
-
-                try
-                {
-                    var result = JsonSerializer.Deserialize<MedicalRecordResponse>(responseBody, new JsonSerializerOptions
-                    {
-                        PropertyNameCaseInsensitive = true
-                    });
-
-                    if (result?.Records?.Values == null)
-                    {
-                        throw new Exception("Failed to deserialize medical records data");
-                    }
-
-                    // Convert DTOs to MedicalRecord entities
-                    var records = new List<MedicalRecord>();
-                    foreach (var dto in result.Records.Values)
-                    {
-                        try
-                        {
-                            var record = new MedicalRecord
-                            {
-                                Id = dto.Id,
-                                PatientId = dto.PatientId,
-                                Patient = new Patient { Id = dto.PatientId, Name = dto.PatientName },
-                                DoctorId = dto.DoctorId,
-                                Doctor = new Doctor { Id = dto.DoctorId, Name = dto.DoctorName, Department = new Department { Name = dto.DoctorDepartment } },
-                                ProcedureId = dto.ProcedureId,
-                                Procedure = new Procedure { Id = dto.ProcedureId, Name = dto.ProcedureName, Department = new Department { Name = dto.ProcedureDepartment } },
-                                Diagnosis = dto.Diagnosis,
-                                CreatedAt = dto.CreatedAt
-                            };
-                            records.Add(record);
-                        }
-                        catch (Exception ex)
-                        {
-                            Console.WriteLine($"Error converting DTO to entity: {ex.Message}");
-                            Console.WriteLine($"DTO data: Id={dto.Id}, PatientId={dto.PatientId}, DoctorId={dto.DoctorId}");
-                        }
-                    }
-
-                    return records;
-                }
-                catch (JsonException ex)
-                {
-                    throw new Exception($"Failed to parse medical records data. Response: {responseBody}", ex);
-                }
+                return new List<MedicalRecord>();
             }
-            catch (Exception ex)
+
+            var records = new List<MedicalRecord>();
+            foreach (var dto in result.Records.Values)
             {
-                Console.WriteLine($"Error getting medical records: {ex.Message}");
-                if (ex.InnerException != null)
+                var record = new MedicalRecord
                 {
-                    Console.WriteLine($"Inner exception: {ex.InnerException.Message}");
-                }
-                throw;
+                    Id = dto.Id,
+                    PatientId = dto.PatientId,
+                    Patient = new Patient { Id = dto.PatientId, Name = dto.PatientName },
+                    DoctorId = dto.DoctorId,
+                    Doctor = new Doctor { Id = dto.DoctorId, Name = dto.DoctorName, Department = new Department { Name = dto.DoctorDepartment } },
+                    ProcedureId = dto.ProcedureId,
+                    Procedure = new Procedure { Id = dto.ProcedureId, Name = dto.ProcedureName, Department = new Department { Name = dto.ProcedureDepartment } },
+                    Diagnosis = dto.Diagnosis,
+                    CreatedAt = dto.CreatedAt
+                };
+                records.Add(record);
             }
+
+            return records;
         }
 
         public async Task<MedicalRecord?> GetByIdAsync(int id)
         {
-            try
-            {
-                AddAuthorizationHeader();
-                HttpResponseMessage response = await _httpClient.GetAsync(_baseUrl + $"medicalrecord/{id}");
+            AddAuthorizationHeader();
+            HttpResponseMessage response = await _httpClient.GetAsync(_baseUrl + $"medicalrecord/{id}");
 
-                if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
-                    return null;
+            if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
+                return null;
 
-                response.EnsureSuccessStatusCode();
-                string responseBody = await response.Content.ReadAsStringAsync();
+            response.EnsureSuccessStatusCode();
+            string responseBody = await response.Content.ReadAsStringAsync();
 
-                try
-                {
-                    var record = JsonSerializer.Deserialize<MedicalRecord>(responseBody, _jsonOptions);
-                    if (record == null)
-                    {
-                        throw new Exception("Failed to deserialize medical record data");
-                    }
-                    return record;
-                }
-                catch (JsonException ex)
-                {
-                    throw new Exception($"Failed to parse medical record data. Response: {responseBody}", ex);
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error getting medical record with ID {id}: {ex.Message}");
-                throw;
-            }
+            return JsonSerializer.Deserialize<MedicalRecord>(responseBody, _jsonOptions);
         }
 
         public async Task<bool> UpdateAsync(MedicalRecord medicalRecord)

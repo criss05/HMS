@@ -1,6 +1,5 @@
 using HMS.Shared.Repositories.Interfaces;
 using HMS.Shared.Proxies.Implementations;
-using System.Net.Http;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -8,44 +7,39 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllersWithViews();
 
 // Configure HttpClient
-var token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIzIiwiYXVkIjoiYWNjb3VudCIsImlzcyI6ImFwcG9pbnRtZW50bWFuYWdlciIsImV4cCI6MTc0OTA0OTkwNiwiaWF0IjoxNzQ5MDQ2MzA2LCJuYmYiOjE3NDkwNDYzMDZ9.xB48ZldrA7A0wCK4Wl5SHi1Q6_YqfguJolkQRQaXCGc";
 builder.Services.AddHttpClient();
+
+// TODO: Get token from authentication service
+var token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIzIiwiYXVkIjoiYWNjb3VudCIsImlzcyI6ImFwcG9pbnRtZW50bWFuYWdlciIsImV4cCI6MTc0OTA0OTkwNiwiaWF0IjoxNzQ5MDQ2MzA2LCJuYmYiOjE3NDkwNDYzMDZ9.xB48ZldrA7A0wCK4Wl5SHi1Q6_YqfguJolkQRQaXCGc";
 
 // Register repositories
 builder.Services.AddScoped<IDoctorRepository>(provider =>
 {
-    var httpClientFactory = provider.GetRequiredService<IHttpClientFactory>();
-    var httpClient = httpClientFactory.CreateClient();
+    var httpClient = provider.GetRequiredService<IHttpClientFactory>().CreateClient();
     return new DoctorProxy(httpClient, token);
 });
 
 builder.Services.AddScoped<IPatientRepository>(provider =>
 {
-    var httpClientFactory = provider.GetRequiredService<IHttpClientFactory>();
-    var httpClient = httpClientFactory.CreateClient();
+    var httpClient = provider.GetRequiredService<IHttpClientFactory>().CreateClient();
     return new PatientProxy(httpClient, token);
 });
 
 builder.Services.AddScoped<IMedicalRecordRepository>(provider =>
 {
-    var httpClientFactory = provider.GetRequiredService<IHttpClientFactory>();
-    var httpClient = httpClientFactory.CreateClient();
+    var httpClient = provider.GetRequiredService<IHttpClientFactory>().CreateClient();
     return new MedicalRecordProxy(httpClient, token);
 });
 
-builder.Services.AddScoped<IAppointmentRepository>(sp => {
-    var httpClientFactory = sp.GetRequiredService<IHttpClientFactory>();
-    var httpClient = httpClientFactory.CreateClient();
-    // TODO: Get token from authentication service
-    var token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIzIiwiYXVkIjoiYWNjb3VudCIsImlzcyI6ImFwcG9pbnRtZW50bWFuYWdlciIsImV4cCI6MTc0OTA0OTkwNiwiaWF0IjoxNzQ5MDQ2MzA2LCJuYmYiOjE3NDkwNDYzMDZ9.xB48ZldrA7A0wCK4Wl5SHi1Q6_YqfguJolkQRQaXCGc";
+builder.Services.AddScoped<IAppointmentRepository>(provider =>
+{
+    var httpClient = provider.GetRequiredService<IHttpClientFactory>().CreateClient();
     return new AppointmentProxy(httpClient, token);
 });
 
-builder.Services.AddScoped<IScheduleRepository>(sp => {
-    var httpClientFactory = sp.GetRequiredService<IHttpClientFactory>();
-    var httpClient = httpClientFactory.CreateClient();
-    // TODO: Get token from authentication service
-    var token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIzIiwiYXVkIjoiYWNjb3VudCIsImlzcyI6ImFwcG9pbnRtZW50bWFuYWdlciIsImV4cCI6MTc0OTA0OTkwNiwiaWF0IjoxNzQ5MDQ2MzA2LCJuYmYiOjE3NDkwNDYzMDZ9.xB48ZldrA7A0wCK4Wl5SHi1Q6_YqfguJolkQRQaXCGc";
+builder.Services.AddScoped<IScheduleRepository>(provider =>
+{
+    var httpClient = provider.GetRequiredService<IHttpClientFactory>().CreateClient();
     return new ScheduleProxy(httpClient, token);
 });
 
