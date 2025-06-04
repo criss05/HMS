@@ -16,11 +16,18 @@ namespace HMS.Shared.Proxies.Implementations
         private readonly HttpClient _httpClient;
         private readonly string _baseUrl = Config._base_api_url;
         private readonly string _token;
+        private readonly JsonSerializerOptions _jsonOptions;
 
         public DoctorProxy(HttpClient httpClient, string token)
         {
             this._httpClient = httpClient;
             this._token = token;
+            this._jsonOptions = new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true,
+                ReferenceHandler = ReferenceHandler.Preserve,
+                Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) }
+            };
         }
 
         private void AddAuthorizationHeader()
@@ -31,22 +38,14 @@ namespace HMS.Shared.Proxies.Implementations
         public async Task<Doctor> AddAsync(Doctor doctor)
         {
             AddAuthorizationHeader();
-            string doctorJson = JsonSerializer.Serialize(doctor, new JsonSerializerOptions
-            {
-                PropertyNameCaseInsensitive = true,
-                Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) }
-            });
+            string doctorJson = JsonSerializer.Serialize(doctor, _jsonOptions);
             StringContent content = new StringContent(doctorJson, Encoding.UTF8, "application/json");
 
             HttpResponseMessage response = await _httpClient.PostAsync(_baseUrl + "doctor", content);
             response.EnsureSuccessStatusCode();
 
             var json = await response.Content.ReadAsStringAsync();
-            return JsonSerializer.Deserialize<Doctor>(json, new JsonSerializerOptions
-            {
-                PropertyNameCaseInsensitive = true,
-                Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) }
-            })!;
+            return JsonSerializer.Deserialize<Doctor>(json, _jsonOptions)!;
         }
 
         public async Task<bool> DeleteAsync(int id)
@@ -69,11 +68,7 @@ namespace HMS.Shared.Proxies.Implementations
 
             string responseBody = await response.Content.ReadAsStringAsync();
 
-            IEnumerable<Doctor> doctors = JsonSerializer.Deserialize<IEnumerable<Doctor>>(responseBody, new JsonSerializerOptions
-            {
-                PropertyNameCaseInsensitive = true,
-               Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) }
-            });
+            IEnumerable<Doctor> doctors = JsonSerializer.Deserialize<IEnumerable<Doctor>>(responseBody, _jsonOptions);
 
             return doctors;
         }
@@ -100,11 +95,7 @@ namespace HMS.Shared.Proxies.Implementations
 
                 try
                 {
-                    Doctor doctor = JsonSerializer.Deserialize<Doctor>(responseBody, new JsonSerializerOptions
-                    {
-                        PropertyNameCaseInsensitive = true,
-                        Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) }
-                    });
+                    Doctor doctor = JsonSerializer.Deserialize<Doctor>(responseBody, _jsonOptions);
 
                     if (doctor == null)
                     {
@@ -133,11 +124,7 @@ namespace HMS.Shared.Proxies.Implementations
 
             string responseBody = await response.Content.ReadAsStringAsync();
 
-            IEnumerable<Doctor> doctors = JsonSerializer.Deserialize<IEnumerable<Doctor>>(responseBody, new JsonSerializerOptions
-            {
-                PropertyNameCaseInsensitive = true,
-                Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) }
-            });
+            IEnumerable<Doctor> doctors = JsonSerializer.Deserialize<IEnumerable<Doctor>>(responseBody, _jsonOptions);
 
             return doctors;
         }
@@ -145,11 +132,7 @@ namespace HMS.Shared.Proxies.Implementations
         public async Task<bool> UpdateAsync(Doctor doctor)
         {
             AddAuthorizationHeader();
-            string doctorJson = JsonSerializer.Serialize(doctor, new JsonSerializerOptions
-            {
-                PropertyNameCaseInsensitive = true,
-                Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) }
-            });
+            string doctorJson = JsonSerializer.Serialize(doctor, _jsonOptions);
             StringContent content = new StringContent(doctorJson, Encoding.UTF8, "application/json");
 
             HttpResponseMessage response = await _httpClient.PutAsync(_baseUrl + $"doctor/{doctor.Id}", content);
