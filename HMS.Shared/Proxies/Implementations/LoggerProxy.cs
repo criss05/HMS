@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace HMS.Shared.Proxies.Implementations
 {
-    class LoggerProxy : ILogRepository
+    public class LoggerProxy : ILoggerRepository
     {
         private readonly HttpClient _http_client;
         private static readonly string s_base_api_url = Config._base_api_url;
@@ -23,9 +23,9 @@ namespace HMS.Shared.Proxies.Implementations
         /// <summary>
         /// Initializes a new instance of the <see cref="LoggerProxy"/> class.
         /// </summary>
-        public LoggerProxy(HttpClient http_client, string token)
+        public LoggerProxy(HttpClient httpClient, string token)
         {
-            this._http_client = http_client;
+            this._http_client = httpClient;
 
             this._json_options = new JsonSerializerOptions
             {
