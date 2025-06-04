@@ -15,7 +15,7 @@ builder.Services.AddScoped<IDoctorRepository>(sp => {
     var httpClientFactory = sp.GetRequiredService<IHttpClientFactory>();
     var httpClient = httpClientFactory.CreateClient();
     // TODO: Get token from authentication service
-    var token = "";
+    var token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIzIiwiYXVkIjoiYWNjb3VudCIsImlzcyI6ImFwcG9pbnRtZW50bWFuYWdlciIsImV4cCI6MTc0OTA0OTkwNiwiaWF0IjoxNzQ5MDQ2MzA2LCJuYmYiOjE3NDkwNDYzMDZ9.xB48ZldrA7A0wCK4Wl5SHi1Q6_YqfguJolkQRQaXCGc";
     return new DoctorProxy(httpClient, token);
 });
 
@@ -23,7 +23,7 @@ builder.Services.AddScoped<IAppointmentRepository>(sp => {
     var httpClientFactory = sp.GetRequiredService<IHttpClientFactory>();
     var httpClient = httpClientFactory.CreateClient();
     // TODO: Get token from authentication service
-    var token = "";
+    var token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIzIiwiYXVkIjoiYWNjb3VudCIsImlzcyI6ImFwcG9pbnRtZW50bWFuYWdlciIsImV4cCI6MTc0OTA0OTkwNiwiaWF0IjoxNzQ5MDQ2MzA2LCJuYmYiOjE3NDkwNDYzMDZ9.xB48ZldrA7A0wCK4Wl5SHi1Q6_YqfguJolkQRQaXCGc";
     return new AppointmentProxy(httpClient, token);
 });
 
@@ -31,7 +31,7 @@ builder.Services.AddScoped<IScheduleRepository>(sp => {
     var httpClientFactory = sp.GetRequiredService<IHttpClientFactory>();
     var httpClient = httpClientFactory.CreateClient();
     // TODO: Get token from authentication service
-    var token = "";
+    var token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIzIiwiYXVkIjoiYWNjb3VudCIsImlzcyI6ImFwcG9pbnRtZW50bWFuYWdlciIsImV4cCI6MTc0OTA0OTkwNiwiaWF0IjoxNzQ5MDQ2MzA2LCJuYmYiOjE3NDkwNDYzMDZ9.xB48ZldrA7A0wCK4Wl5SHi1Q6_YqfguJolkQRQaXCGc";
     return new ScheduleProxy(httpClient, token);
 });
 
