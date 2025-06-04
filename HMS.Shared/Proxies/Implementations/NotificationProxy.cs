@@ -1,4 +1,5 @@
-﻿using HMS.Shared.Entities;
+﻿using HMS.Shared.DTOs;
+using HMS.Shared.Entities;
 using HMS.Shared.Repositories.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -20,9 +21,9 @@ namespace HMS.Shared.Proxies.Implementations
         private static readonly string s_base_api_url = Config._base_api_url;
         private readonly string _token;
 
-        public NotificationProxy(HttpClient _http_client, string token)
+        public NotificationProxy(HttpClient httpClient, string token)
         {
-            this._http_client = _http_client;
+            this._http_client = httpClient;
             _token = token;
         }
         private void AddAuthorizationHeader()
@@ -31,19 +32,19 @@ namespace HMS.Shared.Proxies.Implementations
         }
 
         /// <inheritdoc/>
-        public async Task<IEnumerable<Notification>> GetAllAsync()
+        public async Task<IEnumerable<NotificationDto>> GetAllAsync()
         {
             AddAuthorizationHeader();
             HttpResponseMessage response = await this._http_client.GetAsync(s_base_api_url + "notification");
             response.EnsureSuccessStatusCode();
 
             String json = await response.Content.ReadAsStringAsync();
-            List<Notification> notifications = JsonSerializer.Deserialize<List<Notification>>(json, new JsonSerializerOptions
+            List<NotificationDto> notifications = JsonSerializer.Deserialize<List<NotificationDto>>(json, new JsonSerializerOptions
             {
                 PropertyNameCaseInsensitive = true
             });
 
-            return notifications ?? new List<Notification>();
+            return notifications ?? new List<NotificationDto>();
         }
 
         /// <inheritdoc/>
@@ -54,7 +55,7 @@ namespace HMS.Shared.Proxies.Implementations
             response.EnsureSuccessStatusCode();
 
             String json = await response.Content.ReadAsStringAsync();
-            List<Notification> notifications = JsonSerializer.Deserialize<List<Notification>>(json, new JsonSerializerOptions
+            IEnumerable<Notification> notifications = JsonSerializer.Deserialize<IEnumerable<Notification>>(json, new JsonSerializerOptions
             {
                 PropertyNameCaseInsensitive = true
             });
@@ -86,7 +87,7 @@ namespace HMS.Shared.Proxies.Implementations
         }
 
         /// <inheritdoc/>
-        public async Task AddAsync(Notification notification)
+        public async Task<Notification> AddAsync(Notification notification)
         {
             AddAuthorizationHeader();
             StringContent jsonContent = new StringContent(
@@ -96,13 +97,21 @@ namespace HMS.Shared.Proxies.Implementations
 
             HttpResponseMessage response = await this._http_client.PostAsync(s_base_api_url + "notification", jsonContent);
             response.EnsureSuccessStatusCode();
+
+            string jsonResponse = await response.Content.ReadAsStringAsync();
+            Notification createdNotification = JsonSerializer.Deserialize<Notification>(jsonResponse, new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true
+            });
+
+            return createdNotification;
         }
 
         /// <inheritdoc/>
-        public async Task DeleteAsync(int id)
+        public async Task<bool> DeleteAsync(int id)
         {
             AddAuthorizationHeader();
-            HttpResponseMessage response = await this._http_client.DeleteAsync(s_base_api_url + $"notification/delete/{id}");
+            HttpResponseMessage response = await this._http_client.DeleteAsync(s_base_api_url + $"notification/{id}");
 
             if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
             {
@@ -110,18 +119,38 @@ namespace HMS.Shared.Proxies.Implementations
             }
 
             response.EnsureSuccessStatusCode();
+
+            if (response.StatusCode == System.Net.HttpStatusCode.NoContent)
+            {
+                return true; // Deletion successful
+            }
+            return false;
         }
 
-        public async Task UpdateAsync(Notification notification)
+        public async Task<bool> UpdateAsync(Notification notification)
         {
             AddAuthorizationHeader();
             StringContent jsonContent = new StringContent(
                 JsonSerializer.Serialize(notification),
                 Encoding.UTF8,
                 "application/json");
-    
-            HttpResponseMessage response = await this._http_client.PostAsync(s_base_api_url + $"notification/update/{notification.Id}", jsonContent);
+
+            HttpResponseMessage response = await this._http_client.PostAsync(s_base_api_url + $"notification/{notification.Id}", jsonContent);
             response.EnsureSuccessStatusCode();
+
+            if (response.StatusCode == System.Net.HttpStatusCode.NoContent)
+            {
+                return true; // Update successful
+            }
+            else if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
+            {
+                throw new KeyNotFoundException($"Notification with ID {notification.Id} was not found.");
+            }
+            else
+            {
+                return false; // Update failed for some reason
+
+            }
         }
     }
 }
