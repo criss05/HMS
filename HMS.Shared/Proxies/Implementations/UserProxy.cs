@@ -6,11 +6,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace HMS.Shared.Proxies.Implementations
 {
-    class UserProxy : IUserRepository
+    public class UserProxy : IUserRepository
     {
         private readonly HttpClient _httpClient;
         private readonly string _baseUrl = Config._base_api_url;
@@ -21,6 +22,7 @@ namespace HMS.Shared.Proxies.Implementations
             this._httpClient = httpClient;
             this._token = token;
         }
+
         private void AddAuthorizationHeader()
         {
             _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", this._token);
@@ -77,7 +79,11 @@ namespace HMS.Shared.Proxies.Implementations
         {
             AddAuthorizationHeader();
 
-            string userJson = JsonSerializer.Serialize(user);
+            string userJson = JsonSerializer.Serialize(user, new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true,
+                Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) } // without this, the enum values will not match
+            });
             StringContent content = new StringContent(userJson, Encoding.UTF8, "application/json");
 
             HttpResponseMessage response = await _httpClient.PostAsync(_baseUrl + "user", content);
@@ -86,8 +92,10 @@ namespace HMS.Shared.Proxies.Implementations
             string responseBody = await response.Content.ReadAsStringAsync();
             UserDto createdUser = JsonSerializer.Deserialize<UserDto>(responseBody, new JsonSerializerOptions
             {
-                PropertyNameCaseInsensitive = true
+                PropertyNameCaseInsensitive = true,
+                Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) }
             });
+
             if (createdUser == null)
             {
                 throw new Exception("Failed to deserialize created user.");
@@ -98,7 +106,12 @@ namespace HMS.Shared.Proxies.Implementations
         {
             AddAuthorizationHeader();
 
-            string userJson = JsonSerializer.Serialize(user);
+            string userJson = JsonSerializer.Serialize(user, new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true,
+                Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) } // without this, the enum values will not match
+            });
+
             StringContent content = new StringContent(userJson, Encoding.UTF8, "application/json");
 
             HttpResponseMessage response = await _httpClient.PutAsync(_baseUrl + $"user/{user.Id}", content);
@@ -126,7 +139,7 @@ namespace HMS.Shared.Proxies.Implementations
         {
             AddAuthorizationHeader();
 
-            HttpResponseMessage response = await _httpClient.DeleteAsync(_baseUrl + $"user/delete/{id}");
+            HttpResponseMessage response = await _httpClient.DeleteAsync(_baseUrl + $"user/{id}");
             response.EnsureSuccessStatusCode();
 
             if (response.StatusCode == System.Net.HttpStatusCode.NoContent)
