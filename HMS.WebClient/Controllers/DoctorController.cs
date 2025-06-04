@@ -99,6 +99,10 @@ namespace HMS.WebClient.Controllers
                 existingDoctor.PhoneNumber = model.PhoneNumber;
                 existingDoctor.YearsOfExperience = model.YearsOfExperience;
                 existingDoctor.LicenseNumber = model.LicenseNumber;
+                existingDoctor.CNP = model.CNP;
+                
+                // Keep the existing password
+                existingDoctor.Password = existingDoctor.Password;
 
                 var success = await _doctorRepository.UpdateAsync(existingDoctor);
                 if (!success)

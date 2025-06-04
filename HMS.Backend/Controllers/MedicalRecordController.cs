@@ -33,8 +33,8 @@ namespace HMS.Backend.Controllers
             _jsonOptions = new JsonSerializerOptions
             {
                 PropertyNameCaseInsensitive = true,
-                ReferenceHandler = ReferenceHandler.Preserve,
-                Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) }
+                ReferenceHandler = ReferenceHandler.IgnoreCycles,
+                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
             };
         }
 
@@ -49,8 +49,23 @@ namespace HMS.Backend.Controllers
         public async Task<IActionResult> GetAll()
         {
             var records = await _medicalRecordRepository.GetAllAsync();
-            var serializedRecords = JsonSerializer.Serialize(records, _jsonOptions);
-            return Content(serializedRecords, "application/json");
+            return Ok(new
+            {
+                records = records.Select(r => new
+                {
+                    r.Id,
+                    r.PatientId,
+                    PatientName = r.Patient?.Name,
+                    r.DoctorId,
+                    DoctorName = r.Doctor?.Name,
+                    DoctorDepartment = r.Doctor?.Department?.Name,
+                    r.ProcedureId,
+                    ProcedureName = r.Procedure?.Name,
+                    ProcedureDepartment = r.Procedure?.Department?.Name,
+                    r.Diagnosis,
+                    r.CreatedAt
+                })
+            });
         }
 
         /// <summary>
@@ -68,8 +83,21 @@ namespace HMS.Backend.Controllers
         {
             var record = await _medicalRecordRepository.GetByIdAsync(id);
             if (record == null) return NotFound();
-            var serializedRecord = JsonSerializer.Serialize(record, _jsonOptions);
-            return Content(serializedRecord, "application/json");
+
+            return Ok(new
+            {
+                record.Id,
+                record.PatientId,
+                PatientName = record.Patient?.Name,
+                record.DoctorId,
+                DoctorName = record.Doctor?.Name,
+                DoctorDepartment = record.Doctor?.Department?.Name,
+                record.ProcedureId,
+                ProcedureName = record.Procedure?.Name,
+                ProcedureDepartment = record.Procedure?.Department?.Name,
+                record.Diagnosis,
+                record.CreatedAt
+            });
         }
 
         /// <summary>
@@ -110,8 +138,20 @@ namespace HMS.Backend.Controllers
             };
 
             var createdRecord = await _medicalRecordRepository.AddAsync(record);
-            var serializedRecord = JsonSerializer.Serialize(createdRecord, _jsonOptions);
-            return Created($"/api/medicalrecord/{createdRecord.Id}", serializedRecord);
+            return CreatedAtAction(nameof(GetById), new { id = createdRecord.Id }, new
+            {
+                createdRecord.Id,
+                createdRecord.PatientId,
+                PatientName = createdRecord.Patient?.Name,
+                createdRecord.DoctorId,
+                DoctorName = createdRecord.Doctor?.Name,
+                DoctorDepartment = createdRecord.Doctor?.Department?.Name,
+                createdRecord.ProcedureId,
+                ProcedureName = createdRecord.Procedure?.Name,
+                ProcedureDepartment = createdRecord.Procedure?.Department?.Name,
+                createdRecord.Diagnosis,
+                createdRecord.CreatedAt
+            });
         }
 
         /// <summary>
