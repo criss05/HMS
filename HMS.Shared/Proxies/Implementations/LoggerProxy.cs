@@ -23,9 +23,9 @@ namespace HMS.Shared.Proxies.Implementations
         /// <summary>
         /// Initializes a new instance of the <see cref="LoggerProxy"/> class.
         /// </summary>
-        public LoggerProxy(string token)
+        public LoggerProxy(HttpClient http_client, string token)
         {
-            this._http_client = new HttpClient();
+            this._http_client = http_client;
 
             this._json_options = new JsonSerializerOptions
             {
