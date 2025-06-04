@@ -23,7 +23,7 @@ namespace HMS.Shared.Proxies.Implementations
             this._jsonOptions = new JsonSerializerOptions
             {
                 PropertyNameCaseInsensitive = true,
-                ReferenceHandler = ReferenceHandler.IgnoreCycles,
+                ReferenceHandler = ReferenceHandler.Preserve,
                 DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
             };
         }
@@ -58,9 +58,35 @@ namespace HMS.Shared.Proxies.Implementations
             return true;
         }
 
+        private class RecordValues
+        {
+            [JsonPropertyName("$values")]
+            public List<MedicalRecordDto> Values { get; set; } = new();
+        }
+
         private class MedicalRecordResponse
         {
-            public IEnumerable<MedicalRecord> Records { get; set; } = new List<MedicalRecord>();
+            [JsonPropertyName("$id")]
+            public string Id { get; set; } = "";
+
+            public RecordValues Records { get; set; } = new();
+        }
+
+        private class MedicalRecordDto
+        {
+            [JsonPropertyName("$id")]
+            public string RefId { get; set; } = "";
+            public int Id { get; set; }
+            public int PatientId { get; set; }
+            public string PatientName { get; set; } = "";
+            public int DoctorId { get; set; }
+            public string DoctorName { get; set; } = "";
+            public string DoctorDepartment { get; set; } = "";
+            public int ProcedureId { get; set; }
+            public string ProcedureName { get; set; } = "";
+            public string ProcedureDepartment { get; set; } = "";
+            public string Diagnosis { get; set; } = "";
+            public DateTime CreatedAt { get; set; }
         }
 
         public async Task<IEnumerable<MedicalRecord>> GetAllAsync()
@@ -76,11 +102,26 @@ namespace HMS.Shared.Proxies.Implementations
                 try
                 {
                     var result = JsonSerializer.Deserialize<MedicalRecordResponse>(responseBody, _jsonOptions);
-                    if (result == null || result.Records == null)
+                    if (result?.Records?.Values == null)
                     {
                         throw new Exception("Failed to deserialize medical records data");
                     }
-                    return result.Records;
+
+                    // Convert DTOs to MedicalRecord entities
+                    var records = result.Records.Values.Select(dto => new MedicalRecord
+                    {
+                        Id = dto.Id,
+                        PatientId = dto.PatientId,
+                        Patient = new Patient { Id = dto.PatientId, Name = dto.PatientName },
+                        DoctorId = dto.DoctorId,
+                        Doctor = new Doctor { Id = dto.DoctorId, Name = dto.DoctorName, Department = new Department { Name = dto.DoctorDepartment } },
+                        ProcedureId = dto.ProcedureId,
+                        Procedure = new Procedure { Id = dto.ProcedureId, Name = dto.ProcedureName, Department = new Department { Name = dto.ProcedureDepartment } },
+                        Diagnosis = dto.Diagnosis,
+                        CreatedAt = dto.CreatedAt
+                    });
+
+                    return records;
                 }
                 catch (JsonException ex)
                 {
