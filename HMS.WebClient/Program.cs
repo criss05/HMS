@@ -1,7 +1,39 @@
+using HMS.Shared.Repositories.Interfaces;
+using HMS.Shared.Proxies.Implementations;
+using System.Net.Http;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+
+// Register HttpClient
+builder.Services.AddHttpClient();
+
+// Register repositories
+builder.Services.AddScoped<IDoctorRepository>(sp => {
+    var httpClientFactory = sp.GetRequiredService<IHttpClientFactory>();
+    var httpClient = httpClientFactory.CreateClient();
+    // TODO: Get token from authentication service
+    var token = "";
+    return new DoctorProxy(httpClient, token);
+});
+
+builder.Services.AddScoped<IAppointmentRepository>(sp => {
+    var httpClientFactory = sp.GetRequiredService<IHttpClientFactory>();
+    var httpClient = httpClientFactory.CreateClient();
+    // TODO: Get token from authentication service
+    var token = "";
+    return new AppointmentProxy(httpClient, token);
+});
+
+builder.Services.AddScoped<IMedicalRecordRepository>(sp => {
+    var httpClientFactory = sp.GetRequiredService<IHttpClientFactory>();
+    var httpClient = httpClientFactory.CreateClient();
+    // TODO: Get token from authentication service
+    var token = "";
+    return new MedicalRecordProxy(httpClient, token);
+});
 
 var app = builder.Build();
 
