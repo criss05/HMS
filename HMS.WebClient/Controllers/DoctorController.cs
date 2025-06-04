@@ -4,16 +4,21 @@ using HMS.Shared.DTOs;
 using HMS.Shared.Entities;
 using System.Threading.Tasks;
 using System;
+using System.Linq;
 
 namespace HMS.WebClient.Controllers
 {
     public class DoctorController : Controller
     {
         private readonly IDoctorRepository _doctorRepository;
+        private readonly IMedicalRecordRepository _medicalRecordRepository;
 
-        public DoctorController(IDoctorRepository doctorRepository)
+        public DoctorController(
+            IDoctorRepository doctorRepository,
+            IMedicalRecordRepository medicalRecordRepository)
         {
             _doctorRepository = doctorRepository;
+            _medicalRecordRepository = medicalRecordRepository;
         }
 
         public IActionResult Index()
@@ -55,9 +60,10 @@ namespace HMS.WebClient.Controllers
             {
                 // Get the current doctor's ID from the session/claims
                 var doctorId = 3; // TODO: Get from session/claims
-                var doctor = await _doctorRepository.GetByIdAsync(doctorId);
+                var records = await _medicalRecordRepository.GetAllAsync();
+                var doctorRecords = records.Where(r => r.DoctorId == doctorId).ToList();
                 
-                return View(doctor.Appointments);
+                return View(doctorRecords);
             }
             catch (KeyNotFoundException)
             {
@@ -73,7 +79,7 @@ namespace HMS.WebClient.Controllers
                 ModelState.AddModelError("", "An error occurred while loading the medical history. Please try again later.");
                 
                 // Return to view with error message
-                return View(Array.Empty<Appointment>());
+                return View(Array.Empty<MedicalRecord>());
             }
         }
 

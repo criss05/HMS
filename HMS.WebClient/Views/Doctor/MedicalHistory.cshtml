@@ -1,4 +1,4 @@
-@model IEnumerable<HMS.Shared.Entities.Appointment>
+@model IEnumerable<HMS.Shared.Entities.MedicalRecord>
 @{
     ViewData["Title"] = "Medical History";
     Layout = "_DoctorLayout";
@@ -23,7 +23,7 @@
                     @if (!Model.Any())
                     {
                         <div class="alert alert-info">
-                            No appointments found.
+                            No medical records found.
                         </div>
                     }
                     else
@@ -32,52 +32,57 @@
                             <table class="table table-striped">
                                 <thead>
                                     <tr>
-                                        <th>Date & Time</th>
+                                        <th>Date</th>
                                         <th>Patient Name</th>
                                         <th>Procedure</th>
+                                        <th>Diagnosis</th>
                                         <th>Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @foreach (var appointment in Model)
+                                    @foreach (var record in Model)
                                     {
                                         <tr>
-                                            <td>@appointment.DateTime.ToString("g")</td>
-                                            <td>@appointment.Patient?.Name</td>
-                                            <td>@appointment.Procedure?.Name</td>
+                                            <td>@record.CreatedAt.ToString("g")</td>
+                                            <td>@(record.Patient?.Name ?? "Unknown")</td>
+                                            <td>@(record.Procedure?.Name ?? "Unknown")</td>
+                                            <td>@(record.Diagnosis?.Length > 50 ? record.Diagnosis.Substring(0, 47) + "..." : record.Diagnosis)</td>
                                             <td>
                                                 <div class="btn-group">
-                                                    <button type="button" class="btn btn-sm btn-info" data-bs-toggle="modal" data-bs-target="#appointmentModal_@appointment.Id">
+                                                    <button type="button" class="btn btn-sm btn-info" data-bs-toggle="modal" data-bs-target="#recordModal_@record.Id">
                                                         View Details
                                                     </button>
                                                 </div>
                                             </td>
                                         </tr>
 
-                                        <!-- Modal for appointment details -->
-                                        <div class="modal fade" id="appointmentModal_@appointment.Id" tabindex="-1">
-                                            <div class="modal-dialog">
+                                        <!-- Modal for record details -->
+                                        <div class="modal fade" id="recordModal_@record.Id" tabindex="-1">
+                                            <div class="modal-dialog modal-lg">
                                                 <div class="modal-content">
                                                     <div class="modal-header">
-                                                        <h5 class="modal-title">Appointment Details</h5>
+                                                        <h5 class="modal-title">Medical Record Details</h5>
                                                         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                                                     </div>
                                                     <div class="modal-body">
                                                         <dl class="row">
-                                                            <dt class="col-sm-4">Date & Time</dt>
-                                                            <dd class="col-sm-8">@appointment.DateTime.ToString("g")</dd>
+                                                            <dt class="col-sm-4">Date</dt>
+                                                            <dd class="col-sm-8">@record.CreatedAt.ToString("g")</dd>
 
-                                                            <dt class="col-sm-4">Patient</dt>
-                                                            <dd class="col-sm-8">@appointment.Patient?.Name</dd>
+                                                            <dt class="col-sm-4">Patient Name</dt>
+                                                            <dd class="col-sm-8">@(record.Patient?.Name ?? "Unknown")</dd>
+
+                                                            <dt class="col-sm-4">Patient Contact</dt>
+                                                            <dd class="col-sm-8">@(record.Patient?.PhoneNumber ?? "N/A")</dd>
 
                                                             <dt class="col-sm-4">Procedure</dt>
-                                                            <dd class="col-sm-8">@appointment.Procedure?.Name</dd>
+                                                            <dd class="col-sm-8">@(record.Procedure?.Name ?? "Unknown")</dd>
 
-                                                            @if (appointment.Patient != null)
-                                                            {
-                                                                <dt class="col-sm-4">Patient Contact</dt>
-                                                                <dd class="col-sm-8">@appointment.Patient.PhoneNumber</dd>
-                                                            }
+                                                            <dt class="col-sm-4">Department</dt>
+                                                            <dd class="col-sm-8">@(record.Procedure?.Department?.Name ?? "Unknown")</dd>
+
+                                                            <dt class="col-sm-4">Diagnosis</dt>
+                                                            <dd class="col-sm-8">@record.Diagnosis</dd>
                                                         </dl>
                                                     </div>
                                                     <div class="modal-footer">
