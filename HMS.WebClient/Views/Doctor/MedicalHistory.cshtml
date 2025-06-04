@@ -31,7 +31,6 @@
                                         <td>@appointment.DateTime.ToString("g")</td>
                                         <td>@appointment.Patient.Name</td>
                                         <td>@appointment.Procedure.Name</td>
-                                        <td>@appointment.Room.Number</td>
                                         <td>
                                             <div class="btn-group">
                                                 <button type="button" class="btn btn-sm btn-info" data-bs-toggle="modal" data-bs-target="#appointmentModal_@appointment.Id">
@@ -60,8 +59,6 @@
                                                         <dt class="col-sm-4">Procedure</dt>
                                                         <dd class="col-sm-8">@appointment.Procedure.Name</dd>
 
-                                                        <dt class="col-sm-4">Room</dt>
-                                                        <dd class="col-sm-8">@appointment.Room.Number</dd>
                                                     </dl>
                                                 </div>
                                                 <div class="modal-footer">
