@@ -34,7 +34,7 @@ namespace HMS.Shared.Proxies.Implementations
             string doctorJson = JsonSerializer.Serialize(doctor, new JsonSerializerOptions
             {
                 PropertyNameCaseInsensitive = true,
-                Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) } // without this, the enum values will not match
+                Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) }
             });
             StringContent content = new StringContent(doctorJson, Encoding.UTF8, "application/json");
 
@@ -45,7 +45,7 @@ namespace HMS.Shared.Proxies.Implementations
             return JsonSerializer.Deserialize<Doctor>(json, new JsonSerializerOptions
             {
                 PropertyNameCaseInsensitive = true,
-                Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) } // without this, the enum values will not match
+                Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) }
             })!;
         }
 
@@ -72,7 +72,7 @@ namespace HMS.Shared.Proxies.Implementations
             IEnumerable<Doctor> doctors = JsonSerializer.Deserialize<IEnumerable<Doctor>>(responseBody, new JsonSerializerOptions
             {
                 PropertyNameCaseInsensitive = true,
-               Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) } // without this, the enum values will not match
+               Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) }
             });
 
             return doctors;
@@ -80,19 +80,49 @@ namespace HMS.Shared.Proxies.Implementations
 
         public async Task<Doctor> GetByIdAsync(int id)
         {
-            AddAuthorizationHeader();
-            HttpResponseMessage response = await _httpClient.GetAsync(_baseUrl + $"doctor/{id}");
-            response.EnsureSuccessStatusCode();
-
-            string responseBody = await response.Content.ReadAsStringAsync();
-
-            Doctor doctor = JsonSerializer.Deserialize<Doctor>(responseBody, new JsonSerializerOptions
+            try
             {
-                PropertyNameCaseInsensitive = true,
-               Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) } // without this, the enum values will not match
-            });
+                AddAuthorizationHeader();
+                HttpResponseMessage response = await _httpClient.GetAsync(_baseUrl + $"doctor/{id}");
+                
+                if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
+                {
+                    throw new KeyNotFoundException($"Doctor with ID {id} was not found.");
+                }
 
-            return doctor;
+                if (!response.IsSuccessStatusCode)
+                {
+                    string errorContent = await response.Content.ReadAsStringAsync();
+                    throw new Exception($"Failed to get doctor. Status code: {response.StatusCode}. Error: {errorContent}");
+                }
+
+                string responseBody = await response.Content.ReadAsStringAsync();
+
+                try
+                {
+                    Doctor doctor = JsonSerializer.Deserialize<Doctor>(responseBody, new JsonSerializerOptions
+                    {
+                        PropertyNameCaseInsensitive = true,
+                        Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) }
+                    });
+
+                    if (doctor == null)
+                    {
+                        throw new Exception("Failed to deserialize doctor data");
+                    }
+
+                    return doctor;
+                }
+                catch (JsonException ex)
+                {
+                    throw new Exception($"Failed to parse doctor data. Response: {responseBody}", ex);
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error getting doctor with ID {id}: {ex.Message}");
+                throw;
+            }
         }
 
         public async Task<IEnumerable<Doctor>> GetByDepartmentIdAsync(int departmentId)
@@ -106,7 +136,7 @@ namespace HMS.Shared.Proxies.Implementations
             IEnumerable<Doctor> doctors = JsonSerializer.Deserialize<IEnumerable<Doctor>>(responseBody, new JsonSerializerOptions
             {
                 PropertyNameCaseInsensitive = true,
-                Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) } // without this, the enum values will not match
+                Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) }
             });
 
             return doctors;
@@ -118,7 +148,7 @@ namespace HMS.Shared.Proxies.Implementations
             string doctorJson = JsonSerializer.Serialize(doctor, new JsonSerializerOptions
             {
                 PropertyNameCaseInsensitive = true,
-                Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) } // without this, the enum values will not match
+                Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) }
             });
             StringContent content = new StringContent(doctorJson, Encoding.UTF8, "application/json");
 

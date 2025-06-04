@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using HMS.Shared.Repositories.Interfaces;
 using HMS.Shared.DTOs;
 using System.Threading.Tasks;
+using System;
 
 namespace HMS.WebClient.Controllers
 {
@@ -21,55 +22,98 @@ namespace HMS.WebClient.Controllers
 
         public async Task<IActionResult> Profile()
         {
-            // Get the current doctor's ID from the session/claims
-            var doctorId = 3; // TODO: Get from session/claims
-            var doctor = await _doctorRepository.GetByIdAsync(doctorId);
-            
-            if (doctor == null)
+            try
             {
-                return NotFound();
+                // Get the current doctor's ID from the session/claims
+                var doctorId = 3; // TODO: Get from session/claims
+                var doctor = await _doctorRepository.GetByIdAsync(doctorId);
+                
+                return View(doctor);
             }
-
-            return View(doctor);
+            catch (KeyNotFoundException)
+            {
+                // Doctor not found
+                return NotFound("Doctor not found. Please make sure you are logged in with a valid doctor account.");
+            }
+            catch (Exception ex)
+            {
+                // Log the error
+                Console.WriteLine($"Error in Profile action: {ex.Message}");
+                
+                // Add error message to be displayed to the user
+                ModelState.AddModelError("", "An error occurred while loading the profile. Please try again later.");
+                
+                // Return to view with error message
+                return View();
+            }
         }
 
         public async Task<IActionResult> MedicalHistory()
         {
-            // Get the current doctor's ID from the session/claims
-            var doctorId = 3; // TODO: Get from session/claims
-            var doctor = await _doctorRepository.GetByIdAsync(doctorId);
-            
-            if (doctor == null)
+            try
             {
-                return NotFound();
+                // Get the current doctor's ID from the session/claims
+                var doctorId = 3; // TODO: Get from session/claims
+                var doctor = await _doctorRepository.GetByIdAsync(doctorId);
+                
+                return View(doctor.Appointments);
             }
-
-            // For now, we'll just show the doctor's appointments from their entity
-            return View(doctor.Appointments);
+            catch (KeyNotFoundException)
+            {
+                // Doctor not found
+                return NotFound("Doctor not found. Please make sure you are logged in with a valid doctor account.");
+            }
+            catch (Exception ex)
+            {
+                // Log the error
+                Console.WriteLine($"Error in MedicalHistory action: {ex.Message}");
+                
+                // Add error message to be displayed to the user
+                ModelState.AddModelError("", "An error occurred while loading the medical history. Please try again later.");
+                
+                // Return to view with error message
+                return View(Array.Empty<HMS.Shared.Entities.Appointment>());
+            }
         }
 
         [HttpPost]
         public async Task<IActionResult> UpdateProfile(DoctorDto model)
         {
-            if (!ModelState.IsValid)
+            try
             {
+                if (!ModelState.IsValid)
+                {
+                    return View("Profile", model);
+                }
+
+                var doctor = await _doctorRepository.GetByIdAsync(model.Id);
+                if (doctor == null)
+                {
+                    return NotFound("Doctor not found. Please make sure you are logged in with a valid doctor account.");
+                }
+
+                var success = await _doctorRepository.UpdateAsync(doctor);
+                if (!success)
+                {
+                    ModelState.AddModelError("", "Failed to update profile. Please try again.");
+                    return View("Profile", model);
+                }
+
+                // Add success message
+                TempData["SuccessMessage"] = "Profile updated successfully.";
+                return RedirectToAction(nameof(Profile));
+            }
+            catch (Exception ex)
+            {
+                // Log the error
+                Console.WriteLine($"Error in UpdateProfile action: {ex.Message}");
+                
+                // Add error message to be displayed to the user
+                ModelState.AddModelError("", "An error occurred while updating the profile. Please try again later.");
+                
+                // Return to view with error message
                 return View("Profile", model);
             }
-
-            var doctor = await _doctorRepository.GetByIdAsync(model.Id);
-            if (doctor == null)
-            {
-                return NotFound();
-            }
-
-            var success = await _doctorRepository.UpdateAsync(doctor);
-            if (!success)
-            {
-                ModelState.AddModelError("", "Failed to update profile");
-                return View("Profile", model);
-            }
-
-            return RedirectToAction(nameof(Profile));
         }
     }
 } 
