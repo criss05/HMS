@@ -13,64 +13,84 @@
                     <a asp-action="Profile" class="btn btn-light">Back to Profile</a>
                 </div>
                 <div class="card-body">
-                    <div class="table-responsive">
-                        <table class="table table-striped">
-                            <thead>
-                                <tr>
-                                    <th>Date & Time</th>
-                                    <th>Patient Name</th>
-                                    <th>Procedure</th>
-                                    <th>Room</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach (var appointment in Model)
-                                {
+                    @if (!ViewData.ModelState.IsValid)
+                    {
+                        <div class="alert alert-danger">
+                            <div asp-validation-summary="All" class="text-danger"></div>
+                        </div>
+                    }
+
+                    @if (!Model.Any())
+                    {
+                        <div class="alert alert-info">
+                            No appointments found.
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
                                     <tr>
-                                        <td>@appointment.DateTime.ToString("g")</td>
-                                        <td>@appointment.Patient.Name</td>
-                                        <td>@appointment.Procedure.Name</td>
-                                        <td>
-                                            <div class="btn-group">
-                                                <button type="button" class="btn btn-sm btn-info" data-bs-toggle="modal" data-bs-target="#appointmentModal_@appointment.Id">
-                                                    View Details
-                                                </button>
-                                            </div>
-                                        </td>
+                                        <th>Date & Time</th>
+                                        <th>Patient Name</th>
+                                        <th>Procedure</th>
+                                        <th>Actions</th>
                                     </tr>
-
-                                    <!-- Modal for appointment details -->
-                                    <div class="modal fade" id="appointmentModal_@appointment.Id" tabindex="-1">
-                                        <div class="modal-dialog">
-                                            <div class="modal-content">
-                                                <div class="modal-header">
-                                                    <h5 class="modal-title">Appointment Details</h5>
-                                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                </thead>
+                                <tbody>
+                                    @foreach (var appointment in Model)
+                                    {
+                                        <tr>
+                                            <td>@appointment.DateTime.ToString("g")</td>
+                                            <td>@appointment.Patient?.Name</td>
+                                            <td>@appointment.Procedure?.Name</td>
+                                            <td>
+                                                <div class="btn-group">
+                                                    <button type="button" class="btn btn-sm btn-info" data-bs-toggle="modal" data-bs-target="#appointmentModal_@appointment.Id">
+                                                        View Details
+                                                    </button>
                                                 </div>
-                                                <div class="modal-body">
-                                                    <dl class="row">
-                                                        <dt class="col-sm-4">Date & Time</dt>
-                                                        <dd class="col-sm-8">@appointment.DateTime.ToString("g")</dd>
+                                            </td>
+                                        </tr>
 
-                                                        <dt class="col-sm-4">Patient</dt>
-                                                        <dd class="col-sm-8">@appointment.Patient.Name</dd>
+                                        <!-- Modal for appointment details -->
+                                        <div class="modal fade" id="appointmentModal_@appointment.Id" tabindex="-1">
+                                            <div class="modal-dialog">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <h5 class="modal-title">Appointment Details</h5>
+                                                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        <dl class="row">
+                                                            <dt class="col-sm-4">Date & Time</dt>
+                                                            <dd class="col-sm-8">@appointment.DateTime.ToString("g")</dd>
 
-                                                        <dt class="col-sm-4">Procedure</dt>
-                                                        <dd class="col-sm-8">@appointment.Procedure.Name</dd>
+                                                            <dt class="col-sm-4">Patient</dt>
+                                                            <dd class="col-sm-8">@appointment.Patient?.Name</dd>
 
-                                                    </dl>
-                                                </div>
-                                                <div class="modal-footer">
-                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                                            <dt class="col-sm-4">Procedure</dt>
+                                                            <dd class="col-sm-8">@appointment.Procedure?.Name</dd>
+
+                                                            @if (appointment.Patient != null)
+                                                            {
+                                                                <dt class="col-sm-4">Patient Contact</dt>
+                                                                <dd class="col-sm-8">@appointment.Patient.PhoneNumber</dd>
+                                                            }
+                                                        </dl>
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
-                                }
-                            </tbody>
-                        </table>
-                    </div>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
                 </div>
             </div>
         </div>

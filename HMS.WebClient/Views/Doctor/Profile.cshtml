@@ -1,4 +1,5 @@
-@model HMS.Shared.DTOs.DoctorDto
+@model HMS.Shared.Entities.Doctor
+
 @{
     ViewData["Title"] = "Doctor Profile";
     Layout = "_DoctorLayout";
@@ -12,6 +13,19 @@
                     <h2 class="mb-0">Doctor Profile</h2>
                 </div>
                 <div class="card-body">
+                    @if (!string.IsNullOrEmpty(TempData["SuccessMessage"]?.ToString()))
+                    {
+                        <div class="alert alert-success">
+                            @TempData["SuccessMessage"]
+                        </div>
+                    }
+                    @if (!ViewData.ModelState.IsValid)
+                    {
+                        <div class="alert alert-danger">
+                            <div asp-validation-summary="All" class="text-danger"></div>
+                        </div>
+                    }
+
                     <form asp-action="UpdateProfile" method="post">
                         <input type="hidden" asp-for="Id" />
                         <input type="hidden" asp-for="Role" />
@@ -42,8 +56,8 @@
                         </div>
 
                         <div class="mb-3">
-                            <label asp-for="DepartmentName" class="form-label">Department</label>
-                            <input asp-for="DepartmentName" class="form-control" readonly />
+                            <label asp-for="Department.Name" class="form-label">Department</label>
+                            <input asp-for="Department.Name" class="form-control" readonly />
                         </div>
 
                         <div class="mb-3">

@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using HMS.Shared.Repositories.Interfaces;
 using HMS.Shared.DTOs;
+using HMS.Shared.Entities;
 using System.Threading.Tasks;
 using System;
 
@@ -44,7 +45,7 @@ namespace HMS.WebClient.Controllers
                 ModelState.AddModelError("", "An error occurred while loading the profile. Please try again later.");
                 
                 // Return to view with error message
-                return View();
+                return View(new Doctor()); // Return empty doctor to avoid null reference
             }
         }
 
@@ -72,12 +73,12 @@ namespace HMS.WebClient.Controllers
                 ModelState.AddModelError("", "An error occurred while loading the medical history. Please try again later.");
                 
                 // Return to view with error message
-                return View(Array.Empty<HMS.Shared.Entities.Appointment>());
+                return View(Array.Empty<Appointment>());
             }
         }
 
         [HttpPost]
-        public async Task<IActionResult> UpdateProfile(DoctorDto model)
+        public async Task<IActionResult> UpdateProfile(Doctor model)
         {
             try
             {
@@ -86,13 +87,20 @@ namespace HMS.WebClient.Controllers
                     return View("Profile", model);
                 }
 
-                var doctor = await _doctorRepository.GetByIdAsync(model.Id);
-                if (doctor == null)
+                var existingDoctor = await _doctorRepository.GetByIdAsync(model.Id);
+                if (existingDoctor == null)
                 {
                     return NotFound("Doctor not found. Please make sure you are logged in with a valid doctor account.");
                 }
 
-                var success = await _doctorRepository.UpdateAsync(doctor);
+                // Update only the editable fields
+                existingDoctor.Name = model.Name;
+                existingDoctor.Email = model.Email;
+                existingDoctor.PhoneNumber = model.PhoneNumber;
+                existingDoctor.YearsOfExperience = model.YearsOfExperience;
+                existingDoctor.LicenseNumber = model.LicenseNumber;
+
+                var success = await _doctorRepository.UpdateAsync(existingDoctor);
                 if (!success)
                 {
                     ModelState.AddModelError("", "Failed to update profile. Please try again.");
