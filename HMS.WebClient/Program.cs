@@ -19,22 +19,6 @@ builder.Services.AddScoped<IDoctorRepository>(sp => {
     return new DoctorProxy(httpClient, token);
 });
 
-builder.Services.AddScoped<IAppointmentRepository>(sp => {
-    var httpClientFactory = sp.GetRequiredService<IHttpClientFactory>();
-    var httpClient = httpClientFactory.CreateClient();
-    // TODO: Get token from authentication service
-    var token = "";
-    return new AppointmentProxy(httpClient, token);
-});
-
-builder.Services.AddScoped<IMedicalRecordRepository>(sp => {
-    var httpClientFactory = sp.GetRequiredService<IHttpClientFactory>();
-    var httpClient = httpClientFactory.CreateClient();
-    // TODO: Get token from authentication service
-    var token = "";
-    return new MedicalRecordProxy(httpClient, token);
-});
-
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

@@ -1,26 +1,17 @@
 using Microsoft.AspNetCore.Mvc;
-using HMS.WebClient.Models;
 using HMS.Shared.Repositories.Interfaces;
 using HMS.Shared.DTOs;
 using System.Threading.Tasks;
-using System.Collections.Generic;
 
 namespace HMS.WebClient.Controllers
 {
     public class DoctorController : Controller
     {
         private readonly IDoctorRepository _doctorRepository;
-        private readonly IAppointmentRepository _appointmentRepository;
-        private readonly IMedicalRecordRepository _medicalRecordRepository;
 
-        public DoctorController(
-            IDoctorRepository doctorRepository,
-            IAppointmentRepository appointmentRepository,
-            IMedicalRecordRepository medicalRecordRepository)
+        public DoctorController(IDoctorRepository doctorRepository)
         {
             _doctorRepository = doctorRepository;
-            _appointmentRepository = appointmentRepository;
-            _medicalRecordRepository = medicalRecordRepository;
         }
 
         public IActionResult Index()
@@ -31,7 +22,7 @@ namespace HMS.WebClient.Controllers
         public async Task<IActionResult> Profile()
         {
             // Get the current doctor's ID from the session/claims
-            var doctorId = 3; // TODO: Get from session/claims
+            var doctorId = 1; // TODO: Get from session/claims
             var doctor = await _doctorRepository.GetByIdAsync(doctorId);
             
             if (doctor == null)
@@ -45,12 +36,16 @@ namespace HMS.WebClient.Controllers
         public async Task<IActionResult> MedicalHistory()
         {
             // Get the current doctor's ID from the session/claims
-            var doctorId = 3; // TODO: Get from session/claims
+            var doctorId = 1; // TODO: Get from session/claims
+            var doctor = await _doctorRepository.GetByIdAsync(doctorId);
             
-            var appointments = await _appointmentRepository.GetAllAsync();
-            var doctorAppointments = appointments.Where(a => a.DoctorId == doctorId);
-            
-            return View(doctorAppointments);
+            if (doctor == null)
+            {
+                return NotFound();
+            }
+
+            // For now, we'll just show the doctor's appointments from their entity
+            return View(doctor.Appointments);
         }
 
         [HttpPost]
