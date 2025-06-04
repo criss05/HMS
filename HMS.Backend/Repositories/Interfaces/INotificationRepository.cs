@@ -23,6 +23,13 @@ namespace HMS.Backend.Repositories.Interfaces
         Task<Notification?> GetByIdAsync(int id);
 
         /// <summary>
+        /// Retrieves a notification by its unique identifier asynchronously.
+        /// </summary>
+        /// <param name="id">The notification's unique ID.</param>
+        /// <returns>The matching notification or null if not found.</returns>
+        Task<IEnumerable<Notification>> GetByUserIdAsync(int id);
+
+        /// <summary>
         /// Adds a new notification asynchronously.
         /// </summary>
         /// <param name="notification">Notification entity to add.</param>

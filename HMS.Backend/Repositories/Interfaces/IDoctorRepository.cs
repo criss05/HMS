@@ -23,6 +23,13 @@ namespace HMS.Backend.Repositories.Interfaces
         Task<Doctor?> GetByIdAsync(int id);
 
         /// <summary>
+        /// Gets all doctors associated with a specific department asynchronously.
+        /// </summary>
+        /// <param name="departmentId">The unique  identifier of the department.</param>
+        /// <returns>The doctors in the departnemt if found, otherwise empty list.</returns>
+        Task<IEnumerable<Doctor>> GetByDepartmentIdAsync(int departmentId);
+
+        /// <summary>
         /// Adds a new doctor asynchronously.
         /// </summary>
         /// <param name="doctor">The doctor to add.</param>
