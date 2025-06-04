@@ -5,12 +5,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 
 namespace HMS.Shared.Proxies.Implementations
 {
-    class DoctorProxy : IDoctorRepository
+    public class DoctorProxy : IDoctorRepository
     {
         private readonly HttpClient _httpClient;
         private readonly string _baseUrl = Config._base_api_url;
@@ -30,7 +31,11 @@ namespace HMS.Shared.Proxies.Implementations
         public async Task<Doctor> AddAsync(Doctor doctor)
         {
             AddAuthorizationHeader();
-            string doctorJson = JsonSerializer.Serialize(doctor);
+            string doctorJson = JsonSerializer.Serialize(doctor, new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true,
+                Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) } // without this, the enum values will not match
+            });
             StringContent content = new StringContent(doctorJson, Encoding.UTF8, "application/json");
 
             HttpResponseMessage response = await _httpClient.PostAsync(_baseUrl + "doctor", content);
@@ -39,14 +44,15 @@ namespace HMS.Shared.Proxies.Implementations
             var json = await response.Content.ReadAsStringAsync();
             return JsonSerializer.Deserialize<Doctor>(json, new JsonSerializerOptions
             {
-                PropertyNameCaseInsensitive = true
+                PropertyNameCaseInsensitive = true,
+                Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) } // without this, the enum values will not match
             })!;
         }
 
         public async Task<bool> DeleteAsync(int id)
         {
             AddAuthorizationHeader();
-            HttpResponseMessage response = await _httpClient.DeleteAsync(_baseUrl + $"doctor/delete/{id}");
+            HttpResponseMessage response = await _httpClient.DeleteAsync(_baseUrl + $"doctor/{id}");
             response.EnsureSuccessStatusCode();
 
             if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
@@ -63,9 +69,10 @@ namespace HMS.Shared.Proxies.Implementations
 
             string responseBody = await response.Content.ReadAsStringAsync();
 
-            List<Doctor> doctors = JsonSerializer.Deserialize<List<Doctor>>(responseBody, new JsonSerializerOptions
+            IEnumerable<Doctor> doctors = JsonSerializer.Deserialize<IEnumerable<Doctor>>(responseBody, new JsonSerializerOptions
             {
-                PropertyNameCaseInsensitive = true
+                PropertyNameCaseInsensitive = true,
+               Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) } // without this, the enum values will not match
             });
 
             return doctors;
@@ -81,52 +88,38 @@ namespace HMS.Shared.Proxies.Implementations
 
             Doctor doctor = JsonSerializer.Deserialize<Doctor>(responseBody, new JsonSerializerOptions
             {
-                PropertyNameCaseInsensitive = true
+                PropertyNameCaseInsensitive = true,
+               Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) } // without this, the enum values will not match
             });
 
             return doctor;
         }
 
-        public async Task<List<Doctor>> GetByDepartmentIdAsync(int departmentId)
+        public async Task<IEnumerable<Doctor>> GetByDepartmentIdAsync(int departmentId)
         {
             AddAuthorizationHeader();
-            HttpResponseMessage response = await _httpClient.GetAsync(_baseUrl + $"doctor/doctor/{departmentId}");
+            HttpResponseMessage response = await _httpClient.GetAsync(_baseUrl + $"doctor/department/{departmentId}");
             response.EnsureSuccessStatusCode();
 
             string responseBody = await response.Content.ReadAsStringAsync();
 
-            List<Doctor> doctors = JsonSerializer.Deserialize<List<Doctor>>(responseBody, new JsonSerializerOptions
+            IEnumerable<Doctor> doctors = JsonSerializer.Deserialize<IEnumerable<Doctor>>(responseBody, new JsonSerializerOptions
             {
-                PropertyNameCaseInsensitive = true
+                PropertyNameCaseInsensitive = true,
+                Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) } // without this, the enum values will not match
             });
 
             return doctors;
         }
 
-        public async Task<Department> GetDepartmentByIdAsync(int id)
-        {
-            AddAuthorizationHeader();
-            var departments = await GetAllDepartmentsAsync();
-            return departments.FirstOrDefault(d => d.Id == id);
-        }
-
-        public async Task<List<Department>> GetAllDepartmentsAsync()
-        {
-            AddAuthorizationHeader();
-            HttpResponseMessage response = await _httpClient.GetAsync(_baseUrl + "department");
-            response.EnsureSuccessStatusCode();
-
-            string responseBody = await response.Content.ReadAsStringAsync();
-            return JsonSerializer.Deserialize<List<Department>>(responseBody, new JsonSerializerOptions
-            {
-                PropertyNameCaseInsensitive = true
-            });
-        }
-
         public async Task<bool> UpdateAsync(Doctor doctor)
         {
             AddAuthorizationHeader();
-            string doctorJson = JsonSerializer.Serialize(doctor);
+            string doctorJson = JsonSerializer.Serialize(doctor, new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true,
+                Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) } // without this, the enum values will not match
+            });
             StringContent content = new StringContent(doctorJson, Encoding.UTF8, "application/json");
 
             HttpResponseMessage response = await _httpClient.PutAsync(_baseUrl + $"doctor/{doctor.Id}", content);
@@ -136,16 +129,6 @@ namespace HMS.Shared.Proxies.Implementations
                 return false;
 
             return response.IsSuccessStatusCode;
-        }
-
-        public async Task UpdateByNameAsync(string name, Doctor doctor)
-        {
-            AddAuthorizationHeader();
-            string doctorJson = JsonSerializer.Serialize(doctor);
-            StringContent content = new StringContent(doctorJson, Encoding.UTF8, "application/json");
-
-            HttpResponseMessage response = await _httpClient.PutAsync(_baseUrl + $"doctor/by-name/{Uri.EscapeDataString(name)}", content);
-            response.EnsureSuccessStatusCode();
         }
     }
 }
