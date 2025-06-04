@@ -42,6 +42,17 @@ namespace HMS.Backend.Controllers
             return Ok(doctor);
         }
 
+        [HttpGet("department/{id}")]
+        [Authorize]
+        [ProducesResponseType(typeof(IEnumerable<Doctor>), 200)]
+        [ProducesResponseType(404)]
+        public async Task<IActionResult> GetByDepartmentId(int id)
+        {
+            var doctors = await _doctorRepository.GetByDepartmentIdAsync(id);
+            if (doctors.Count() == 0) return NotFound();
+            return Ok(doctors);
+        }
+
         [HttpPost]
         [Authorize]
         [ProducesResponseType(typeof(Doctor), 201)]
