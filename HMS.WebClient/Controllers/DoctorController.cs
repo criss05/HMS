@@ -22,7 +22,7 @@ namespace HMS.WebClient.Controllers
         public async Task<IActionResult> Profile()
         {
             // Get the current doctor's ID from the session/claims
-            var doctorId = 1; // TODO: Get from session/claims
+            var doctorId = 3; // TODO: Get from session/claims
             var doctor = await _doctorRepository.GetByIdAsync(doctorId);
             
             if (doctor == null)
@@ -36,7 +36,7 @@ namespace HMS.WebClient.Controllers
         public async Task<IActionResult> MedicalHistory()
         {
             // Get the current doctor's ID from the session/claims
-            var doctorId = 1; // TODO: Get from session/claims
+            var doctorId = 3; // TODO: Get from session/claims
             var doctor = await _doctorRepository.GetByIdAsync(doctorId);
             
             if (doctor == null)
