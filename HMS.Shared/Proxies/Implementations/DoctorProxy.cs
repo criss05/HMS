@@ -33,7 +33,7 @@ namespace HMS.Shared.Proxies.Implementations
             string doctorJson = JsonSerializer.Serialize(doctor);
             StringContent content = new StringContent(doctorJson, Encoding.UTF8, "application/json");
 
-            HttpResponseMessage response = await _httpClient.PostAsync(_baseUrl + "api/doctor", content);
+            HttpResponseMessage response = await _httpClient.PostAsync(_baseUrl + "doctor", content);
             response.EnsureSuccessStatusCode();
 
             var json = await response.Content.ReadAsStringAsync();
@@ -46,7 +46,7 @@ namespace HMS.Shared.Proxies.Implementations
         public async Task<bool> DeleteAsync(int id)
         {
             AddAuthorizationHeader();
-            HttpResponseMessage response = await _httpClient.DeleteAsync(_baseUrl + $"api/doctor/delete/{id}");
+            HttpResponseMessage response = await _httpClient.DeleteAsync(_baseUrl + $"doctor/delete/{id}");
             response.EnsureSuccessStatusCode();
 
             if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
@@ -58,7 +58,7 @@ namespace HMS.Shared.Proxies.Implementations
         public async Task<IEnumerable<Doctor>> GetAllAsync()
         {
             AddAuthorizationHeader();
-            HttpResponseMessage response = await _httpClient.GetAsync(_baseUrl + "api/doctor");
+            HttpResponseMessage response = await _httpClient.GetAsync(_baseUrl + "doctor");
             response.EnsureSuccessStatusCode();
 
             string responseBody = await response.Content.ReadAsStringAsync();
@@ -74,7 +74,7 @@ namespace HMS.Shared.Proxies.Implementations
         public async Task<Doctor> GetByIdAsync(int id)
         {
             AddAuthorizationHeader();
-            HttpResponseMessage response = await _httpClient.GetAsync(_baseUrl + $"api/doctor/{id}");
+            HttpResponseMessage response = await _httpClient.GetAsync(_baseUrl + $"doctor/{id}");
             response.EnsureSuccessStatusCode();
 
             string responseBody = await response.Content.ReadAsStringAsync();
@@ -90,7 +90,7 @@ namespace HMS.Shared.Proxies.Implementations
         public async Task<List<Doctor>> GetByDepartmentIdAsync(int departmentId)
         {
             AddAuthorizationHeader();
-            HttpResponseMessage response = await _httpClient.GetAsync(_baseUrl + $"api/doctor/doctor/{departmentId}");
+            HttpResponseMessage response = await _httpClient.GetAsync(_baseUrl + $"doctor/doctor/{departmentId}");
             response.EnsureSuccessStatusCode();
 
             string responseBody = await response.Content.ReadAsStringAsync();
@@ -113,7 +113,7 @@ namespace HMS.Shared.Proxies.Implementations
         public async Task<List<Department>> GetAllDepartmentsAsync()
         {
             AddAuthorizationHeader();
-            HttpResponseMessage response = await _httpClient.GetAsync(_baseUrl + "api/department");
+            HttpResponseMessage response = await _httpClient.GetAsync(_baseUrl + "department");
             response.EnsureSuccessStatusCode();
 
             string responseBody = await response.Content.ReadAsStringAsync();
@@ -129,7 +129,7 @@ namespace HMS.Shared.Proxies.Implementations
             string doctorJson = JsonSerializer.Serialize(doctor);
             StringContent content = new StringContent(doctorJson, Encoding.UTF8, "application/json");
 
-            HttpResponseMessage response = await _httpClient.PutAsync(_baseUrl + $"api/doctor/{doctor.Id}", content);
+            HttpResponseMessage response = await _httpClient.PutAsync(_baseUrl + $"doctor/{doctor.Id}", content);
             response.EnsureSuccessStatusCode();
 
             if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
@@ -144,7 +144,7 @@ namespace HMS.Shared.Proxies.Implementations
             string doctorJson = JsonSerializer.Serialize(doctor);
             StringContent content = new StringContent(doctorJson, Encoding.UTF8, "application/json");
 
-            HttpResponseMessage response = await _httpClient.PutAsync(_baseUrl + $"api/doctor/by-name/{Uri.EscapeDataString(name)}", content);
+            HttpResponseMessage response = await _httpClient.PutAsync(_baseUrl + $"doctor/by-name/{Uri.EscapeDataString(name)}", content);
             response.EnsureSuccessStatusCode();
         }
     }
