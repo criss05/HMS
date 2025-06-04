@@ -111,14 +111,20 @@ namespace HMS.Backend.Controllers
             if (department == null)
                 return BadRequest($"Department with ID {dto.DepartmentId} not found.");
 
+            // Update user fields
             existing.Email = dto.Email;
-            existing.Password = dto.Password;
+            // Only update password if it's provided in the DTO
+            if (!string.IsNullOrWhiteSpace(dto.Password))
+            {
+                existing.Password = dto.Password;
+            }
             existing.Role = dto.Role;
             existing.Name = dto.Name;
             existing.CNP = dto.CNP;
             existing.PhoneNumber = dto.PhoneNumber;
-            existing.CreatedAt = dto.CreatedAt;
-
+            // Don't update CreatedAt as it should be immutable
+            
+            // Update doctor fields
             existing.DepartmentId = dto.DepartmentId;
             existing.Department = department;
             existing.YearsOfExperience = dto.YearsOfExperience;

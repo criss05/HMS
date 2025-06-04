@@ -4,6 +4,8 @@ using HMS.Shared.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace HMS.Backend.Controllers
@@ -16,6 +18,7 @@ namespace HMS.Backend.Controllers
         private readonly IPatientRepository _patientRepository;
         private readonly IDoctorRepository _doctorRepository;
         private readonly IProcedureRepository _procedureRepository;
+        private readonly JsonSerializerOptions _jsonOptions;
 
         public MedicalRecordController(
             IMedicalRecordRepository medicalRecordRepository,
@@ -27,6 +30,12 @@ namespace HMS.Backend.Controllers
             _patientRepository = patientRepository;
             _doctorRepository = doctorRepository;
             _procedureRepository = procedureRepository;
+            _jsonOptions = new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true,
+                ReferenceHandler = ReferenceHandler.Preserve,
+                Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) }
+            };
         }
 
         /// <summary>
@@ -40,7 +49,8 @@ namespace HMS.Backend.Controllers
         public async Task<IActionResult> GetAll()
         {
             var records = await _medicalRecordRepository.GetAllAsync();
-            return Ok(records);
+            var serializedRecords = JsonSerializer.Serialize(records, _jsonOptions);
+            return Content(serializedRecords, "application/json");
         }
 
         /// <summary>
@@ -58,7 +68,8 @@ namespace HMS.Backend.Controllers
         {
             var record = await _medicalRecordRepository.GetByIdAsync(id);
             if (record == null) return NotFound();
-            return Ok(record);
+            var serializedRecord = JsonSerializer.Serialize(record, _jsonOptions);
+            return Content(serializedRecord, "application/json");
         }
 
         /// <summary>
@@ -99,7 +110,8 @@ namespace HMS.Backend.Controllers
             };
 
             var createdRecord = await _medicalRecordRepository.AddAsync(record);
-            return CreatedAtAction(nameof(GetById), new { id = createdRecord.Id }, createdRecord);
+            var serializedRecord = JsonSerializer.Serialize(createdRecord, _jsonOptions);
+            return Created($"/api/medicalrecord/{createdRecord.Id}", serializedRecord);
         }
 
         /// <summary>

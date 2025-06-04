@@ -24,8 +24,21 @@ namespace HMS.Backend.Repositories.Implementations
         {
             return await _context.MedicalRecords
                 .Include(m => m.Patient)
+                    .ThenInclude(p => p.Reviews)
+                .Include(m => m.Patient)
+                    .ThenInclude(p => p.Appointments)
+                .Include(m => m.Patient)
+                    .ThenInclude(p => p.MedicalRecords)
                 .Include(m => m.Doctor)
+                    .ThenInclude(d => d.Department)
+                .Include(m => m.Doctor)
+                    .ThenInclude(d => d.Schedules)
+                .Include(m => m.Doctor)
+                    .ThenInclude(d => d.Reviews)
+                .Include(m => m.Doctor)
+                    .ThenInclude(d => d.Appointments)
                 .Include(m => m.Procedure)
+                    .ThenInclude(p => p.Department)
                 .ToListAsync();
         }
 
@@ -34,8 +47,21 @@ namespace HMS.Backend.Repositories.Implementations
         {
             return await _context.MedicalRecords
                 .Include(m => m.Patient)
+                    .ThenInclude(p => p.Reviews)
+                .Include(m => m.Patient)
+                    .ThenInclude(p => p.Appointments)
+                .Include(m => m.Patient)
+                    .ThenInclude(p => p.MedicalRecords)
                 .Include(m => m.Doctor)
+                    .ThenInclude(d => d.Department)
+                .Include(m => m.Doctor)
+                    .ThenInclude(d => d.Schedules)
+                .Include(m => m.Doctor)
+                    .ThenInclude(d => d.Reviews)
+                .Include(m => m.Doctor)
+                    .ThenInclude(d => d.Appointments)
                 .Include(m => m.Procedure)
+                    .ThenInclude(p => p.Department)
                 .FirstOrDefaultAsync(m => m.Id == id);
         }
 
