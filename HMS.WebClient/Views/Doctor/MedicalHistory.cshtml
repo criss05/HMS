@@ -78,7 +78,9 @@
                                 <div class="list-group-item">
                                     <div class="d-flex justify-content-between align-items-center">
                                         <div>
-                                            <h6 class="mb-1">Patient ID: @appointment.PatientId</h6>
+                                            <h6 class="mb-1">
+                                                @(ViewData[$"PatientName_{appointment.PatientId}"] ?? $"Patient {appointment.PatientId}")
+                                            </h6>
                                             <small class="text-muted">
                                                 Date: @appointment.DateTime.ToString("MMM dd, yyyy")
                                                 <br />
@@ -120,7 +122,9 @@
                                 <div class="list-group-item">
                                     <div class="d-flex justify-content-between align-items-center">
                                         <div>
-                                            <h6 class="mb-1">Patient ID: @record.PatientId</h6>
+                                            <h6 class="mb-1">
+                                                @(ViewData[$"PatientName_{record.PatientId}"] ?? $"Patient {record.PatientId}")
+                                            </h6>
                                             <small class="text-muted">
                                                 @(record.CreatedAt?.ToString("MMM dd, yyyy") ?? "No date")
                                                 <br />
@@ -165,7 +169,7 @@
                             <thead>
                                 <tr>
                                     <th>Date</th>
-                                    <th>Patient ID</th>
+                                    <th>Patient</th>
                                     <th>Procedure ID</th>
                                     <th>Actions</th>
                                 </tr>
@@ -175,7 +179,7 @@
                                 {
                                     <tr>
                                         <td>@(record.CreatedAt?.ToString("MMM dd, yyyy") ?? "No date")</td>
-                                        <td>@record.PatientId</td>
+                                        <td>@(ViewData[$"PatientName_{record.PatientId}"] ?? $"Patient {record.PatientId}")</td>
                                         <td>@record.ProcedureId</td>
                                         <td>
                                             <a asp-action="ViewRecord" asp-route-id="@record.Id" class="btn btn-sm btn-info">
