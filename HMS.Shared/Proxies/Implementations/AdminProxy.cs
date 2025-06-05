@@ -82,7 +82,7 @@ namespace HMS.Shared.Proxies.Implementations
             }
         }
 
-        public async Task<IEnumerable<Admin>> GetAllAsync()
+        public async Task<IEnumerable<AdminDto>> GetAllAsync()
         {
             try
             {
@@ -91,7 +91,7 @@ namespace HMS.Shared.Proxies.Implementations
                 response.EnsureSuccessStatusCode();
 
                 string responseBody = await response.Content.ReadAsStringAsync();
-                return JsonSerializer.Deserialize<IEnumerable<Admin>>(responseBody, new JsonSerializerOptions
+                return JsonSerializer.Deserialize<IEnumerable<AdminDto>>(responseBody, new JsonSerializerOptions
                 {
                     PropertyNameCaseInsensitive = true,
                     Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) }
