@@ -24,6 +24,7 @@ namespace HMS.WebClient.Controllers
         private readonly IPatientRepository _patientRepository;
         private readonly AuthService _authService;
         private readonly ILogger<DoctorController> _logger;
+        private readonly IProcedureRepository _procedureRepository;
 
         public DoctorController(
             DoctorService doctorService,
@@ -31,7 +32,8 @@ namespace HMS.WebClient.Controllers
             IAppointmentRepository appointmentRepository,
             IPatientRepository patientRepository,
             AuthService authService,
-            ILogger<DoctorController> logger)
+            ILogger<DoctorController> logger,
+            IProcedureRepository procedureRepository)
         {
             _doctorService = doctorService;
             _medicalRecordRepository = medicalRecordRepository;
@@ -39,6 +41,7 @@ namespace HMS.WebClient.Controllers
             _patientRepository = patientRepository;
             _authService = authService;
             _logger = logger;
+            _procedureRepository = procedureRepository;
         }
 
         public IActionResult Index()
@@ -261,6 +264,22 @@ namespace HMS.WebClient.Controllers
                 if (patient != null)
                 {
                     ViewData["PatientName"] = patient.Name;
+                }
+
+                // Get procedure name and department
+                var procedure = await _procedureRepository.GetByIdAsync(record.ProcedureId);
+                if (procedure != null)
+                {
+                    ViewData["ProcedureName"] = procedure.Name;
+                    ViewData["ProcedureDepartment"] = procedure.DepartmentName;
+                }
+
+                // Get doctor name and department
+                var doctor = await _doctorService.GetDoctorByIdAsync(record.DoctorId);
+                if (doctor != null)
+                {
+                    ViewData["DoctorName"] = doctor.Name;
+                    ViewData["DoctorDepartment"] = doctor.DepartmentName;
                 }
 
                 return View(record);

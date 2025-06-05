@@ -20,45 +20,29 @@
 
                 <dt class="col-sm-3">Patient</dt>
                 <dd class="col-sm-9">
-                    @(ViewData["PatientName"] ?? "Unknown") 
-                    <small class="text-muted">(ID: @Model.PatientId)</small>
+                    @(ViewData["PatientName"] ?? "Unknown")
                 </dd>
 
                 <dt class="col-sm-3">Doctor</dt>
                 <dd class="col-sm-9">
-                    @(Model.DoctorName ?? "Unknown")
-                    <small class="text-muted">
-                        (ID: @Model.DoctorId)
-                        @if (!string.IsNullOrEmpty(Model.DoctorDepartment))
-                        {
-                            <span> - @Model.DoctorDepartment Department</span>
-                        }
-                    </small>
+                    @(ViewData["DoctorName"] ?? "Unknown")
+                    @if (!string.IsNullOrEmpty((string)ViewData["DoctorDepartment"]))
+                    {
+                        <small class="text-muted">(@ViewData["DoctorDepartment"] Department)</small>
+                    }
                 </dd>
 
                 <dt class="col-sm-3">Procedure</dt>
                 <dd class="col-sm-9">
-                    @(Model.ProcedureName ?? "Unknown")
-                    <small class="text-muted">
-                        (ID: @Model.ProcedureId)
-                        @if (!string.IsNullOrEmpty(Model.ProcedureDepartment))
-                        {
-                            <span> - @Model.ProcedureDepartment Department</span>
-                        }
-                    </small>
+                    @(ViewData["ProcedureName"] ?? "Unknown")
+                    @if (!string.IsNullOrEmpty((string)ViewData["ProcedureDepartment"]))
+                    {
+                        <small class="text-muted">(@ViewData["ProcedureDepartment"] Department)</small>
+                    }
                 </dd>
 
                 <dt class="col-sm-3">Diagnosis</dt>
-                <dd class="col-sm-9">
-                    @if (string.IsNullOrEmpty(Model.Diagnosis))
-                    {
-                        <span class="text-muted">No diagnosis recorded</span>
-                    }
-                    else
-                    {
-                        @Model.Diagnosis
-                    }
-                </dd>
+                <dd class="col-sm-9">@Model.Diagnosis</dd>
             </dl>
         </div>
     </div>
