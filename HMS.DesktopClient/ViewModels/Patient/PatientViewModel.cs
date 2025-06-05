@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -14,11 +15,13 @@ namespace HMS.DesktopClient.ViewModels.Patient
     {
         public event PropertyChangedEventHandler? PropertyChanged;
         private PatientService PatientService;
+        private AppointmentService AppointmentService;
         private ObservableCollection<PatientDto> _patients;
 
-        public PatientViewModel(PatientService patientService)
+        public PatientViewModel(PatientService patientService, AppointmentService appointmentService)
         {
             PatientService = patientService;
+            AppointmentService = appointmentService;
         }
 
         public async Task InitializeAsync()
@@ -41,8 +44,23 @@ namespace HMS.DesktopClient.ViewModels.Patient
         {
             try
             {
-                var patients = await PatientService.GetAllPatientsAsync();
-                Patients = new ObservableCollection<PatientDto>(patients);
+                Patients = new ObservableCollection<PatientDto>();
+                var appointments = await AppointmentService.GetAppointmentsForDoctor(App.CurrentDoctor.Id);
+                var patientIds = appointments.Select(a => a.PatientId).Distinct().ToList();
+                if (patientIds.Count == 0)
+                {
+                    Patients = new ObservableCollection<PatientDto>();
+                    return;
+                }
+                Debug.WriteLine($"Found {patientIds.Count} unique patient IDs from appointments for doctor with ID {App.CurrentDoctor.Id}.");
+                foreach (var patient in patientIds)
+                {
+                    var patientDto = await PatientService.GetPatientByIdAsync(patient);
+                    if (patientDto != null)
+                    {
+                        Patients.Add(patientDto);
+                    }
+                }
             }
             catch (Exception ex)
             {
