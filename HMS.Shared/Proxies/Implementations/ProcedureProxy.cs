@@ -8,6 +8,7 @@ using System.Text;
 using System.Text.Json.Serialization;
 using System.Text.Json;
 using System.Threading.Tasks;
+using HMS.Shared.DTOs;
 
 namespace HMS.Shared.Proxies.Implementations
 {
@@ -47,19 +48,19 @@ namespace HMS.Shared.Proxies.Implementations
             _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _token);
         }
 
-        public async Task<IEnumerable<Procedure>> GetAllAsync()
+        public async Task<IEnumerable<ProcedureDto>> GetAllAsync()
         {
             AddAuthorizationHeader();
             HttpResponseMessage response = await _httpClient.GetAsync(_baseUrl + "procedure");
             response.EnsureSuccessStatusCode();
 
             string responseBody = await response.Content.ReadAsStringAsync();
-            var procedures = JsonSerializer.Deserialize<IEnumerable<Procedure>>(responseBody, _jsonOptions);
+            var procedures = JsonSerializer.Deserialize<IEnumerable<ProcedureDto>>(responseBody, _jsonOptions);
 
-            return procedures ?? new List<Procedure>();
+            return procedures ?? new List<ProcedureDto>();
         }
 
-        public async Task<Procedure?> GetByIdAsync(int id)
+        public async Task<ProcedureDto?> GetByIdAsync(int id)
         {
             AddAuthorizationHeader();
             HttpResponseMessage response = await _httpClient.GetAsync($"{_baseUrl}procedure/{id}");
@@ -70,10 +71,10 @@ namespace HMS.Shared.Proxies.Implementations
             response.EnsureSuccessStatusCode();
             string responseBody = await response.Content.ReadAsStringAsync();
 
-            return JsonSerializer.Deserialize<Procedure>(responseBody, _jsonOptions);
+            return JsonSerializer.Deserialize<ProcedureDto>(responseBody, _jsonOptions);
         }
 
-        public async Task<Procedure> AddAsync(Procedure procedure)
+        public async Task<ProcedureDto> AddAsync(ProcedureDto procedure)
         {
             AddAuthorizationHeader();
             string procedureJson = JsonSerializer.Serialize(procedure, _jsonOptions);
@@ -83,10 +84,10 @@ namespace HMS.Shared.Proxies.Implementations
             response.EnsureSuccessStatusCode();
 
             string responseBody = await response.Content.ReadAsStringAsync();
-            return JsonSerializer.Deserialize<Procedure>(responseBody, _jsonOptions)!;
+            return JsonSerializer.Deserialize<ProcedureDto>(responseBody, _jsonOptions)!;
         }
 
-        public async Task<bool> UpdateAsync(Procedure procedure)
+        public async Task<bool> UpdateAsync(ProcedureDto procedure)
         {
             AddAuthorizationHeader();
             string procedureJson = JsonSerializer.Serialize(procedure, _jsonOptions);
