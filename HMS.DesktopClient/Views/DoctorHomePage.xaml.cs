@@ -27,5 +27,11 @@ namespace HMS.DesktopClient.Views
         {
             this.InitializeComponent();
         }
+
+        private void PatientsButton_Click(object sender, RoutedEventArgs e)
+        {
+            MainFrame.Navigate(typeof(DoctorHomePage));
+        }
     }
+
 }
