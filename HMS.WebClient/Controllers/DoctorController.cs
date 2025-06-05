@@ -1,25 +1,31 @@
 using Microsoft.AspNetCore.Mvc;
 using HMS.Shared.Repositories.Interfaces;
-using HMS.Shared.DTOs;
-using HMS.Shared.Entities;
+using HMS.WebClient.Services;
+using HMS.WebClient.ViewModels;
 using System.Threading.Tasks;
 using System;
 using System.Linq;
 using System.Collections.Generic;
+using HMS.WebClient.Attributes;
+using HMS.Shared.Enums;
 
 namespace HMS.WebClient.Controllers
 {
+    [Authorize(UserRole.Doctor)]
     public class DoctorController : Controller
     {
-        private readonly IDoctorRepository _doctorRepository;
+        private readonly DoctorService _doctorService;
         private readonly IMedicalRecordRepository _medicalRecordRepository;
+        private readonly AuthService _authService;
 
         public DoctorController(
-            IDoctorRepository doctorRepository,
-            IMedicalRecordRepository medicalRecordRepository)
+            DoctorService doctorService,
+            IMedicalRecordRepository medicalRecordRepository,
+            AuthService authService)
         {
-            _doctorRepository = doctorRepository;
+            _doctorService = doctorService;
             _medicalRecordRepository = medicalRecordRepository;
+            _authService = authService;
         }
 
         public IActionResult Index()
@@ -31,20 +37,76 @@ namespace HMS.WebClient.Controllers
         {
             try
             {
-                // Get the current doctor's ID from the session/claims
-                var doctorId = 3; // TODO: Get from session/claims
-                var doctor = await _doctorRepository.GetByIdAsync(doctorId);
+                var currentUser = _authService.GetCurrentUser();
+                if (currentUser == null)
+                {
+                    return RedirectToAction("Login", "Account");
+                }
+
+                var doctorViewModel = await _doctorService.GetDoctorByIdAsync(currentUser.Id);
                 
-                return View(doctor);
+                if (doctorViewModel == null)
+                {
+                    return NotFound("Doctor not found. Please make sure you are logged in with a valid doctor account.");
+                }
+
+                return View(doctorViewModel);
             }
-            catch (KeyNotFoundException)
-            {
-                return NotFound("Doctor not found. Please make sure you are logged in with a valid doctor account.");
-            }
-            catch (Exception)
+            catch (Exception ex)
             {
                 ModelState.AddModelError("", "An error occurred while loading the profile. Please try again later.");
-                return View(new Doctor());
+                return View(new DoctorViewModel());
+            }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Edit(int id)
+        {
+            var currentUser = _authService.GetCurrentUser();
+            if (currentUser == null || currentUser.Id != id)
+            {
+                return Forbid();
+            }
+
+            var doctorViewModel = await _doctorService.GetDoctorByIdAsync(id);
+            if (doctorViewModel == null)
+            {
+                return NotFound();
+            }
+
+            return View(doctorViewModel);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(DoctorViewModel doctorViewModel)
+        {
+            var currentUser = _authService.GetCurrentUser();
+            if (currentUser == null || currentUser.Id != doctorViewModel.Id)
+            {
+                return Forbid();
+            }
+
+            if (!ModelState.IsValid)
+            {
+                return View(doctorViewModel);
+            }
+
+            try
+            {
+                var success = await _doctorService.UpdateDoctorAsync(doctorViewModel);
+                if (!success)
+                {
+                    ModelState.AddModelError("", "Failed to update doctor profile.");
+                    return View(doctorViewModel);
+                }
+
+                return RedirectToAction(nameof(Profile));
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError("", "An error occurred while updating the profile.");
+                return View(doctorViewModel);
             }
         }
 
@@ -52,10 +114,14 @@ namespace HMS.WebClient.Controllers
         {
             try
             {
-                // Get the current doctor's ID from the session/claims
-                var doctorId = 3; // TODO: Get from session/claims
+                var currentUser = _authService.GetCurrentUser();
+                if (currentUser == null)
+                {
+                    return RedirectToAction("Login", "Account");
+                }
+
                 var records = await _medicalRecordRepository.GetAllAsync();
-                var doctorRecords = records?.Where(r => r.DoctorId == doctorId).ToList();
+                var doctorRecords = records?.Where(r => r.DoctorId == currentUser.Id).ToList();
                 
                 return View(doctorRecords ?? new List<MedicalRecordDto>());
             }
@@ -63,50 +129,6 @@ namespace HMS.WebClient.Controllers
             {
                 ModelState.AddModelError("", "An error occurred while loading the medical history. Please try again later.");
                 return View(new List<MedicalRecordDto>());
-            }
-        }
-
-        [HttpPost]
-        public async Task<IActionResult> UpdateProfile(Doctor model)
-        {
-            try
-            {
-                if (!ModelState.IsValid)
-                {
-                    return View("Profile", model);
-                }
-
-                var existingDoctor = await _doctorRepository.GetByIdAsync(model.Id);
-                if (existingDoctor == null)
-                {
-                    return NotFound("Doctor not found. Please make sure you are logged in with a valid doctor account.");
-                }
-
-                // Update only the editable fields
-                existingDoctor.Name = model.Name;
-                existingDoctor.Email = model.Email;
-                existingDoctor.PhoneNumber = model.PhoneNumber;
-                existingDoctor.YearsOfExperience = model.YearsOfExperience;
-                existingDoctor.LicenseNumber = model.LicenseNumber;
-                existingDoctor.CNP = model.CNP;
-                
-                // Keep the existing password
-                existingDoctor.Password = existingDoctor.Password;
-
-                var success = await _doctorRepository.UpdateAsync(existingDoctor);
-                if (!success)
-                {
-                    ModelState.AddModelError("", "Failed to update profile. Please try again.");
-                    return View("Profile", model);
-                }
-
-                TempData["SuccessMessage"] = "Profile updated successfully.";
-                return RedirectToAction(nameof(Profile));
-            }
-            catch (Exception)
-            {
-                ModelState.AddModelError("", "An error occurred while updating the profile. Please try again later.");
-                return View("Profile", model);
             }
         }
     }

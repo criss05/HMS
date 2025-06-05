@@ -30,6 +30,7 @@ builder.Services.AddSession(options =>
 
 // Register auth service
 builder.Services.AddScoped<AuthService>();
+builder.Services.AddScoped<DoctorService>();
 
 // Register repositories with proxy
 builder.Services.AddScoped<IDoctorRepository>(provider =>
