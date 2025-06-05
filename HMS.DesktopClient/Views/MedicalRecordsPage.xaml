@@ -11,7 +11,7 @@
     <StackPanel Padding="20" Spacing="10">
         <controls:DataGrid
             x:Name="RecordsGrid"
-            ItemsSource="{x:Bind ViewModel.MedicalRecords, Mode=OneWay}"
+            ItemsSource="{Binding MedicalRecords}"
             AutoGenerateColumns="False"
             SelectionMode="Single"
             Height="400">
