@@ -19,6 +19,7 @@
     <None Remove="Views\LoginPage.xaml" />
     <None Remove="Views\PatientHomePage.xaml" />
     <None Remove="Views\PatientsPage.xaml" />
+    <None Remove="Views\MedicalRecordsPage.xaml" />
     <None Remove="Views\Patient\PatientProfilePage.xaml" />
   </ItemGroup>
 
@@ -56,6 +57,11 @@
   </ItemGroup>
   <ItemGroup>
     <Page Update="Views\PatientsPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Views\MedicalRecordsPage.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
