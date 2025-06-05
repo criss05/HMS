@@ -89,13 +89,13 @@ namespace HMS.Shared.Proxies.Implementations
             return JsonSerializer.Deserialize<PatientDto>(responseBody, _jsonOptions)!;
         }
 
-        public async Task<bool> UpdateAsync(PatientDto patient)
+        public async Task<bool> UpdateAsync(PatientUpdateDto patient, int id)
         {
             AddAuthorizationHeader();
             string jsonContent = JsonSerializer.Serialize(patient, _jsonOptions);
             StringContent content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
-
-            HttpResponseMessage response = await _httpClient.PutAsync($"{_baseUrl}patient/{patient.Id}", content);
+            Debug.WriteLine(jsonContent);
+            HttpResponseMessage response = await _httpClient.PutAsync($"{_baseUrl}patient/{id}", content);
 
             if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
                 return false;

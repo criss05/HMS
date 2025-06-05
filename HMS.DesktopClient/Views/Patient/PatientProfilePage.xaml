@@ -5,10 +5,54 @@
     xmlns:local="using:HMS.DesktopClient.Views.Patient"
     Background="White">
 
-    <Grid>
-        <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
-            <TextBlock Text="Name:" FontSize="20" Margin="0,0,0,5"/>
-            <TextBlock x:Name="NameTextBlock" FontSize="24"/>
-        </StackPanel>
-    </Grid>
+    <StackPanel Padding="20" Spacing="10">
+        <Button Content="Update Profile"
+                HorizontalAlignment="Right"
+                Click="OnUpdateButtonClick" />
+
+        <ScrollViewer>
+            <StackPanel Spacing="10">
+                <TextBlock Text="Name" FontWeight="Bold" />
+                <TextBox Text="{Binding Name, Mode=TwoWay}" />
+
+                <TextBlock Text="Phone Number" FontWeight="Bold" />
+                <TextBox Text="{Binding PhoneNumber, Mode=TwoWay}" />
+
+                <TextBlock Text="CNP" FontWeight="Bold" />
+                <TextBox Text="{Binding CNP, Mode=TwoWay}" />
+
+                <TextBlock Text="Email" FontWeight="Bold" />
+                <TextBox Text="{Binding Email}" IsEnabled="False" />
+
+                <TextBlock Text="Role" FontWeight="Bold" />
+                <TextBox Text="{Binding Role}" IsEnabled="False" />
+
+                <TextBlock Text="Created At" FontWeight="Bold" />
+                <TextBox Text="{Binding CreatedAt}" IsEnabled="False" />
+
+                <!-- New fields -->
+
+                <TextBlock Text="Blood Type" FontWeight="Bold" />
+                <TextBox Text="{Binding BloodType, Mode=TwoWay}" />
+
+                <TextBlock Text="Emergency Contact" FontWeight="Bold" />
+                <TextBox Text="{Binding EmergencyContact, Mode=TwoWay}" />
+
+                <TextBlock Text="Allergies" FontWeight="Bold" />
+                <TextBox Text="{Binding Allergies, Mode=TwoWay}" />
+
+                <TextBlock Text="Weight" FontWeight="Bold" />
+                <TextBox Text="{Binding Weight, Mode=TwoWay}" />
+
+                <TextBlock Text="Height" FontWeight="Bold" />
+                <TextBox Text="{Binding Height, Mode=TwoWay}" />
+
+                <TextBlock Text="Birth Date" FontWeight="Bold" />
+                <TextBox Text="{Binding BirthDate, Mode=TwoWay}" />
+
+                <TextBlock Text="Address" FontWeight="Bold" />
+                <TextBox Text="{Binding Address, Mode=TwoWay}" />
+            </StackPanel>
+        </ScrollViewer>
+    </StackPanel>
 </Page>
