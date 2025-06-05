@@ -56,6 +56,10 @@ namespace HMS.WebClient.Services
                 dto.Password = existingDoctor.Password;
             }
 
+            dto.ScheduleIds = existingDoctor.ScheduleIds;
+            dto.ReviewIds = existingDoctor.ReviewIds;
+            dto.AppointmentIds = existingDoctor.AppointmentIds;
+
             return await _doctorRepository.UpdateAsync(dto);
         }
 
@@ -79,9 +83,9 @@ namespace HMS.WebClient.Services
                 DepartmentName = dto.DepartmentName,
                 YearsOfExperience = dto.YearsOfExperience,
                 LicenseNumber = dto.LicenseNumber,
-                ScheduleIds = dto.ScheduleIds,
-                ReviewIds = dto.ReviewIds,
-                AppointmentIds = dto.AppointmentIds
+                ScheduleIds = dto.ScheduleIds ?? new List<int>(),
+                ReviewIds = dto.ReviewIds ?? new List<int>(),
+                AppointmentIds = dto.AppointmentIds ?? new List<int>()
             };
         }
 
@@ -101,9 +105,9 @@ namespace HMS.WebClient.Services
                 DepartmentName = viewModel.DepartmentName,
                 YearsOfExperience = viewModel.YearsOfExperience,
                 LicenseNumber = viewModel.LicenseNumber,
-                ScheduleIds = viewModel.ScheduleIds,
-                ReviewIds = viewModel.ReviewIds,
-                AppointmentIds = viewModel.AppointmentIds
+                ScheduleIds = viewModel.ScheduleIds ?? new List<int>(),
+                ReviewIds = viewModel.ReviewIds ?? new List<int>(),
+                AppointmentIds = viewModel.AppointmentIds ?? new List<int>()
             };
         }
     }

@@ -7,9 +7,25 @@
 <div class="container mt-4">
     <h2>@ViewData["Title"]</h2>
 
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="fas fa-exclamation-circle"></i> @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="fas fa-check-circle"></i> @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
     <div class="card">
         <div class="card-body">
-            <form asp-action="Edit" method="post">
+            <form asp-action="Edit" method="post" id="editForm">
                 <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                 <input type="hidden" asp-for="Id" />
                 <input type="hidden" asp-for="Role" />
@@ -70,7 +86,7 @@
                 </div>
 
                 <div class="mt-4">
-                    <button type="submit" class="btn btn-primary">
+                    <button type="submit" class="btn btn-primary" id="saveButton">
                         <i class="fas fa-save"></i> Save Changes
                     </button>
                     <a asp-action="Profile" class="btn btn-secondary">
@@ -85,4 +101,11 @@
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
     <script src="https://kit.fontawesome.com/your-font-awesome-kit.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('#editForm').on('submit', function() {
+                $('#saveButton').prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Saving...');
+            });
+        });
+    </script>
 } 
