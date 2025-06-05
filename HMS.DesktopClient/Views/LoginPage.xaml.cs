@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
 using HMS.DesktopClient.APIClients;
+using HMS.DesktopClient.Views.Patient;
 using HMS.Shared.DTOs;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Xaml;

@@ -1,28 +1,24 @@
-﻿using HMS.Shared.DTOs;
-using HMS.Shared.Entities;
+﻿using HMS.Shared.Entities;
 using HMS.Shared.Repositories.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net.Http;
-using System.Net.Http.Json;
-using System.Runtime.CompilerServices;
+using System.Net.Http.Headers;
 using System.Text;
-using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace HMS.Shared.Proxies.Implementations
 {
-    public class LoggerProxy : ILoggerRepository
+    public class ProcedureProxy : IProcedureRepository
     {
         private readonly HttpClient _httpClient;
-        private static readonly string _baseUrl = Config._base_api_url;
+        private readonly string _baseUrl = Config._base_api_url;
         private readonly string _token;
         private readonly JsonSerializerOptions _jsonOptions;
 
-        // Constructor cu HttpClient + token
-        public LoggerProxy(HttpClient httpClient, string token)
+        public ProcedureProxy(HttpClient httpClient, string token)
         {
             _httpClient = httpClient;
             _token = token;
@@ -34,10 +30,9 @@ namespace HMS.Shared.Proxies.Implementations
             };
         }
 
-        // Constructor doar cu token
-        public LoggerProxy(string token)
+        public ProcedureProxy(string token)
         {
-            _httpClient = new HttpClient { BaseAddress = new Uri(_baseUrl) };
+            this._httpClient = new HttpClient { BaseAddress = new Uri(this._baseUrl) };
             _token = token;
             _jsonOptions = new JsonSerializerOptions
             {
@@ -49,53 +44,55 @@ namespace HMS.Shared.Proxies.Implementations
 
         private void AddAuthorizationHeader()
         {
-            _httpClient.DefaultRequestHeaders.Authorization =
-                new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", _token);
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _token);
         }
 
-        public async Task<IEnumerable<LogDto>> GetAllAsync()
+        public async Task<IEnumerable<Procedure>> GetAllAsync()
         {
             AddAuthorizationHeader();
-            HttpResponseMessage response = await _httpClient.GetAsync(_baseUrl + "log");
+            HttpResponseMessage response = await _httpClient.GetAsync(_baseUrl + "procedure");
             response.EnsureSuccessStatusCode();
 
             string responseBody = await response.Content.ReadAsStringAsync();
-            return JsonSerializer.Deserialize<IEnumerable<LogDto>>(responseBody, _jsonOptions) ?? new List<LogDto>();
+            var procedures = JsonSerializer.Deserialize<IEnumerable<Procedure>>(responseBody, _jsonOptions);
+
+            return procedures ?? new List<Procedure>();
         }
 
-        public async Task<LogDto?> GetByIdAsync(int id)
+        public async Task<Procedure?> GetByIdAsync(int id)
         {
             AddAuthorizationHeader();
-            HttpResponseMessage response = await _httpClient.GetAsync(_baseUrl + $"log/{id}");
+            HttpResponseMessage response = await _httpClient.GetAsync($"{_baseUrl}procedure/{id}");
 
             if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
                 return null;
 
             response.EnsureSuccessStatusCode();
             string responseBody = await response.Content.ReadAsStringAsync();
-            return JsonSerializer.Deserialize<LogDto>(responseBody, _jsonOptions);
+
+            return JsonSerializer.Deserialize<Procedure>(responseBody, _jsonOptions);
         }
 
-        public async Task<LogDto> AddAsync(LogDto log)
+        public async Task<Procedure> AddAsync(Procedure procedure)
         {
             AddAuthorizationHeader();
-            string logJson = JsonSerializer.Serialize(log, _jsonOptions);
-            StringContent content = new StringContent(logJson, Encoding.UTF8, "application/json");
+            string procedureJson = JsonSerializer.Serialize(procedure, _jsonOptions);
+            StringContent content = new StringContent(procedureJson, Encoding.UTF8, "application/json");
 
-            HttpResponseMessage response = await _httpClient.PostAsync(_baseUrl + "log", content);
+            HttpResponseMessage response = await _httpClient.PostAsync($"{_baseUrl}procedure", content);
             response.EnsureSuccessStatusCode();
 
             string responseBody = await response.Content.ReadAsStringAsync();
-            return JsonSerializer.Deserialize<LogDto>(responseBody, _jsonOptions)!;
+            return JsonSerializer.Deserialize<Procedure>(responseBody, _jsonOptions)!;
         }
 
-        public async Task<bool> UpdateAsync(LogDto log)
+        public async Task<bool> UpdateAsync(Procedure procedure)
         {
             AddAuthorizationHeader();
-            string logJson = JsonSerializer.Serialize(log, _jsonOptions);
-            StringContent content = new StringContent(logJson, Encoding.UTF8, "application/json");
+            string procedureJson = JsonSerializer.Serialize(procedure, _jsonOptions);
+            StringContent content = new StringContent(procedureJson, Encoding.UTF8, "application/json");
 
-            HttpResponseMessage response = await _httpClient.PutAsync(_baseUrl + $"log/{log.Id}", content);
+            HttpResponseMessage response = await _httpClient.PutAsync($"{_baseUrl}procedure/{procedure.Id}", content);
 
             if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
                 return false;
@@ -107,7 +104,7 @@ namespace HMS.Shared.Proxies.Implementations
         public async Task<bool> DeleteAsync(int id)
         {
             AddAuthorizationHeader();
-            HttpResponseMessage response = await _httpClient.DeleteAsync(_baseUrl + $"log/{id}");
+            HttpResponseMessage response = await _httpClient.DeleteAsync($"{_baseUrl}procedure/{id}");
 
             if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
                 return false;

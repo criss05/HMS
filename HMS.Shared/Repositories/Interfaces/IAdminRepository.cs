@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using HMS.Shared.DTOs;
 using HMS.Shared.Entities;
+using HMS.Shared.DTOs;
 
 namespace HMS.Shared.Repositories.Interfaces
 {

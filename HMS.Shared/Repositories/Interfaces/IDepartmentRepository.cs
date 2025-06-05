@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 namespace HMS.Shared.Repositories.Interfaces
 {
     /// <summary>
-    /// Repository interface for managing Department entities.
+    /// Repository interface for managing Department DTOs.
     /// </summary>
     public interface IDepartmentRepository
     {
@@ -35,7 +35,7 @@ namespace HMS.Shared.Repositories.Interfaces
         /// </summary>
         /// <param name="department">The department with updated information.</param>
         /// <returns>True if update succeeded, otherwise false.</returns>
-        Task<bool> UpdateAsync(Department department);
+        Task<bool> UpdateAsync(DepartmentDto department);
 
         /// <summary>
         /// Deletes a department by its unique identifier asynchronously.

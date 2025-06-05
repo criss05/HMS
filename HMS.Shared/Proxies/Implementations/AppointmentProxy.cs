@@ -6,6 +6,8 @@ using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
+using System.Transactions;
+using HMS.Shared.DTOs;
 
 namespace HMS.Shared.Proxies.Implementations
 {
@@ -14,39 +16,51 @@ namespace HMS.Shared.Proxies.Implementations
         private readonly HttpClient _httpClient;
         private readonly string _baseUrl = Config._base_api_url;
         private readonly string _token;
+        private readonly JsonSerializerOptions _jsonOptions;
 
         public AppointmentProxy(HttpClient httpClient, string token)
         {
-            this._httpClient = httpClient;
-            this._token = token;
+            _httpClient = httpClient;
+            _token = token;
+            _jsonOptions = new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true,
+                ReferenceHandler = ReferenceHandler.Preserve,
+                Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) }
+            };
+        }
+
+        public AppointmentProxy(string token)
+        {
+            _httpClient = new HttpClient { BaseAddress = new Uri(_baseUrl) };
+            _token = token;
+            _jsonOptions = new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true,
+                ReferenceHandler = ReferenceHandler.Preserve,
+                Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) }
+            };
         }
 
         private void AddAuthorizationHeader()
         {
-            _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", this._token);
+            _httpClient.DefaultRequestHeaders.Authorization =
+                new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", _token);
         }
 
-        public async Task<Appointment> AddAsync(Appointment appointment)
+        public async Task<AppointmentDto> AddAsync(AppointmentDto appointment)
         {
             try
             {
                 AddAuthorizationHeader();
-                string appointmentJson = JsonSerializer.Serialize(appointment, new JsonSerializerOptions
-                {
-                    PropertyNameCaseInsensitive = true,
-                    Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) }
-                });
+                string appointmentJson = JsonSerializer.Serialize(appointment, _jsonOptions);
                 StringContent content = new StringContent(appointmentJson, Encoding.UTF8, "application/json");
 
                 HttpResponseMessage response = await _httpClient.PostAsync(_baseUrl + "appointment", content);
                 response.EnsureSuccessStatusCode();
 
                 string responseBody = await response.Content.ReadAsStringAsync();
-                return JsonSerializer.Deserialize<Appointment>(responseBody, new JsonSerializerOptions
-                {
-                    PropertyNameCaseInsensitive = true,
-                    Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) }
-                })!;
+                return JsonSerializer.Deserialize<AppointmentDto>(responseBody, _jsonOptions)!;
             }
             catch (Exception ex)
             {
@@ -61,7 +75,7 @@ namespace HMS.Shared.Proxies.Implementations
             {
                 AddAuthorizationHeader();
                 HttpResponseMessage response = await _httpClient.DeleteAsync(_baseUrl + $"appointment/{id}");
-                
+
                 if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
                     return false;
 
@@ -75,7 +89,7 @@ namespace HMS.Shared.Proxies.Implementations
             }
         }
 
-        public async Task<IEnumerable<Appointment>> GetAllAsync()
+        public async Task<IEnumerable<AppointmentDto>> GetAllAsync()
         {
             try
             {
@@ -84,11 +98,7 @@ namespace HMS.Shared.Proxies.Implementations
                 response.EnsureSuccessStatusCode();
 
                 string responseBody = await response.Content.ReadAsStringAsync();
-                return JsonSerializer.Deserialize<IEnumerable<Appointment>>(responseBody, new JsonSerializerOptions
-                {
-                    PropertyNameCaseInsensitive = true,
-                    Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) }
-                })!;
+                return JsonSerializer.Deserialize<IEnumerable<AppointmentDto>>(responseBody, _jsonOptions)!;
             }
             catch (Exception ex)
             {
@@ -97,7 +107,7 @@ namespace HMS.Shared.Proxies.Implementations
             }
         }
 
-        public async Task<Appointment?> GetByIdAsync(int id)
+        public async Task<AppointmentDto?> GetByIdAsync(int id)
         {
             try
             {
@@ -110,11 +120,7 @@ namespace HMS.Shared.Proxies.Implementations
                 response.EnsureSuccessStatusCode();
 
                 string responseBody = await response.Content.ReadAsStringAsync();
-                return JsonSerializer.Deserialize<Appointment>(responseBody, new JsonSerializerOptions
-                {
-                    PropertyNameCaseInsensitive = true,
-                    Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) }
-                });
+                return JsonSerializer.Deserialize<AppointmentDto>(responseBody, _jsonOptions);
             }
             catch (Exception ex)
             {
@@ -123,16 +129,12 @@ namespace HMS.Shared.Proxies.Implementations
             }
         }
 
-        public async Task<bool> UpdateAsync(Appointment appointment)
+        public async Task<bool> UpdateAsync(AppointmentDto appointment)
         {
             try
             {
                 AddAuthorizationHeader();
-                string appointmentJson = JsonSerializer.Serialize(appointment, new JsonSerializerOptions
-                {
-                    PropertyNameCaseInsensitive = true,
-                    Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) }
-                });
+                string appointmentJson = JsonSerializer.Serialize(appointment, _jsonOptions);
                 StringContent content = new StringContent(appointmentJson, Encoding.UTF8, "application/json");
 
                 HttpResponseMessage response = await _httpClient.PutAsync(_baseUrl + $"appointment/{appointment.Id}", content);
