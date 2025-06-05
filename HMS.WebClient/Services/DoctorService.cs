@@ -51,6 +51,10 @@ namespace HMS.WebClient.Services
                 var existingDoctor = await _doctorRepository.GetByIdAsync(viewModel.Id);
                 if (existingDoctor == null) return false;
 
+                // Preserve department data
+                viewModel.DepartmentId = existingDoctor.DepartmentId;
+                viewModel.DepartmentName = existingDoctor.DepartmentName;
+
                 var dto = MapToDoctorDto(viewModel);
                 
                 // Preserve password if not changed
@@ -66,10 +70,6 @@ namespace HMS.WebClient.Services
 
                 var success = await _doctorRepository.UpdateAsync(dto);
                 if (!success) return false;
-
-                // Refresh the data to ensure we have the latest state
-                var updatedDoctor = await _doctorRepository.GetByIdAsync(viewModel.Id);
-                if (updatedDoctor == null) return false;
 
                 return true;
             }
