@@ -184,9 +184,13 @@ namespace HMS.WebClient.Controllers
                     allAppointments = new List<AppointmentDto>();
                 }
 
+                // Filter appointments for current doctor
+                var doctorAppointments = allAppointments.Where(a => a.DoctorId == currentUser.Id).ToList();
+                _logger.LogInformation($"MedicalHistory: Found {doctorAppointments.Count} appointments for doctor {currentUser.Id}");
+
                 // Get patient names for all appointments
                 var appointmentsWithPatients = new List<AppointmentDto>();
-                foreach (var appointment in allAppointments)
+                foreach (var appointment in doctorAppointments)
                 {
                     var patient = await _patientRepository.GetByIdAsync(appointment.PatientId);
                     if (patient != null)
