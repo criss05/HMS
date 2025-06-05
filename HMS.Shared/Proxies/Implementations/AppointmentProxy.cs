@@ -3,11 +3,11 @@ using HMS.Shared.Entities;
 using HMS.Shared.Repositories.Interfaces;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
-using System.Linq;
 
 namespace HMS.Shared.Proxies.Implementations
 {
@@ -55,13 +55,11 @@ namespace HMS.Shared.Proxies.Implementations
             try
             {
                 AddAuthorizationHeader();
-                string appointmentJson = JsonSerializer.Serialize(appointment, _jsonOptions);
-                StringContent content = new StringContent(appointmentJson, Encoding.UTF8, "application/json");
-
-                HttpResponseMessage response = await _httpClient.PostAsync(_baseUrl + "appointment", content);
+                var content = new StringContent(JsonSerializer.Serialize(appointment, _jsonOptions), Encoding.UTF8, "application/json");
+                var response = await _httpClient.PostAsync(_baseUrl + "appointment", content);
                 response.EnsureSuccessStatusCode();
 
-                string responseBody = await response.Content.ReadAsStringAsync();
+                var responseBody = await response.Content.ReadAsStringAsync();
                 return JsonSerializer.Deserialize<AppointmentDto>(responseBody, _jsonOptions)!;
             }
             catch (Exception ex)
@@ -76,13 +74,8 @@ namespace HMS.Shared.Proxies.Implementations
             try
             {
                 AddAuthorizationHeader();
-                HttpResponseMessage response = await _httpClient.DeleteAsync(_baseUrl + $"appointment/{id}");
-
-                if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
-                    return false;
-
-                response.EnsureSuccessStatusCode();
-                return true;
+                var response = await _httpClient.DeleteAsync(_baseUrl + $"appointment/{id}");
+                return response.StatusCode != System.Net.HttpStatusCode.NotFound && response.IsSuccessStatusCode;
             }
             catch (Exception ex)
             {
@@ -96,24 +89,21 @@ namespace HMS.Shared.Proxies.Implementations
             try
             {
                 AddAuthorizationHeader();
-                HttpResponseMessage response = await _httpClient.GetAsync(_baseUrl + "appointment");
+                var response = await _httpClient.GetAsync(_baseUrl + "appointment");
                 response.EnsureSuccessStatusCode();
 
-                string responseBody = await response.Content.ReadAsStringAsync();
+                var responseBody = await response.Content.ReadAsStringAsync();
+                var appointments = new List<AppointmentDto>();
 
-                try 
+                try
                 {
-                    var appointments = new List<AppointmentDto>();
                     var jsonDoc = JsonDocument.Parse(responseBody);
 
                     void ParseAppointment(JsonElement element)
                     {
                         try
                         {
-                            if (element.TryGetProperty("$ref", out var refElement))
-                            {
-                                return;
-                            }
+                            if (element.TryGetProperty("$ref", out _)) return;
 
                             var appointment = new AppointmentDto();
 
@@ -135,12 +125,10 @@ namespace HMS.Shared.Proxies.Implementations
                             if (element.TryGetProperty("dateTime", out var dateTimeElement))
                                 appointment.DateTime = dateTimeElement.GetDateTime();
 
-                            if (appointment.Id.HasValue && appointment.DoctorId != 0 && appointment.PatientId != 0)
+                            if (appointment.Id.HasValue && appointment.DoctorId != 0 && appointment.PatientId != 0 &&
+                                !appointments.Any(a => a.Id == appointment.Id))
                             {
-                                if (!appointments.Any(a => a.Id == appointment.Id))
-                                {
-                                    appointments.Add(appointment);
-                                }
+                                appointments.Add(appointment);
                             }
                         }
                         catch (Exception ex)
@@ -194,14 +182,13 @@ namespace HMS.Shared.Proxies.Implementations
             try
             {
                 AddAuthorizationHeader();
-                HttpResponseMessage response = await _httpClient.GetAsync(_baseUrl + $"appointment/{id}");
+                var response = await _httpClient.GetAsync(_baseUrl + $"appointment/{id}");
 
                 if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
                     return null;
 
                 response.EnsureSuccessStatusCode();
-
-                string responseBody = await response.Content.ReadAsStringAsync();
+                var responseBody = await response.Content.ReadAsStringAsync();
                 return JsonSerializer.Deserialize<AppointmentDto>(responseBody, _jsonOptions);
             }
             catch (Exception ex)
@@ -216,16 +203,9 @@ namespace HMS.Shared.Proxies.Implementations
             try
             {
                 AddAuthorizationHeader();
-                string appointmentJson = JsonSerializer.Serialize(appointment, _jsonOptions);
-                StringContent content = new StringContent(appointmentJson, Encoding.UTF8, "application/json");
-
-                HttpResponseMessage response = await _httpClient.PutAsync(_baseUrl + $"appointment/{appointment.Id}", content);
-
-                if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
-                    return false;
-
-                response.EnsureSuccessStatusCode();
-                return true;
+                var content = new StringContent(JsonSerializer.Serialize(appointment, _jsonOptions), Encoding.UTF8, "application/json");
+                var response = await _httpClient.PutAsync(_baseUrl + $"appointment/{appointment.Id}", content);
+                return response.StatusCode != System.Net.HttpStatusCode.NotFound && response.IsSuccessStatusCode;
             }
             catch (Exception ex)
             {
