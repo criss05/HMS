@@ -1,3 +1,4 @@
+
 using System;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
@@ -13,18 +14,18 @@ namespace HMS.DesktopClient.ViewModels
 
         public ObservableCollection<MedicalRecordDto> MedicalRecords { get; } = new();
 
-        public MedicalRecordHistoryViewModel(int doctorId, MedicalRecordProxy medicalRecordProxy)
+        public MedicalRecordHistoryViewModel(int patientId, MedicalRecordProxy medicalRecordProxy)
         {
             _medicalRecordProxy = medicalRecordProxy;
-            InitializeAsync(doctorId);
+            InitializeAsync(patientId);
         }
 
-        private async Task InitializeAsync(int doctorId)
+        private async Task InitializeAsync(int patientId)
         {
             try
             {
                 var records = await _medicalRecordProxy.GetAllAsync();
-                foreach (var record in records.Where(r => r.DoctorId == doctorId))
+                foreach (var record in records.Where(r => r.PatientId == patientId))
                 {
                     MedicalRecords.Add(record);
                 }
