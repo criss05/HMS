@@ -14,7 +14,7 @@ namespace HMS.Shared.Repositories.Interfaces
         /// Retrieves all admins asynchronously.
         /// </summary>
         /// <returns>A collection of all admins.</returns>
-        Task<IEnumerable<AdminDto>> GetAllAsync();
+        Task<IEnumerable<Admin>> GetAllAsync();
 
         /// <summary>
         /// Retrieves an admin by its unique identifier asynchronously.
