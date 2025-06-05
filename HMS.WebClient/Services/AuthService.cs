@@ -25,6 +25,22 @@ namespace HMS.WebClient.Services
             _httpClient.BaseAddress = new Uri(apiBaseUrl);
         }
 
+        public int? GetUserId()
+        {
+            var user = GetCurrentUser();
+            if (user != null)
+            {
+                return user.Id;
+            }
+
+            var userIdClaim = _httpContextAccessor.HttpContext?.User?.FindFirst("UserId");
+            if (userIdClaim != null && int.TryParse(userIdClaim.Value, out int userId))
+            {
+                return userId;
+            }
+            return null;
+        }
+
         public async Task<UserWithTokenDto?> Login(string email, string password)
         {
             try
@@ -33,12 +49,10 @@ namespace HMS.WebClient.Services
 
                 if (!response.IsSuccessStatusCode)
                 {
-                    Console.WriteLine($"Login failed with status code: {response.StatusCode}");
                     return null;
                 }
 
                 var jsonContent = await response.Content.ReadAsStringAsync();
-                Console.WriteLine($"Login response: {jsonContent}");
 
                 var options = new JsonSerializerOptions
                 {
@@ -51,26 +65,27 @@ namespace HMS.WebClient.Services
                 {
                     var userWithToken = JsonSerializer.Deserialize<UserWithTokenDto>(jsonContent, options);
 
-                    if (userWithToken == null)
+                    if (userWithToken == null || string.IsNullOrEmpty(userWithToken.Token))
                     {
-                        Console.WriteLine("Failed to deserialize user data");
                         return null;
                     }
 
+                    // Clear any existing session data
+                    _httpContextAccessor.HttpContext?.Session.Clear();
+
+                    // Store token and user data in session
                     _httpContextAccessor.HttpContext?.Session.SetString(TokenKey, userWithToken.Token);
                     _httpContextAccessor.HttpContext?.Session.SetString(UserKey, jsonContent);
 
                     return userWithToken;
                 }
-                catch (JsonException ex)
+                catch
                 {
-                    Console.WriteLine($"JSON deserialization error: {ex.Message}");
                     return null;
                 }
             }
-            catch (Exception ex)
+            catch
             {
-                Console.WriteLine($"Login error: {ex.Message}");
                 return null;
             }
         }
@@ -78,43 +93,51 @@ namespace HMS.WebClient.Services
         public async Task<bool> Register(UserDto userDto)
         {
             try
-            {
+            { 
                 var json = JsonSerializer.Serialize(userDto);
                 var content = new StringContent(json, Encoding.UTF8, "application/json");
 
                 var response = await _httpClient.PostAsync("User", content);
-
-                Console.WriteLine($"Register response: {response.StatusCode}");
                 return response.IsSuccessStatusCode;
             }
-            catch (Exception ex)
+            catch
             {
-                Console.WriteLine($"Registration error: {ex.Message}");
                 return false;
             }
         }
 
         public UserWithTokenDto? GetCurrentUser()
         {
-            var userJson = _httpContextAccessor.HttpContext?.Session.GetString(UserKey);
-
-            if (string.IsNullOrEmpty(userJson))
-                return null;
-
-            var options = new JsonSerializerOptions
-            {
-                PropertyNameCaseInsensitive = true,
-                ReferenceHandler = ReferenceHandler.Preserve,
-                Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) }
-            };
-
             try
             {
-                return JsonSerializer.Deserialize<UserWithTokenDto>(userJson, options);
+                var userJson = _httpContextAccessor.HttpContext?.Session.GetString(UserKey);
+
+                if (string.IsNullOrEmpty(userJson))
+                {
+                    return null;
+                }
+
+                var options = new JsonSerializerOptions
+                {
+                    PropertyNameCaseInsensitive = true,
+                    ReferenceHandler = ReferenceHandler.Preserve,
+                    Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) }
+                };
+
+                try
+                {
+                    return JsonSerializer.Deserialize<UserWithTokenDto>(userJson, options);
+                }
+                catch
+                {
+                    // Session data might be corrupted, clear it
+                    _httpContextAccessor.HttpContext?.Session.Remove(UserKey);
+                    _httpContextAccessor.HttpContext?.Session.Remove(TokenKey);
+                    return null;
+                }
             }
-            catch (Exception ex)
+            catch
             {
-                Console.WriteLine($"Error deserializing current user: {ex.Message}");
                 return null;
             }
         }
