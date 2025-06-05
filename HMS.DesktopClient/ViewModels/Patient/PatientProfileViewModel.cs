@@ -1,28 +1,39 @@
 ﻿using HMS.Shared.DTOs;
+using HMS.Shared.DTOs.Patient;
+using HMS.Shared.Proxies.Implementations;
+using HMS.Shared.Services;
+using System;
 using System.ComponentModel;
+using System.Threading.Tasks;
 
 namespace HMS.DesktopClient.ViewModels
 {
     public class PatientProfileViewModel : INotifyPropertyChanged
     {
-        private UserWithTokenDto _user;
+        private readonly UserWithTokenDto _user;    // holds token and user info
+        private PatientDto _patient;                 // holds patient-specific + user info (except token)
+        private readonly PatientService _patientService;
 
         public event PropertyChangedEventHandler? PropertyChanged;
 
-        public PatientProfileViewModel(UserWithTokenDto user)
+        public PatientProfileViewModel(UserWithTokenDto user, PatientDto patient)
         {
             _user = user;
+            _patient = patient;
+
+            var proxy = new PatientProxy(_user.Token);
+            _patientService = new PatientService(proxy);
         }
 
-        // Editable fields
+        // User fields come from _patient (inherited user fields)
         public string Name
         {
-            get => _user.Name;
+            get => _patient.Name ?? "";
             set
             {
-                if (_user.Name != value)
+                if (_patient.Name != value)
                 {
-                    _user.Name = value;
+                    _patient.Name = value;
                     OnPropertyChanged(nameof(Name));
                 }
             }
@@ -30,12 +41,12 @@ namespace HMS.DesktopClient.ViewModels
 
         public string PhoneNumber
         {
-            get => _user.PhoneNumber;
+            get => _patient.PhoneNumber ?? "";
             set
             {
-                if (_user.PhoneNumber != value)
+                if (_patient.PhoneNumber != value)
                 {
-                    _user.PhoneNumber = value;
+                    _patient.PhoneNumber = value;
                     OnPropertyChanged(nameof(PhoneNumber));
                 }
             }
@@ -43,22 +54,125 @@ namespace HMS.DesktopClient.ViewModels
 
         public string CNP
         {
-            get => _user.CNP;
+            get => _patient.CNP ?? "";
             set
             {
-                if (_user.CNP != value)
+                if (_patient.CNP != value)
                 {
-                    _user.CNP = value;
+                    _patient.CNP = value;
                     OnPropertyChanged(nameof(CNP));
                 }
             }
         }
 
-        // Read-only properties
-        public string Email => _user.Email;
-        public string Role => _user.Role.ToString();
-        public string CreatedAt => _user.CreatedAt.ToString("yyyy-MM-dd HH:mm");
+        // Patient-only fields
+        public string BloodType
+        {
+            get => _patient.BloodType ?? "";
+            set
+            {
+                if (_patient.BloodType != value)
+                {
+                    _patient.BloodType = value;
+                    OnPropertyChanged(nameof(BloodType));
+                }
+            }
+        }
+
+        public string EmergencyContact
+        {
+            get => _patient.EmergencyContact ?? "";
+            set
+            {
+                if (_patient.EmergencyContact != value)
+                {
+                    _patient.EmergencyContact = value;
+                    OnPropertyChanged(nameof(EmergencyContact));
+                }
+            }
+        }
+
+        public string Allergies
+        {
+            get => _patient.Allergies ?? "";
+            set
+            {
+                if (_patient.Allergies != value)
+                {
+                    _patient.Allergies = value;
+                    OnPropertyChanged(nameof(Allergies));
+                }
+            }
+        }
+
+        public float Weight
+        {
+            get => _patient.Weight;
+            set
+            {
+                if (_patient.Weight != value)
+                {
+                    _patient.Weight = value;
+                    OnPropertyChanged(nameof(Weight));
+                }
+            }
+        }
+
+        public float Height
+        {
+            get => _patient.Height;
+            set
+            {
+                if (_patient.Height != value)
+                {
+                    _patient.Height = value;
+                    OnPropertyChanged(nameof(Height));
+                }
+            }
+        }
+
+        public DateTime BirthDate
+        {
+            get => _patient.BirthDate;
+            set
+            {
+                if (_patient.BirthDate != value)
+                {
+                    _patient.BirthDate = value;
+                    OnPropertyChanged(nameof(BirthDate));
+                }
+            }
+        }
+
+        public string Address
+        {
+            get => _patient.Address ?? "";
+            set
+            {
+                if (_patient.Address != value)
+                {
+                    _patient.Address = value;
+                    OnPropertyChanged(nameof(Address));
+                }
+            }
+        }
+
+        // Read-only properties from _patient (user info)
+        public int Id => _patient.Id;
+        public string Email => _patient.Email ?? "";
+        public string Role => _patient.Role.ToString();
+        public string CreatedAt => _patient.CreatedAt.ToString("yyyy-MM-dd HH:mm");
+
+        // Token only from _user
         public string Token => _user.Token;
+
+        // Update patient info
+        public async Task<bool> UpdatePatientAsync()
+        {
+            // Make sure patient DTO fields are in sync with user info if needed here
+
+            return await _patientService.UpdatePatientAsync(_patient);
+        }
 
         private void OnPropertyChanged(string propertyName) =>
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
