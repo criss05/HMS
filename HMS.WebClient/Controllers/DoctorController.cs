@@ -189,7 +189,6 @@ namespace HMS.WebClient.Controllers
                 {
                     _logger.LogInformation($"DEBUG: Found appointment - ID: {apt.Id}, DoctorId: {apt.DoctorId}, PatientId: {apt.PatientId}, DateTime: {apt.DateTime}");
                 }
-                _logger.LogInformation($"DEBUG: Total appointments in database: {allAppointments.Count}");
                 _logger.LogInformation($"DEBUG: Current doctor ID: {currentUser.Id}");
 
                 // Filter appointments for current doctor
