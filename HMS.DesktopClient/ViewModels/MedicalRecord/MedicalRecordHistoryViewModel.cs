@@ -1,34 +1,30 @@
 using System;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
-using Hospital.Managers;
-using Hospital.Models;
-using Hospital.Views;
+using HMS.Shared.DTOs;
+using HMS.Shared.Proxies.Implementations;
+using System.Linq;
 
-namespace Hospital.ViewModels
+namespace HMS.DesktopClient.ViewModels
 {
     public class MedicalRecordHistoryViewModel
     {
-        private readonly IMedicalRecordManager _medicalRecordManager;
-        private readonly IDocumentManager _documentManager;
+        private readonly MedicalRecordProxy _medicalRecordProxy;
 
-        public ObservableCollection<MedicalRecordJointModel> MedicalRecords { get; private set; }
+        public ObservableCollection<MedicalRecordDto> MedicalRecords { get; } = new();
 
-        public MedicalRecordHistoryViewModel(int patientId, IMedicalRecordManager medicalRecordManager, IDocumentManager documentManager)
+        public MedicalRecordHistoryViewModel(int doctorId, MedicalRecordProxy medicalRecordProxy)
         {
-            _medicalRecordManager = medicalRecordManager;
-            _documentManager = documentManager;
-            MedicalRecords = new ObservableCollection<MedicalRecordJointModel>();
-            InitializeAsync(patientId);
+            _medicalRecordProxy = medicalRecordProxy;
+            InitializeAsync(doctorId);
         }
 
-        private async void InitializeAsync(int patientId)
+        private async Task InitializeAsync(int doctorId)
         {
             try
             {
-                await _medicalRecordManager.LoadMedicalRecordsForPatient(patientId);
-                var records = await _medicalRecordManager.GetMedicalRecords();
-                foreach (var record in records)
+                var records = await _medicalRecordProxy.GetAllAsync();
+                foreach (var record in records.Where(r => r.DoctorId == doctorId))
                 {
                     MedicalRecords.Add(record);
                 }
@@ -38,15 +34,6 @@ namespace Hospital.ViewModels
                 // Handle error appropriately (e.g., logging, UI notification)
                 Console.WriteLine($"Error loading medical records: {ex.Message}");
             }
-        }
-
-        public void ShowMedicalRecordDetails(MedicalRecordJointModel medicalRecord)
-        {
-            if (medicalRecord == null)
-                throw new ArgumentNullException(nameof(medicalRecord));
-
-            var detailsView = new MedicalRecordDetailsView(medicalRecord, _documentManager);
-            detailsView.Activate();
         }
     }
 }
