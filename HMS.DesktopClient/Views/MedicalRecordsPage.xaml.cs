@@ -8,11 +8,11 @@ namespace HMS.DesktopClient.Views
     {
         public MedicalRecordHistoryViewModel ViewModel { get; }
 
-        public MedicalRecordsPage(int doctorId)
+        public MedicalRecordsPage(int patientId)
         {
             this.InitializeComponent();
             var proxy = new MedicalRecordProxy(App.CurrentUser!.Token);
-            ViewModel = new MedicalRecordHistoryViewModel(doctorId, proxy);
+            ViewModel = new MedicalRecordHistoryViewModel(patientId, proxy);
             RecordsGrid.DataContext = ViewModel;
         }
     }

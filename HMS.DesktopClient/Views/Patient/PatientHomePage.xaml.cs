@@ -25,14 +25,9 @@ namespace HMS.DesktopClient.Views.Patient
 
         private async void MedicalRecords_Click(object sender, RoutedEventArgs e)
         {
-            ContentDialog dialog = new ContentDialog
-            {
-                Title = "Medical Records",
-                Content = "Medical Records button clicked.",
-                CloseButtonText = "OK",
-                XamlRoot = this.Content.XamlRoot
-            };
-            await dialog.ShowAsync();
+            var patientId = App.CurrentUser!.Id;
+            var recordsWindow = new MedicalRecordsPage(patientId);
+            recordsWindow.Activate();
         }
 
         private async void Profile_Click(object sender, RoutedEventArgs e)
