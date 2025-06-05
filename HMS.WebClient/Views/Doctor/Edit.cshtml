@@ -31,8 +31,6 @@
                 <input type="hidden" asp-for="Id" />
                 <input type="hidden" asp-for="Role" />
                 <input type="hidden" asp-for="CreatedAt" />
-                <input type="hidden" asp-for="DepartmentId" />
-                <input type="hidden" asp-for="DepartmentName" />
                 
                 @{
                     var scheduleIdsJson = JsonSerializer.Serialize(Model.ScheduleIds);
@@ -94,6 +92,8 @@
                             <div class="form-control-plaintext">
                                 <i class="fas fa-hospital-alt"></i> @Model.DepartmentName
                             </div>
+                            <input type="hidden" asp-for="DepartmentId" />
+                            <input type="hidden" asp-for="DepartmentName" />
                         </div>
                     </div>
                 </div>
