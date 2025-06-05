@@ -18,15 +18,18 @@ namespace HMS.WebClient.Controllers
     {
         private readonly DoctorService _doctorService;
         private readonly IMedicalRecordRepository _medicalRecordRepository;
+        private readonly IAppointmentRepository _appointmentRepository;
         private readonly AuthService _authService;
 
         public DoctorController(
             DoctorService doctorService,
             IMedicalRecordRepository medicalRecordRepository,
+            IAppointmentRepository appointmentRepository,
             AuthService authService)
         {
             _doctorService = doctorService;
             _medicalRecordRepository = medicalRecordRepository;
+            _appointmentRepository = appointmentRepository;
             _authService = authService;
         }
 
@@ -153,6 +156,13 @@ namespace HMS.WebClient.Controllers
                 var records = await _medicalRecordRepository.GetAllAsync();
                 var doctorRecords = records?.Where(r => r.DoctorId == currentUser.Id).ToList() ?? new List<MedicalRecordDto>();
 
+                // Get upcoming appointments
+                var allAppointments = await _appointmentRepository.GetAllAsync();
+                var upcomingAppointments = allAppointments?
+                    .Where(a => a.DoctorId == currentUser.Id && a.DateTime > DateTime.Now)
+                    .OrderBy(a => a.DateTime)
+                    .ToList() ?? new List<AppointmentDto>();
+
                 // Create view model with all sections
                 var viewModel = new DoctorMedicalHistoryViewModel
                 {
@@ -160,17 +170,17 @@ namespace HMS.WebClient.Controllers
                     DepartmentName = doctorViewModel.DepartmentName,
                     MedicalRecords = doctorRecords.OrderByDescending(r => r.CreatedAt).ToList(),
                     RecentPatients = doctorRecords
-                        .GroupBy(r => new { r.PatientId, r.PatientName })
+                        .GroupBy(r => new { r.PatientId })
                         .Select(g => new PatientSummaryViewModel
                         {
                             Id = g.Key.PatientId,
-                            Name = g.Key.PatientName ?? "Unknown",
-                            LastVisit = g.Max(r => r.CreatedAt),
+                            Name = $"Patient {g.Key.PatientId}", // Using ID as we don't have names in DTO
+                            LastVisit = g.Max(r => r.CreatedAt ?? DateTime.MinValue),
                             VisitCount = g.Count()
                         })
                         .OrderByDescending(p => p.LastVisit)
                         .ToList(),
-                    UpcomingAppointments = new List<AppointmentDto>() // TODO: Add appointments when available
+                    UpcomingAppointments = upcomingAppointments
                 };
 
                 return View(viewModel);
