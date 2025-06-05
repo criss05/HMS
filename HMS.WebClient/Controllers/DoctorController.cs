@@ -91,7 +91,6 @@ namespace HMS.WebClient.Controllers
 
             try
             {
-                // Get the existing doctor to preserve data
                 var existingDoctor = await _doctorService.GetDoctorByIdAsync(doctorViewModel.Id);
                 if (existingDoctor == null)
                 {
@@ -99,16 +98,13 @@ namespace HMS.WebClient.Controllers
                     return View(doctorViewModel);
                 }
 
-                // Preserve department data
                 doctorViewModel.DepartmentId = existingDoctor.DepartmentId;
                 doctorViewModel.DepartmentName = existingDoctor.DepartmentName;
 
-                // Deserialize the JSON strings back to lists
                 doctorViewModel.ScheduleIds = JsonSerializer.Deserialize<List<int>>(scheduleIdsJson) ?? new List<int>();
                 doctorViewModel.ReviewIds = JsonSerializer.Deserialize<List<int>>(reviewIdsJson) ?? new List<int>();
                 doctorViewModel.AppointmentIds = JsonSerializer.Deserialize<List<int>>(appointmentIdsJson) ?? new List<int>();
 
-                // Re-validate model after preserving data
                 ModelState.Clear();
                 if (!TryValidateModel(doctorViewModel))
                 {
