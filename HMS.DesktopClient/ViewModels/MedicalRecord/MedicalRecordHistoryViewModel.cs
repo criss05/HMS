@@ -13,18 +13,18 @@ namespace HMS.DesktopClient.ViewModels
 
         public ObservableCollection<MedicalRecordDto> MedicalRecords { get; } = new();
 
-        public MedicalRecordHistoryViewModel(int patientId, MedicalRecordProxy medicalRecordProxy)
+        public MedicalRecordHistoryViewModel(int doctorId, MedicalRecordProxy medicalRecordProxy)
         {
             _medicalRecordProxy = medicalRecordProxy;
-            _ = InitializeAsync(patientId);
+            InitializeAsync(doctorId);
         }
 
-        private async void InitializeAsync(int patientId)
+        private async Task InitializeAsync(int doctorId)
         {
             try
             {
                 var records = await _medicalRecordProxy.GetAllAsync();
-                foreach (var record in records.Where(r => r.PatientId == patientId))
+                foreach (var record in records.Where(r => r.DoctorId == doctorId))
                 {
                     MedicalRecords.Add(record);
                 }

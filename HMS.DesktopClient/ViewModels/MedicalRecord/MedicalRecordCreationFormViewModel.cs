@@ -54,7 +54,8 @@ namespace HMS.DesktopClient.ViewModels
             {
                 _selectedDepartment = value;
                 OnPropertyChanged(nameof(SelectedDepartment));
-            _ = LoadDoctorsAndProceduresAsync(DepartmentsList.IndexOf(_selectedDepartment) + 1);
+                _ = LoadDoctorsAndProceduresAsync(0);
+_ = LoadDoctorsAndProceduresAsync(DepartmentsList.IndexOf(_selectedDepartment) + 1);
             }
         }
 
@@ -120,7 +121,7 @@ namespace HMS.DesktopClient.ViewModels
             if (departmentId == 0) return;
 
             var doctors = await _doctorProxy.GetAllAsync();
-            foreach (var doctor in doctors.Where(d => _selectedDepartment?.DoctorIds?.Contains(d.Id) == true))
+            foreach (var doctor in doctors.Where(d => d.DepartmentId == departmentId))
                 DoctorsList.Add(doctor);
 
             var procedures = await _procedureProxy.GetAllAsync();

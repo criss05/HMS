@@ -1,0 +1,20 @@
+<Window
+    x:Class="HMS.DesktopClient.Views.MedicalRecord.MedicalRecordDetailPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    Title="Medical Record Details">
+    <Grid Margin="20">
+        <StackPanel Spacing="8">
+            <TextBlock Text="Diagnosis" FontWeight="Bold"/>
+            <TextBlock Text="{Binding MedicalRecord.Diagnosis}"/>
+            <TextBlock Text="Doctor Id" FontWeight="Bold"/>
+            <TextBlock Text="{Binding MedicalRecord.DoctorId}"/>
+            <TextBlock Text="Patient Id" FontWeight="Bold"/>
+            <TextBlock Text="{Binding MedicalRecord.PatientId}"/>
+            <TextBlock Text="Procedure Id" FontWeight="Bold"/>
+            <TextBlock Text="{Binding MedicalRecord.ProcedureId}"/>
+            <TextBlock Text="Created At" FontWeight="Bold"/>
+            <TextBlock Text="{Binding MedicalRecord.CreatedAt}"/>
+        </StackPanel>
+    </Grid>
+</Window>

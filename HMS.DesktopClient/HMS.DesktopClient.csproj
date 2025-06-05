@@ -13,10 +13,17 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Remove="Views\MedicalRecord\MedicalRecordCreatePage.xaml.cs" />
+    <Compile Remove="Views\MedicalRecord\MedicalRecordDetailPage.xaml.cs" />
+    <Compile Remove="Views\MedicalRecord\MedicalRecordHistoryPage.xaml.cs" />
+  </ItemGroup>
+  <ItemGroup>
     <None Remove="Views\AdminHomePage.xaml" />
     <None Remove="Views\DoctorHomePage.xaml" />
     <None Remove="Views\HomePage.xaml" />
     <None Remove="Views\LoginPage.xaml" />
+    <None Remove="Views\MedicalRecord\MedicalRecordDetailPage.xaml" />
+    <None Remove="Views\MedicalRecord\MedicalRecordHistoryPage.xaml" />
     <None Remove="Views\PatientHomePage.xaml" />
     <None Remove="Views\Patient\PatientProfilePage.xaml" />
   </ItemGroup>
@@ -50,7 +57,28 @@
     <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.7.250513003" />
   </ItemGroup>
   <ItemGroup>
+    <Page Include="Views\MedicalRecord\MedicalRecordCreatePage.xaml.cs">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\MedicalRecord\MedicalRecordDetailPage.xaml.cs">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\MedicalRecord\MedicalRecordHistoryPage.xaml.cs">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\HMS.Shared\HMS.Shared.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Views\MedicalRecord\MedicalRecordHistoryPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Views\MedicalRecord\MedicalRecordDetailPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Page Update="Views\AdminHomePage.xaml">
@@ -79,6 +107,11 @@
   </ItemGroup>
   <ItemGroup>
     <Page Update="Views\Patient\PatientProfilePage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Views\MedicalRecord\MedicalRecordCreatePage.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
