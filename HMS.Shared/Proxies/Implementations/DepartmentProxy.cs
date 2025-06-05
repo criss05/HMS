@@ -1,4 +1,5 @@
-﻿using HMS.Shared.Entities;
+﻿using HMS.Shared.DTOs;
+using HMS.Shared.Entities;
 using HMS.Shared.Repositories.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -10,11 +11,17 @@ using System.Threading.Tasks;
 
 namespace HMS.Shared.Proxies.Implementations
 {
-    internal class DepartmentProxy : IDepartmentRepository
+    public class DepartmentProxy : IDepartmentRepository
     {
         private readonly HttpClient _httpClient;
         private readonly string _baseUrl = Config._base_api_url;
         private readonly string _token;
+
+        public DepartmentProxy(string token)
+        {
+            this._httpClient = new HttpClient { BaseAddress = new Uri(this._baseUrl) };
+            this._token = token;
+        }
 
         public DepartmentProxy(HttpClient httpClient, string token)
         {
@@ -26,7 +33,7 @@ namespace HMS.Shared.Proxies.Implementations
         {
             _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", this._token);
         }
-        public async Task<Department> AddAsync(Department department)
+        public async Task<DepartmentDto> AddAsync(Department department)
         {
             try
             {
@@ -42,7 +49,7 @@ namespace HMS.Shared.Proxies.Implementations
                 response.EnsureSuccessStatusCode();
 
                 string responseBody = await response.Content.ReadAsStringAsync();
-                return JsonSerializer.Deserialize<Department>(responseBody, new JsonSerializerOptions
+                return JsonSerializer.Deserialize<DepartmentDto>(responseBody, new JsonSerializerOptions
                 {
                     PropertyNameCaseInsensitive = true,
                     Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) }
@@ -75,7 +82,7 @@ namespace HMS.Shared.Proxies.Implementations
             }
         }
 
-        public async Task<IEnumerable<Department>> GetAllAsync()
+        public async Task<IEnumerable<DepartmentDto>> GetAllAsync()
         {
             try
             {
@@ -84,7 +91,7 @@ namespace HMS.Shared.Proxies.Implementations
                 response.EnsureSuccessStatusCode();
 
                 string responseBody = await response.Content.ReadAsStringAsync();
-                return JsonSerializer.Deserialize<IEnumerable<Department>>(responseBody, new JsonSerializerOptions
+                return JsonSerializer.Deserialize<IEnumerable<DepartmentDto>>(responseBody, new JsonSerializerOptions
                 {
                     PropertyNameCaseInsensitive = true,
                     Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) }
@@ -97,7 +104,7 @@ namespace HMS.Shared.Proxies.Implementations
             }
         }
 
-        public async Task<Department?> GetByIdAsync(int id)
+        public async Task<DepartmentDto?> GetByIdAsync(int id)
         {
             try
             {
@@ -110,11 +117,12 @@ namespace HMS.Shared.Proxies.Implementations
                 response.EnsureSuccessStatusCode();
 
                 string responseBody = await response.Content.ReadAsStringAsync();
-                return JsonSerializer.Deserialize<Department>(responseBody, new JsonSerializerOptions
+                var options = new JsonSerializerOptions
                 {
                     PropertyNameCaseInsensitive = true,
-                    Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) }
-                });
+                    Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) } // without this, the enum values will not match
+                };
+                return JsonSerializer.Deserialize<DepartmentDto>(responseBody, options);
             }
             catch (Exception ex)
             {

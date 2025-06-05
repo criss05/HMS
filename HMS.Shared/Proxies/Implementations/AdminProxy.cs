@@ -11,11 +11,17 @@ using System.Threading.Tasks;
 
 namespace HMS.Shared.Proxies.Implementations
 {
-    internal class AdminProxy : IAdminRepository
+    public class AdminProxy : IAdminRepository
     {
         private readonly HttpClient _httpClient;
         private readonly string _baseUrl = Config._base_api_url;
         private readonly string _token;
+
+        public AdminProxy(string token)
+        {
+            this._httpClient = new HttpClient { BaseAddress = new Uri(this._baseUrl) };
+            this._token = token;
+        }
 
         public AdminProxy(HttpClient httpClient, string token)
         {
@@ -108,7 +114,8 @@ namespace HMS.Shared.Proxies.Implementations
             string responseBody = await response.Content.ReadAsStringAsync();
             AdminDto? admin = JsonSerializer.Deserialize<AdminDto>(responseBody, new JsonSerializerOptions
             {
-                PropertyNameCaseInsensitive = true
+                PropertyNameCaseInsensitive = true,
+                Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) }
             });
             return admin;
         }
@@ -121,10 +128,12 @@ namespace HMS.Shared.Proxies.Implementations
             response.EnsureSuccessStatusCode();
 
             string responseBody = await response.Content.ReadAsStringAsync();
-            AdminDto? admin = JsonSerializer.Deserialize<AdminDto>(responseBody, new JsonSerializerOptions
+            var options = new JsonSerializerOptions
             {
-                PropertyNameCaseInsensitive = true
-            });
+                PropertyNameCaseInsensitive = true,
+                Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) } // without this, the enum values will not match
+            };
+            AdminDto? admin = JsonSerializer.Deserialize<AdminDto>(responseBody, options);
             return admin;
         }
 
