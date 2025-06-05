@@ -13,8 +13,12 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
   <ItemGroup>
+    <None Remove="Views\AdminHomePage.xaml" />
+    <None Remove="Views\DoctorHomePage.xaml" />
     <None Remove="Views\HomePage.xaml" />
     <None Remove="Views\LoginPage.xaml" />
+    <None Remove="Views\PatientHomePage.xaml" />
+    <None Remove="Views\Patient\PatientProfilePage.xaml" />
   </ItemGroup>
 
   <ItemGroup>
@@ -49,12 +53,32 @@
     <ProjectReference Include="..\HMS.Shared\HMS.Shared.csproj" />
   </ItemGroup>
   <ItemGroup>
+    <Page Update="Views\AdminHomePage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Views\DoctorHomePage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Views\PatientHomePage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
     <Page Update="Views\LoginPage.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
   <ItemGroup>
     <Page Update="Views\HomePage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Views\Patient\PatientProfilePage.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
