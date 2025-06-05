@@ -99,24 +99,45 @@ namespace HMS.Shared.Proxies.Implementations
                 response.EnsureSuccessStatusCode();
 
                 string responseBody = await response.Content.ReadAsStringAsync();
-                Console.WriteLine($"Debug - Appointment response: {responseBody}"); // Debug log
 
-                // Try to deserialize as a wrapper first
+                // Try to deserialize as a reference-tracked array
                 try 
                 {
-                    var wrapper = JsonSerializer.Deserialize<AppointmentResponseDto>(responseBody, _jsonOptions);
-                    if (wrapper?.Records != null)
+                    var jsonDoc = JsonDocument.Parse(responseBody);
+                    if (jsonDoc.RootElement.TryGetProperty("$values", out var valuesElement))
                     {
-                        return wrapper.Records;
+                        var appointments = new List<AppointmentDto>();
+                        foreach (var element in valuesElement.EnumerateArray())
+                        {
+                            try
+                            {
+                                var appointment = new AppointmentDto
+                                {
+                                    Id = element.GetProperty("id").GetInt32(),
+                                    PatientId = element.GetProperty("patientId").GetInt32(),
+                                    DoctorId = element.GetProperty("doctorId").GetInt32(),
+                                    ProcedureId = element.GetProperty("procedureId").GetInt32(),
+                                    RoomId = element.GetProperty("roomId").GetInt32(),
+                                    DateTime = element.GetProperty("dateTime").GetDateTime()
+                                };
+                                appointments.Add(appointment);
+                            }
+                            catch (Exception ex)
+                            {
+                                Console.WriteLine($"Error parsing appointment: {ex.Message}");
+                                continue;
+                            }
+                        }
+                        return appointments;
                     }
                 }
-                catch
+                catch (Exception ex)
                 {
-                    // If wrapper deserialization fails, try direct list deserialization
-                    return JsonSerializer.Deserialize<List<AppointmentDto>>(responseBody, _jsonOptions) ?? new List<AppointmentDto>();
+                    Console.WriteLine($"Error parsing reference-tracked response: {ex.Message}");
                 }
 
-                return new List<AppointmentDto>();
+                // Fallback to direct deserialization
+                return JsonSerializer.Deserialize<List<AppointmentDto>>(responseBody, _jsonOptions) ?? new List<AppointmentDto>();
             }
             catch (Exception ex)
             {
