@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using HMS.Shared.DTOs;
 using HMS.Shared.Entities;
 
 namespace HMS.Shared.Repositories.Interfaces
@@ -20,31 +21,31 @@ namespace HMS.Shared.Repositories.Interfaces
         /// </summary>
         /// <param name="id">The admin's unique ID.</param>
         /// <returns>The matching admin or null if not found.</returns>
-        Task<Admin?> GetByIdAsync(int id);
+        Task<AdminDto?> GetByIdAsync(int id);
 
         /// <summary>
         /// Retrieves an admin by email asynchronously.
         /// </summary>
         /// <param name="email">The admin's email.</param>
         /// <returns>The matching admin or null if not found.</returns>
-        Task<Admin?> GetByEmailAsync(string email);
+        Task<AdminDto?> GetByEmailAsync(string email);
 
         /// <summary>
         /// Adds a new admin asynchronously.
         /// </summary>
         /// <param name="admin">Admin entity to add.</param>
-        Task AddAsync(Admin admin);
+        Task<AdminDto> AddAsync(Admin admin);
 
         /// <summary>
         /// Updates an existing admin asynchronously.
         /// </summary>
         /// <param name="admin">Admin entity with updated data.</param>
-        Task UpdateAsync(Admin admin);
+        Task<bool> UpdateAsync(Admin admin);
 
         /// <summary>
         /// Deletes an admin by id asynchronously.
         /// </summary>
         /// <param name="id">The unique ID of the admin to delete.</param>
-        Task DeleteAsync(int id);
+        Task<bool> DeleteAsync(int id);
     }
 }
