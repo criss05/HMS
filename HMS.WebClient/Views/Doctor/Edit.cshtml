@@ -92,8 +92,9 @@
                             <div class="form-control-plaintext">
                                 <i class="fas fa-hospital-alt"></i> @Model.DepartmentName
                             </div>
-                            <input type="hidden" asp-for="DepartmentId" />
-                            <input type="hidden" asp-for="DepartmentName" />
+                            <input type="hidden" asp-for="DepartmentId" value="@Model.DepartmentId" />
+                            <input type="hidden" asp-for="DepartmentName" value="@Model.DepartmentName" />
+                            <span asp-validation-for="DepartmentId" class="text-danger"></span>
                         </div>
                     </div>
                 </div>

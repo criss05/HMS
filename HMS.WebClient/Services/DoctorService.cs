@@ -59,6 +59,10 @@ namespace HMS.WebClient.Services
                     dto.Password = existingDoctor.Password;
                 }
 
+                
+                dto.DepartmentId = existingDoctor.DepartmentId;
+                dto.DepartmentName = existingDoctor.DepartmentName;
+
                 // Preserve collections
                 dto.ScheduleIds = existingDoctor.ScheduleIds ?? new List<int>();
                 dto.ReviewIds = existingDoctor.ReviewIds ?? new List<int>();
