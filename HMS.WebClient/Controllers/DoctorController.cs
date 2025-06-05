@@ -10,6 +10,7 @@ using HMS.Shared.DTOs;
 using HMS.WebClient.Attributes;
 using HMS.Shared.Enums;
 using System.Text.Json;
+using Microsoft.Extensions.Logging;
 
 namespace HMS.WebClient.Controllers
 {
@@ -20,17 +21,20 @@ namespace HMS.WebClient.Controllers
         private readonly IMedicalRecordRepository _medicalRecordRepository;
         private readonly IAppointmentRepository _appointmentRepository;
         private readonly AuthService _authService;
+        private readonly ILogger<DoctorController> _logger;
 
         public DoctorController(
             DoctorService doctorService,
             IMedicalRecordRepository medicalRecordRepository,
             IAppointmentRepository appointmentRepository,
-            AuthService authService)
+            AuthService authService,
+            ILogger<DoctorController> logger)
         {
             _doctorService = doctorService;
             _medicalRecordRepository = medicalRecordRepository;
             _appointmentRepository = appointmentRepository;
             _authService = authService;
+            _logger = logger;
         }
 
         public IActionResult Index()
@@ -142,26 +146,43 @@ namespace HMS.WebClient.Controllers
                 var currentUser = _authService.GetCurrentUser();
                 if (currentUser == null)
                 {
+                    _logger.LogWarning("MedicalHistory: No current user found");
                     return RedirectToAction("Login", "Account");
                 }
 
+                _logger.LogInformation($"MedicalHistory: Fetching doctor profile for ID {currentUser.Id}");
                 var doctorViewModel = await _doctorService.GetDoctorByIdAsync(currentUser.Id);
                 if (doctorViewModel == null)
                 {
+                    _logger.LogWarning($"MedicalHistory: Doctor profile not found for ID {currentUser.Id}");
                     TempData["ErrorMessage"] = "Doctor profile not found.";
                     return RedirectToAction(nameof(Profile));
                 }
 
                 // Get medical records
+                _logger.LogInformation($"MedicalHistory: Fetching medical records for doctor ID {currentUser.Id}");
                 var records = await _medicalRecordRepository.GetAllAsync();
-                var doctorRecords = records?.Where(r => r.DoctorId == currentUser.Id).ToList() ?? new List<MedicalRecordDto>();
+                if (records == null)
+                {
+                    _logger.LogWarning("MedicalHistory: GetAllAsync returned null for medical records");
+                    records = new List<MedicalRecordDto>();
+                }
+                var doctorRecords = records.Where(r => r.DoctorId == currentUser.Id).ToList();
 
                 // Get upcoming appointments
+                _logger.LogInformation($"MedicalHistory: Fetching appointments for doctor ID {currentUser.Id}");
                 var allAppointments = await _appointmentRepository.GetAllAsync();
-                var upcomingAppointments = allAppointments?
+                if (allAppointments == null)
+                {
+                    _logger.LogWarning("MedicalHistory: GetAllAsync returned null for appointments");
+                    allAppointments = new List<AppointmentDto>();
+                }
+                var upcomingAppointments = allAppointments
                     .Where(a => a.DoctorId == currentUser.Id && a.DateTime > DateTime.Now)
                     .OrderBy(a => a.DateTime)
-                    .ToList() ?? new List<AppointmentDto>();
+                    .ToList();
+
+                _logger.LogInformation($"MedicalHistory: Creating view model with {doctorRecords.Count} records and {upcomingAppointments.Count} appointments");
 
                 // Create view model with all sections
                 var viewModel = new DoctorMedicalHistoryViewModel
@@ -183,11 +204,13 @@ namespace HMS.WebClient.Controllers
                     UpcomingAppointments = upcomingAppointments
                 };
 
+                _logger.LogInformation("MedicalHistory: Successfully created view model");
                 return View(viewModel);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                TempData["ErrorMessage"] = "An error occurred while loading the medical history.";
+                _logger.LogError(ex, "An error occurred in MedicalHistory action");
+                TempData["ErrorMessage"] = $"An error occurred while loading the medical history: {ex.Message}";
                 return RedirectToAction(nameof(Profile));
             }
         }
