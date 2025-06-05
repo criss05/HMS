@@ -57,12 +57,12 @@ namespace HMS.WebClient.Controllers
                 var records = await _medicalRecordRepository.GetAllAsync();
                 var doctorRecords = records?.Where(r => r.DoctorId == doctorId).ToList();
                 
-                return View(doctorRecords ?? new List<MedicalRecord>());
+                return View(doctorRecords ?? new List<MedicalRecordDto>());
             }
             catch (Exception)
             {
                 ModelState.AddModelError("", "An error occurred while loading the medical history. Please try again later.");
-                return View(new List<MedicalRecord>());
+                return View(new List<MedicalRecordDto>());
             }
         }
 

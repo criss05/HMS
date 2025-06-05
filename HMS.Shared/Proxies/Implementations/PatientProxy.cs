@@ -14,51 +14,61 @@ namespace HMS.Shared.Proxies.Implementations
 {
     public class PatientProxy : IPatientRepository
     {
-        private readonly HttpClient _http_client;
-        private readonly string s_base_api_url = Config._base_api_url;
+        private readonly HttpClient _httpClient;
+        private readonly string _baseUrl = Config._base_api_url;
         private readonly string _token;
+        private readonly JsonSerializerOptions _jsonOptions;
 
+        // Constructor cu HttpClient + token
         public PatientProxy(HttpClient httpClient, string token)
         {
-            this._http_client = httpClient;
-            this._token = token;
+            _httpClient = httpClient;
+            _token = token;
+            _jsonOptions = new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true,
+                ReferenceHandler = ReferenceHandler.Preserve,
+                Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) }
+            };
+        }
+
+        // Constructor doar cu token (creează HttpClient cu BaseAddress)
+        public PatientProxy(string token)
+        {
+            _httpClient = new HttpClient { BaseAddress = new Uri(_baseUrl) };
+            _token = token;
+            _jsonOptions = new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true,
+                ReferenceHandler = ReferenceHandler.Preserve,
+                Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) }
+            };
         }
 
         private void AddAuthorizationHeader()
         {
-            this._http_client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", this._token);
+            _httpClient.DefaultRequestHeaders.Authorization =
+                new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", _token);
         }
 
         public async Task<IEnumerable<PatientDto>> GetAllAsync()
         {
             AddAuthorizationHeader();
-            HttpResponseMessage response = await this._http_client.GetAsync(this.s_base_api_url + "patient");
+            HttpResponseMessage response = await _httpClient.GetAsync(_baseUrl + "patient");
             response.EnsureSuccessStatusCode();
 
-            string response_body = await response.Content.ReadAsStringAsync();
-
-            IEnumerable<PatientDto> patients = JsonSerializer.Deserialize<IEnumerable<PatientDto>>(response_body, new JsonSerializerOptions
-            {
-                PropertyNameCaseInsensitive = true,
-                Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) } // without this, the enum values will not match
-            });
-
-            return patients;
+            string responseBody = await response.Content.ReadAsStringAsync();
+            return JsonSerializer.Deserialize<IEnumerable<PatientDto>>(responseBody, _jsonOptions) ?? new List<PatientDto>();
         }
 
         public async Task<PatientDto> GetByIdAsync(int id)
         {
             AddAuthorizationHeader();
-            HttpResponseMessage response = await this._http_client.GetAsync($"{this.s_base_api_url}patient/{id}");
+            HttpResponseMessage response = await _httpClient.GetAsync($"{_baseUrl}patient/{id}");
             response.EnsureSuccessStatusCode();
 
-            string response_body = await response.Content.ReadAsStringAsync();
-
-            PatientDto patient = JsonSerializer.Deserialize<PatientDto>(response_body, new JsonSerializerOptions
-            {
-                PropertyNameCaseInsensitive = true,
-                Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) } // without this, the enum values will not match
-            });
+            string responseBody = await response.Content.ReadAsStringAsync();
+            PatientDto? patient = JsonSerializer.Deserialize<PatientDto>(responseBody, _jsonOptions);
 
             if (patient == null)
                 throw new Exception($"No patient found with user id {id}");
@@ -66,105 +76,43 @@ namespace HMS.Shared.Proxies.Implementations
             return patient;
         }
 
-        public async Task<Patient> AddAsync(Patient patient)
+        public async Task<PatientDto> AddAsync(PatientDto patient)
         {
             AddAuthorizationHeader();
-            PatientCreateDto patient_send = new PatientCreateDto
-            {
-                Email = patient.Email,
-                Password = patient.Password,
-                Name = patient.Name,
-                CNP = patient.CNP,
-                PhoneNumber = patient.PhoneNumber,
-                Role = patient.Role.ToString(),
-                BloodType = patient.BloodType.ToString(),
-                EmergencyContact = patient.EmergencyContact,
-                Allergies = patient.Allergies,
-                Weight = patient.Weight,
-                Height = patient.Height,
-                BirthDate = patient.BirthDate,
-                Address = patient.Address
-            };
+            string jsonContent = JsonSerializer.Serialize(patient, _jsonOptions);
+            StringContent content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
 
-            StringContent jsonContent = new StringContent(
-                JsonSerializer.Serialize(patient_send, new JsonSerializerOptions
-                {
-                    PropertyNameCaseInsensitive = true,
-                    Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) } // without this, the enum values will not match
-                }),
-                Encoding.UTF8,
-                "application/json");
-
-            HttpResponseMessage response = await this._http_client.PostAsync(this.s_base_api_url + "patient", jsonContent);
+            HttpResponseMessage response = await _httpClient.PostAsync(_baseUrl + "patient", content);
             response.EnsureSuccessStatusCode();
 
-            string response_body = await response.Content.ReadAsStringAsync();
-
-            Patient patient_response = JsonSerializer.Deserialize<Patient>(response_body, new JsonSerializerOptions
-            {
-                PropertyNameCaseInsensitive = true,
-                Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) } // without this, the enum values will not match
-
-            });
-
-            return patient_response;
+            string responseBody = await response.Content.ReadAsStringAsync();
+            return JsonSerializer.Deserialize<PatientDto>(responseBody, _jsonOptions)!;
         }
 
-        public async Task<bool> UpdateAsync(Patient patient)
+        public async Task<bool> UpdateAsync(PatientDto patient)
         {
             AddAuthorizationHeader();
-            try
-            {
-                PatientUpdateDto patient_send = new PatientUpdateDto
-                {
-                    Email = patient.Email,
-                    Password = patient.Password,
-                    Name = patient.Name,
-                    CNP = patient.CNP,
-                    PhoneNumber = patient.PhoneNumber,
-                    Role = patient.Role.ToString(),
-                    BloodType = patient.BloodType.ToString(),
-                    EmergencyContact = patient.EmergencyContact,
-                    Allergies = patient.Allergies,
-                    Weight = patient.Weight,
-                    Height = patient.Height,
-                    BirthDate = patient.BirthDate,
-                    Address = patient.Address
-                };
+            string jsonContent = JsonSerializer.Serialize(patient, _jsonOptions);
+            StringContent content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
 
-                StringContent jsonContent = new StringContent(
-                    JsonSerializer.Serialize(patient_send, new JsonSerializerOptions
-                    {
-                        PropertyNameCaseInsensitive = true,
-                        Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) } // without this, the enum values will not match
-                    }),
-                    Encoding.UTF8,
-                    "application/json");
+            HttpResponseMessage response = await _httpClient.PutAsync($"{_baseUrl}patient/{patient.Id}", content);
 
-                HttpResponseMessage patient_response = await this._http_client.PutAsync($"{this.s_base_api_url}patient/{patient.Id}", jsonContent);
+            if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
+                return false;
 
-                patient_response.EnsureSuccessStatusCode();
-
-                if (patient_response.StatusCode == System.Net.HttpStatusCode.NotFound)
-                    return false;
-
-                return patient_response.IsSuccessStatusCode;
-            }
-            catch (Exception ex)
-            {
-                throw new Exception($"Error updating patient data: {ex.Message}", ex);
-            }
+            response.EnsureSuccessStatusCode();
+            return response.IsSuccessStatusCode;
         }
 
         public async Task<bool> DeleteAsync(int id)
         {
             AddAuthorizationHeader();
-            HttpResponseMessage response = await this._http_client.DeleteAsync($"{this.s_base_api_url}patient/{id}");
-            response.EnsureSuccessStatusCode();
+            HttpResponseMessage response = await _httpClient.DeleteAsync($"{_baseUrl}patient/{id}");
 
             if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
                 return false;
 
+            response.EnsureSuccessStatusCode();
             return response.IsSuccessStatusCode;
         }
     }

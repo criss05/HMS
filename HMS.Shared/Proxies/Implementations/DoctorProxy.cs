@@ -1,4 +1,5 @@
-﻿using HMS.Shared.Entities;
+﻿using HMS.Shared.DTOs;
+using HMS.Shared.Entities;
 using HMS.Shared.Repositories.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -18,11 +19,25 @@ namespace HMS.Shared.Proxies.Implementations
         private readonly string _token;
         private readonly JsonSerializerOptions _jsonOptions;
 
+        // Constructor cu HttpClient + token
         public DoctorProxy(HttpClient httpClient, string token)
         {
-            this._httpClient = httpClient;
-            this._token = token;
-            this._jsonOptions = new JsonSerializerOptions
+            _httpClient = httpClient;
+            _token = token;
+            _jsonOptions = new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true,
+                ReferenceHandler = ReferenceHandler.Preserve,
+                Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) }
+            };
+        }
+
+        // Constructor doar cu token
+        public DoctorProxy(string token)
+        {
+            _httpClient = new HttpClient { BaseAddress = new Uri(_baseUrl) };
+            _token = token;
+            _jsonOptions = new JsonSerializerOptions
             {
                 PropertyNameCaseInsensitive = true,
                 ReferenceHandler = ReferenceHandler.Preserve,
@@ -32,10 +47,11 @@ namespace HMS.Shared.Proxies.Implementations
 
         private void AddAuthorizationHeader()
         {
-            _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", this._token);
+            _httpClient.DefaultRequestHeaders.Authorization =
+                new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", _token);
         }
 
-        public async Task<Doctor> AddAsync(Doctor doctor)
+        public async Task<DoctorDto> AddAsync(DoctorDto doctor)
         {
             AddAuthorizationHeader();
             string doctorJson = JsonSerializer.Serialize(doctor, _jsonOptions);
@@ -44,70 +60,46 @@ namespace HMS.Shared.Proxies.Implementations
             HttpResponseMessage response = await _httpClient.PostAsync(_baseUrl + "doctor", content);
             response.EnsureSuccessStatusCode();
 
-            var json = await response.Content.ReadAsStringAsync();
-            return JsonSerializer.Deserialize<Doctor>(json, _jsonOptions)!;
+            string json = await response.Content.ReadAsStringAsync();
+            return JsonSerializer.Deserialize<DoctorDto>(json, _jsonOptions)!;
         }
 
         public async Task<bool> DeleteAsync(int id)
         {
             AddAuthorizationHeader();
             HttpResponseMessage response = await _httpClient.DeleteAsync(_baseUrl + $"doctor/{id}");
-            response.EnsureSuccessStatusCode();
 
             if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
                 return false;
 
+            response.EnsureSuccessStatusCode();
             return response.IsSuccessStatusCode;
         }
 
-        public async Task<IEnumerable<Doctor>> GetAllAsync()
+        public async Task<IEnumerable<DoctorDto>> GetAllAsync()
         {
             AddAuthorizationHeader();
             HttpResponseMessage response = await _httpClient.GetAsync(_baseUrl + "doctor");
             response.EnsureSuccessStatusCode();
 
             string responseBody = await response.Content.ReadAsStringAsync();
-
-            IEnumerable<Doctor> doctors = JsonSerializer.Deserialize<IEnumerable<Doctor>>(responseBody, _jsonOptions);
-
-            return doctors;
+            return JsonSerializer.Deserialize<IEnumerable<DoctorDto>>(responseBody, _jsonOptions)!;
         }
 
-        public async Task<Doctor> GetByIdAsync(int id)
+        public async Task<DoctorDto?> GetByIdAsync(int id)
         {
             try
             {
                 AddAuthorizationHeader();
                 HttpResponseMessage response = await _httpClient.GetAsync(_baseUrl + $"doctor/{id}");
-                
-                if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
-                {
-                    throw new KeyNotFoundException($"Doctor with ID {id} was not found.");
-                }
 
-                if (!response.IsSuccessStatusCode)
-                {
-                    string errorContent = await response.Content.ReadAsStringAsync();
-                    throw new Exception($"Failed to get doctor. Status code: {response.StatusCode}. Error: {errorContent}");
-                }
+                if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
+                    return null;
+
+                response.EnsureSuccessStatusCode();
 
                 string responseBody = await response.Content.ReadAsStringAsync();
-
-                try
-                {
-                    Doctor doctor = JsonSerializer.Deserialize<Doctor>(responseBody, _jsonOptions);
-
-                    if (doctor == null)
-                    {
-                        throw new Exception("Failed to deserialize doctor data");
-                    }
-
-                    return doctor;
-                }
-                catch (JsonException ex)
-                {
-                    throw new Exception($"Failed to parse doctor data. Response: {responseBody}", ex);
-                }
+                return JsonSerializer.Deserialize<DoctorDto>(responseBody, _jsonOptions);
             }
             catch (Exception ex)
             {
@@ -116,31 +108,18 @@ namespace HMS.Shared.Proxies.Implementations
             }
         }
 
-        public async Task<IEnumerable<Doctor>> GetByDepartmentIdAsync(int departmentId)
-        {
-            AddAuthorizationHeader();
-            HttpResponseMessage response = await _httpClient.GetAsync(_baseUrl + $"doctor/department/{departmentId}");
-            response.EnsureSuccessStatusCode();
-
-            string responseBody = await response.Content.ReadAsStringAsync();
-
-            IEnumerable<Doctor> doctors = JsonSerializer.Deserialize<IEnumerable<Doctor>>(responseBody, _jsonOptions);
-
-            return doctors;
-        }
-
-        public async Task<bool> UpdateAsync(Doctor doctor)
+        public async Task<bool> UpdateAsync(DoctorDto doctor)
         {
             AddAuthorizationHeader();
             string doctorJson = JsonSerializer.Serialize(doctor, _jsonOptions);
             StringContent content = new StringContent(doctorJson, Encoding.UTF8, "application/json");
 
             HttpResponseMessage response = await _httpClient.PutAsync(_baseUrl + $"doctor/{doctor.Id}", content);
-            response.EnsureSuccessStatusCode();
 
             if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
                 return false;
 
+            response.EnsureSuccessStatusCode();
             return response.IsSuccessStatusCode;
         }
     }
