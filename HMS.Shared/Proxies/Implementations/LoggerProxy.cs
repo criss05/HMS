@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Json;
+using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
@@ -51,13 +52,13 @@ namespace HMS.Shared.Proxies.Implementations
                 new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", _token);
         }
 
-        public async Task<IEnumerable<Log>> GetAllAsync()
+        public async Task<IEnumerable<LogDto>> GetAllAsync()
         {
             try
             {
                 AddAuthorizationHeader();
 
-                HttpResponseMessage response = await this._http_client.GetAsync(s_base_api_url + "log");
+                HttpResponseMessage response = await this._httpClient.GetAsync(_baseUrl + "log");
                 response.EnsureSuccessStatusCode();
 
                 string json = await response.Content.ReadAsStringAsync();
@@ -66,20 +67,20 @@ namespace HMS.Shared.Proxies.Implementations
                     if (document.RootElement.TryGetProperty("$values", out JsonElement valuesElement))
                     {
                         string valuesJson = valuesElement.GetRawText();
-                        var logs = JsonSerializer.Deserialize<List<Log>>(valuesJson, _json_options);
-                        return logs ?? new List<Log>();
+                        var logs = JsonSerializer.Deserialize<List<LogDto>>(valuesJson, _jsonOptions);
+                        return logs ?? new List<LogDto>();
                     }
                     else
                     {
-                        var logs = JsonSerializer.Deserialize<List<Log>>(json, _json_options);
-                        return logs ?? new List<Log>();
+                        var logs = JsonSerializer.Deserialize<List<LogDto>>(json, _jsonOptions);
+                        return logs ?? new List<LogDto>();
                     }
                 }
             }
             catch (Exception exception)
             {
                 System.Diagnostics.Debug.WriteLine($"Exception in GetAllAsync: {exception.Message}");
-                return new List<Log>();
+                return new List<LogDto>();
             }
         }
 
