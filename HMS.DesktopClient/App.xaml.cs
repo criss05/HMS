@@ -2,6 +2,7 @@
 using HMS.DesktopClient.APIClients;
 using HMS.DesktopClient.Views;
 using HMS.Shared.DTOs;
+using HMS.Shared.DTOs.Patient;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Xaml;
 
@@ -17,6 +18,8 @@ namespace HMS.DesktopClient
     {
         public static IServiceProvider Services { get; private set; }
         public static UserWithTokenDto? CurrentUser { get; set; } = null;
+
+        public static PatientDto? CurrentPatient { get; set; } = null;
         /// <summary>
         /// Initializes the singleton application object.  This is the first line of authored code
         /// executed, and as such is the logical equivalent of main() or WinMain().

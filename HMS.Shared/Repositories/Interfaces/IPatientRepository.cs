@@ -35,7 +35,7 @@ namespace HMS.Shared.Repositories.Interfaces
         /// </summary>
         /// <param name="patient">The patient with updated data.</param>
         /// <returns>True if update succeeded, false otherwise.</returns>
-        Task<bool> UpdateAsync(PatientDto patient);
+        Task<bool> UpdateAsync(PatientUpdateDto patient, int id);
 
         /// <summary>
         /// Deletes a patient by their unique identifier asynchronously.

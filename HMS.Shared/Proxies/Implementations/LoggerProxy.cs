@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Json;
-using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -29,8 +28,8 @@ namespace HMS.Shared.Proxies.Implementations
             _jsonOptions = new JsonSerializerOptions
             {
                 PropertyNameCaseInsensitive = true,
-                ReferenceHandler = ReferenceHandler.Preserve,
-                Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) }
+                ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles,
+                Converters = { new System.Text.Json.Serialization.JsonStringEnumConverter() }
             };
         }
 
@@ -55,12 +54,34 @@ namespace HMS.Shared.Proxies.Implementations
 
         public async Task<IEnumerable<LogDto>> GetAllAsync()
         {
-            AddAuthorizationHeader();
-            HttpResponseMessage response = await _httpClient.GetAsync(_baseUrl + "log");
-            response.EnsureSuccessStatusCode();
+            try
+            {
+                AddAuthorizationHeader();
 
-            string responseBody = await response.Content.ReadAsStringAsync();
-            return JsonSerializer.Deserialize<IEnumerable<LogDto>>(responseBody, _jsonOptions) ?? new List<LogDto>();
+                HttpResponseMessage response = await this._httpClient.GetAsync(_baseUrl + "log");
+                response.EnsureSuccessStatusCode();
+
+                string json = await response.Content.ReadAsStringAsync();
+                using (JsonDocument document = JsonDocument.Parse(json))
+                {
+                    if (document.RootElement.TryGetProperty("$values", out JsonElement valuesElement))
+                    {
+                        string valuesJson = valuesElement.GetRawText();
+                        var logs = JsonSerializer.Deserialize<List<LogDto>>(valuesJson, _jsonOptions);
+                        return logs ?? new List<LogDto>();
+                    }
+                    else
+                    {
+                        var logs = JsonSerializer.Deserialize<List<LogDto>>(json, _jsonOptions);
+                        return logs ?? new List<LogDto>();
+                    }
+                }
+            }
+            catch (Exception exception)
+            {
+                System.Diagnostics.Debug.WriteLine($"Exception in GetAllAsync: {exception.Message}");
+                return new List<LogDto>();
+            }
         }
 
         public async Task<LogDto?> GetByIdAsync(int id)

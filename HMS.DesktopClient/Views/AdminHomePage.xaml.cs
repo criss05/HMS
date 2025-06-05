@@ -27,5 +27,11 @@ namespace HMS.DesktopClient.Views
         {
             this.InitializeComponent();
         }
+
+        private void LogsButton_Click(object sender, RoutedEventArgs e)
+        {
+            var adminDashboard = new LogsPage();
+            adminDashboard.Activate();
+        }
     }
 }
