@@ -32,7 +32,6 @@
                             @foreach (var record in Model.OrderByDescending(r => r.CreatedAt))
                             {
                                 <tr>
-                                    <td>@record.CreatedAt.ToString("MMM dd, yyyy")</td>
                                     <td>@record.PatientId</td>
                                     <td>@record.ProcedureId</td>
                                     <td>@record.Diagnosis</td>
