@@ -1,3 +1,4 @@
+using HMS.Shared.DTOs;
 using HMS.Shared.Entities;
 using HMS.Shared.Repositories.Interfaces;
 using System;
@@ -14,140 +15,102 @@ namespace HMS.Shared.Proxies.Implementations
         private readonly HttpClient _httpClient;
         private readonly string _baseUrl = Config._base_api_url;
         private readonly string _token;
+        private readonly JsonSerializerOptions _jsonOptions;
 
+        // Constructor cu HttpClient + token
         public ScheduleProxy(HttpClient httpClient, string token)
         {
-            this._httpClient = httpClient;
-            this._token = token;
+            _httpClient = httpClient;
+            _token = token;
+            _jsonOptions = new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true,
+                ReferenceHandler = ReferenceHandler.Preserve,
+                Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) }
+            };
+        }
+
+        // Constructor doar cu token
+        public ScheduleProxy(string token)
+        {
+            _httpClient = new HttpClient { BaseAddress = new Uri(_baseUrl) };
+            _token = token;
+            _jsonOptions = new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true,
+                ReferenceHandler = ReferenceHandler.Preserve,
+                Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) }
+            };
         }
 
         private void AddAuthorizationHeader()
         {
-            _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", this._token);
+            _httpClient.DefaultRequestHeaders.Authorization =
+                new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", _token);
         }
 
-        public async Task<Schedule> AddAsync(Schedule schedule)
+        public async Task<ScheduleDto> AddAsync(ScheduleDto schedule)
         {
-            try
-            {
-                AddAuthorizationHeader();
-                string scheduleJson = JsonSerializer.Serialize(schedule, new JsonSerializerOptions
-                {
-                    PropertyNameCaseInsensitive = true,
-                    Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) }
-                });
-                StringContent content = new StringContent(scheduleJson, Encoding.UTF8, "application/json");
+            AddAuthorizationHeader();
+            string scheduleJson = JsonSerializer.Serialize(schedule, _jsonOptions);
+            StringContent content = new StringContent(scheduleJson, Encoding.UTF8, "application/json");
 
-                HttpResponseMessage response = await _httpClient.PostAsync(_baseUrl + "schedule", content);
-                response.EnsureSuccessStatusCode();
+            HttpResponseMessage response = await _httpClient.PostAsync(_baseUrl + "schedule", content);
+            response.EnsureSuccessStatusCode();
 
-                string responseBody = await response.Content.ReadAsStringAsync();
-                return JsonSerializer.Deserialize<Schedule>(responseBody, new JsonSerializerOptions
-                {
-                    PropertyNameCaseInsensitive = true,
-                    Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) }
-                })!;
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error adding schedule: {ex.Message}");
-                throw;
-            }
+            string responseBody = await response.Content.ReadAsStringAsync();
+            return JsonSerializer.Deserialize<ScheduleDto>(responseBody, _jsonOptions)!;
         }
 
         public async Task<bool> DeleteAsync(int doctorId, int shiftId)
         {
-            try
-            {
-                AddAuthorizationHeader();
-                HttpResponseMessage response = await _httpClient.DeleteAsync(_baseUrl + $"schedule/{doctorId}/{shiftId}");
-                
-                if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
-                    return false;
+            AddAuthorizationHeader();
+            HttpResponseMessage response = await _httpClient.DeleteAsync(_baseUrl + $"schedule/{doctorId}/{shiftId}");
 
-                response.EnsureSuccessStatusCode();
-                return true;
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error deleting schedule: {ex.Message}");
-                throw;
-            }
+            if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
+                return false;
+
+            response.EnsureSuccessStatusCode();
+            return true;
         }
 
-        public async Task<IEnumerable<Schedule>> GetAllAsync()
+        public async Task<IEnumerable<ScheduleDto>> GetAllAsync()
         {
-            try
-            {
-                AddAuthorizationHeader();
-                HttpResponseMessage response = await _httpClient.GetAsync(_baseUrl + "schedule");
-                response.EnsureSuccessStatusCode();
+            AddAuthorizationHeader();
+            HttpResponseMessage response = await _httpClient.GetAsync(_baseUrl + "schedule");
+            response.EnsureSuccessStatusCode();
 
-                string responseBody = await response.Content.ReadAsStringAsync();
-                return JsonSerializer.Deserialize<IEnumerable<Schedule>>(responseBody, new JsonSerializerOptions
-                {
-                    PropertyNameCaseInsensitive = true,
-                    Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) }
-                })!;
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error getting all schedules: {ex.Message}");
-                throw;
-            }
+            string responseBody = await response.Content.ReadAsStringAsync();
+            return JsonSerializer.Deserialize<IEnumerable<ScheduleDto>>(responseBody, _jsonOptions) ?? new List<ScheduleDto>();
         }
 
-        public async Task<Schedule?> GetByIdsAsync(int doctorId, int shiftId)
+        public async Task<ScheduleDto?> GetByIdsAsync(int doctorId, int shiftId)
         {
-            try
-            {
-                AddAuthorizationHeader();
-                HttpResponseMessage response = await _httpClient.GetAsync(_baseUrl + $"schedule/{doctorId}/{shiftId}");
+            AddAuthorizationHeader();
+            HttpResponseMessage response = await _httpClient.GetAsync(_baseUrl + $"schedule/{doctorId}/{shiftId}");
 
-                if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
-                    return null;
+            if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
+                return null;
 
-                response.EnsureSuccessStatusCode();
+            response.EnsureSuccessStatusCode();
 
-                string responseBody = await response.Content.ReadAsStringAsync();
-                return JsonSerializer.Deserialize<Schedule>(responseBody, new JsonSerializerOptions
-                {
-                    PropertyNameCaseInsensitive = true,
-                    Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) }
-                });
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error getting schedule by IDs: {ex.Message}");
-                throw;
-            }
+            string responseBody = await response.Content.ReadAsStringAsync();
+            return JsonSerializer.Deserialize<ScheduleDto>(responseBody, _jsonOptions);
         }
 
-        public async Task<bool> UpdateAsync(Schedule schedule)
+        public async Task<bool> UpdateAsync(ScheduleDto schedule)
         {
-            try
-            {
-                AddAuthorizationHeader();
-                string scheduleJson = JsonSerializer.Serialize(schedule, new JsonSerializerOptions
-                {
-                    PropertyNameCaseInsensitive = true,
-                    Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) }
-                });
-                StringContent content = new StringContent(scheduleJson, Encoding.UTF8, "application/json");
+            AddAuthorizationHeader();
+            string scheduleJson = JsonSerializer.Serialize(schedule, _jsonOptions);
+            StringContent content = new StringContent(scheduleJson, Encoding.UTF8, "application/json");
 
-                HttpResponseMessage response = await _httpClient.PutAsync(_baseUrl + $"schedule/{schedule.DoctorId}/{schedule.ShiftId}", content);
+            HttpResponseMessage response = await _httpClient.PutAsync(_baseUrl + $"schedule/{schedule.DoctorId}/{schedule.ShiftId}", content);
 
-                if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
-                    return false;
+            if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
+                return false;
 
-                response.EnsureSuccessStatusCode();
-                return true;
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error updating schedule: {ex.Message}");
-                throw;
-            }
+            response.EnsureSuccessStatusCode();
+            return true;
         }
     }
 } 
