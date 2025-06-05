@@ -51,10 +51,6 @@ namespace HMS.WebClient.Services
                 var existingDoctor = await _doctorRepository.GetByIdAsync(viewModel.Id);
                 if (existingDoctor == null) return false;
 
-                // Preserve department data
-                viewModel.DepartmentId = existingDoctor.DepartmentId;
-                viewModel.DepartmentName = existingDoctor.DepartmentName;
-
                 var dto = MapToDoctorDto(viewModel);
                 
                 // Preserve password if not changed
