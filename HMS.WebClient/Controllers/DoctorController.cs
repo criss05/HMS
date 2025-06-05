@@ -184,6 +184,14 @@ namespace HMS.WebClient.Controllers
                     allAppointments = new List<AppointmentDto>();
                 }
 
+                // Debug log all appointments
+                foreach (var apt in allAppointments)
+                {
+                    _logger.LogInformation($"DEBUG: Found appointment - ID: {apt.Id}, DoctorId: {apt.DoctorId}, PatientId: {apt.PatientId}, DateTime: {apt.DateTime}");
+                }
+                _logger.LogInformation($"DEBUG: Total appointments in database: {allAppointments.Count}");
+                _logger.LogInformation($"DEBUG: Current doctor ID: {currentUser.Id}");
+
                 // Filter appointments for current doctor
                 var doctorAppointments = allAppointments.Where(a => a.DoctorId == currentUser.Id).ToList();
                 _logger.LogInformation($"MedicalHistory: Found {doctorAppointments.Count} appointments for doctor {currentUser.Id}");
