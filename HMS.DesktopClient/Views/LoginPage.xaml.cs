@@ -20,6 +20,7 @@ using Windows.Foundation;
 using Windows.Foundation.Collections;
 using HMS.Shared.Proxies.Implementations;
 using HMS.Shared.Enums;
+using HMS.DesktopClient.Views.Doctor;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -58,6 +59,7 @@ namespace HMS.DesktopClient.Views
                 // Now that we have the token, initialize loginService
                 this.loginService = new LoginService(new PatientProxy(App.CurrentUser.Token), new DoctorProxy(App.CurrentUser.Token), new AdminProxy(App.CurrentUser.Token));
 
+
                 if (userWithToken.Role == UserRole.Patient)
                 {
                     PatientDto patientDto = await this.loginService.GetPatientByIdAsync(App.CurrentUser.Id);
@@ -74,7 +76,7 @@ namespace HMS.DesktopClient.Views
                     App.CurrentDoctor = doctorDto;
                 }
 
-                this.errorMessage.Visibility = Visibility.Collapsed;
+                    this.errorMessage.Visibility = Visibility.Collapsed;
 
                 if (App.CurrentUser.Role == UserRole.Patient)
                 {

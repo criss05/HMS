@@ -1,5 +1,5 @@
-﻿using HMS.Shared.DTOs;
-using HMS.Shared.DTOs.Patient;
+﻿using HMS.Shared.DTOs.Patient;
+using HMS.Shared.DTOs;
 using HMS.Shared.Proxies.Implementations;
 using System.Threading.Tasks;
 

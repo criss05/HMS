@@ -21,6 +21,7 @@ namespace HMS.DesktopClient
         public static PatientDto? CurrentPatient { get; set; } = null;
         public static AdminDto? CurrentAdmin { get; set; } = null;
         public static DoctorDto? CurrentDoctor { get; set; } = null;  
+
         /// <summary>
         /// Initializes the singleton application object.  This is the first line of authored code
         /// executed, and as such is the logical equivalent of main() or WinMain().

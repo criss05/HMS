@@ -1,10 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using HMS.Shared.DTOs;
+﻿using HMS.Shared.DTOs;
 using HMS.Shared.Repositories.Interfaces;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace HMS.Shared.Services
 {
@@ -17,17 +14,13 @@ namespace HMS.Shared.Services
             _doctorRepository = doctorRepository;
         }
 
-        public async Task<DoctorDto> AddDoctorAsync(DoctorDto doctor)
+        public async Task<bool> UpdateDoctorAsync(DoctorDto doctor)
         {
-            if (doctor == null)
-                throw new ArgumentNullException(nameof(doctor), "Doctor cannot be null");
-            return await _doctorRepository.AddAsync(doctor);
+            return await _doctorRepository.UpdateAsync(doctor);
         }
 
-        public async Task<DoctorDto> GetDoctorByIdAsync(int id)
+        public async Task<DoctorDto?> GetDoctorByIdAsync(int id)
         {
-            if (id <= 0)
-                throw new ArgumentException("Invalid doctor ID", nameof(id));
             return await _doctorRepository.GetByIdAsync(id);
         }
 
@@ -36,18 +29,14 @@ namespace HMS.Shared.Services
             return await _doctorRepository.GetAllAsync();
         }
 
-        public async Task<bool> UpdateDoctorAsync(DoctorDto doctor)
-        {
-            if (doctor == null)
-                throw new ArgumentNullException(nameof(doctor), "Doctor cannot be null");
-            return await _doctorRepository.UpdateAsync(doctor);
-        }
-
         public async Task<bool> DeleteDoctorAsync(int id)
         {
-            if (id <= 0)
-                throw new ArgumentException("Invalid doctor ID", nameof(id));
             return await _doctorRepository.DeleteAsync(id);
         }
-     }
+
+        public async Task<DoctorDto> AddDoctorAsync(DoctorDto doctor)
+        {
+            return await _doctorRepository.AddAsync(doctor);
+        }
+    }
 }
