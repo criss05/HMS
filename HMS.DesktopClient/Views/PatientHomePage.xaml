@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="utf-8"?>
 <Window
     x:Class="HMS.DesktopClient.Views.PatientHomePage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
@@ -10,6 +9,24 @@
     Title="PatientHomePage">
 
     <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
 
+        <!-- Navigation Bar -->
+        <Grid Background="LightGray" Padding="10" HorizontalAlignment="Stretch">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="10">
+                <Button Content="Doctors" Click="Doctors_Click"/>
+                <Button Content="Medical Records" Click="MedicalRecords_Click"/>
+                <Button Content="Profile" Click="Profile_Click"/>
+                <Button Content="Home" Click="Home_Click"/>
+            </StackPanel>
+        </Grid>
+
+        <!-- Main content area -->
+        <Grid Grid.Row="1">
+            <!-- Content will go here -->
+        </Grid>
     </Grid>
 </Window>
