@@ -7,6 +7,7 @@ using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
+using System.Linq;
 
 namespace HMS.Shared.Proxies.Implementations
 {
@@ -103,49 +104,83 @@ namespace HMS.Shared.Proxies.Implementations
                 // Try to deserialize as a reference-tracked array
                 try 
                 {
+                    var appointments = new List<AppointmentDto>();
                     var jsonDoc = JsonDocument.Parse(responseBody);
-                    if (jsonDoc.RootElement.TryGetProperty("$values", out var valuesElement))
+
+                    // Function to parse appointment from JsonElement
+                    void ParseAppointment(JsonElement element)
                     {
-                        var appointments = new List<AppointmentDto>();
-                        foreach (var element in valuesElement.EnumerateArray())
+                        try
                         {
-                            try
+                            // Handle reference
+                            if (element.TryGetProperty("$ref", out var refElement))
                             {
-                                var appointment = new AppointmentDto();
+                                // Skip already processed references
+                                return;
+                            }
 
-                                // Safely get each property
-                                if (element.TryGetProperty("id", out var idElement))
-                                    appointment.Id = idElement.GetInt32();
+                            var appointment = new AppointmentDto();
 
-                                if (element.TryGetProperty("patientId", out var patientIdElement))
-                                    appointment.PatientId = patientIdElement.GetInt32();
+                            if (element.TryGetProperty("id", out var idElement))
+                                appointment.Id = idElement.GetInt32();
 
-                                if (element.TryGetProperty("doctorId", out var doctorIdElement))
-                                    appointment.DoctorId = doctorIdElement.GetInt32();
+                            if (element.TryGetProperty("patientId", out var patientIdElement))
+                                appointment.PatientId = patientIdElement.GetInt32();
 
-                                if (element.TryGetProperty("procedureId", out var procedureIdElement))
-                                    appointment.ProcedureId = procedureIdElement.GetInt32();
+                            if (element.TryGetProperty("doctorId", out var doctorIdElement))
+                                appointment.DoctorId = doctorIdElement.GetInt32();
 
-                                if (element.TryGetProperty("roomId", out var roomIdElement))
-                                    appointment.RoomId = roomIdElement.GetInt32();
+                            if (element.TryGetProperty("procedureId", out var procedureIdElement))
+                                appointment.ProcedureId = procedureIdElement.GetInt32();
 
-                                if (element.TryGetProperty("dateTime", out var dateTimeElement))
-                                    appointment.DateTime = dateTimeElement.GetDateTime();
+                            if (element.TryGetProperty("roomId", out var roomIdElement))
+                                appointment.RoomId = roomIdElement.GetInt32();
 
-                                // Only add if we have the minimum required fields
-                                if (appointment.Id.HasValue && appointment.DoctorId != 0 && appointment.PatientId != 0)
+                            if (element.TryGetProperty("dateTime", out var dateTimeElement))
+                                appointment.DateTime = dateTimeElement.GetDateTime();
+
+                            if (appointment.Id.HasValue && appointment.DoctorId != 0 && appointment.PatientId != 0)
+                            {
+                                // Only add if not already in the list
+                                if (!appointments.Any(a => a.Id == appointment.Id))
                                 {
                                     appointments.Add(appointment);
                                 }
                             }
-                            catch (Exception ex)
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine($"Error parsing appointment: {ex.Message}");
+                        }
+                    }
+
+                    // Process root values
+                    if (jsonDoc.RootElement.TryGetProperty("$values", out var valuesElement))
+                    {
+                        foreach (var element in valuesElement.EnumerateArray())
+                        {
+                            ParseAppointment(element);
+                        }
+                    }
+
+                    // Also check doctor's appointments if present
+                    if (jsonDoc.RootElement.TryGetProperty("$values", out var rootValues))
+                    {
+                        foreach (var element in rootValues.EnumerateArray())
+                        {
+                            if (element.TryGetProperty("doctor", out var doctorElement) &&
+                                doctorElement.TryGetProperty("appointments", out var doctorAppointments) &&
+                                doctorAppointments.TryGetProperty("$values", out var appointmentsValues))
                             {
-                                Console.WriteLine($"Error parsing appointment: {ex.Message}");
-                                continue;
+                                foreach (var appointmentElement in appointmentsValues.EnumerateArray())
+                                {
+                                    ParseAppointment(appointmentElement);
+                                }
                             }
                         }
-                        return appointments;
                     }
+
+                    return appointments;
                 }
                 catch (Exception ex)
                 {
