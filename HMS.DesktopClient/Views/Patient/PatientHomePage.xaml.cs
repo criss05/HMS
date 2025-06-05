@@ -2,7 +2,7 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using System;
 
-namespace HMS.DesktopClient.Views
+namespace HMS.DesktopClient.Views.Patient
 {
     public sealed partial class PatientHomePage : Window
     {
@@ -37,26 +37,12 @@ namespace HMS.DesktopClient.Views
 
         private async void Profile_Click(object sender, RoutedEventArgs e)
         {
-            ContentDialog dialog = new ContentDialog
-            {
-                Title = "Profile",
-                Content = "Profile button clicked.",
-                CloseButtonText = "OK",
-                XamlRoot = this.Content.XamlRoot
-            };
-            await dialog.ShowAsync();
+            MainFrame.Navigate(typeof(PatientProfilePage));
         }
 
         private async void Home_Click(object sender, RoutedEventArgs e)
         {
-            ContentDialog dialog = new ContentDialog
-            {
-                Title = "Home",
-                Content = "Home button clicked.",
-                CloseButtonText = "OK",
-                XamlRoot = this.Content.XamlRoot
-            };
-            await dialog.ShowAsync();
+            MainFrame.Content = null;
         }
     }
 }
