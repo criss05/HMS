@@ -15,5 +15,6 @@
         <Button x:Name="Logs" Grid.Row="8" Grid.Column="0" Grid.ColumnSpan="2" 
                 Content="Logs page" Click="LogsButton_Click" 
                 HorizontalAlignment="Left" Margin="0,20,0,0"/>
+        <Button Content="Shifts" Click="ShiftsButton_Click" Margin="10,100,0,0"/>
     </Grid>
 </Window>
