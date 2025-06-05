@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using HMS.Shared.DTOs;
 using HMS.Shared.Entities;
 using HMS.Shared.DTOs;
 
@@ -34,18 +35,18 @@ namespace HMS.Shared.Repositories.Interfaces
         /// Adds a new admin asynchronously.
         /// </summary>
         /// <param name="admin">Admin entity to add.</param>
-        Task AddAsync(AdminDto admin);
+        Task<AdminDto> AddAsync(Admin admin);
 
         /// <summary>
         /// Updates an existing admin asynchronously.
         /// </summary>
         /// <param name="admin">Admin entity with updated data.</param>
-        Task UpdateAsync(AdminDto admin);
+        Task<bool> UpdateAsync(Admin admin);
 
         /// <summary>
         /// Deletes an admin by id asynchronously.
         /// </summary>
         /// <param name="id">The unique ID of the admin to delete.</param>
-        Task DeleteAsync(int id);
+        Task<bool> DeleteAsync(int id);
     }
 }

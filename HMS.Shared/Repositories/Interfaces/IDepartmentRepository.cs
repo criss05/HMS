@@ -28,7 +28,7 @@ namespace HMS.Shared.Repositories.Interfaces
         /// </summary>
         /// <param name="department">The department to add.</param>
         /// <returns>The added department with assigned ID.</returns>
-        Task<DepartmentDto> AddAsync(DepartmentDto department);
+        Task<DepartmentDto> AddAsync(Department department);
 
         /// <summary>
         /// Updates an existing department asynchronously.
