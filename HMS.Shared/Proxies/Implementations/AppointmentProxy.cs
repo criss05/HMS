@@ -101,21 +101,17 @@ namespace HMS.Shared.Proxies.Implementations
 
                 string responseBody = await response.Content.ReadAsStringAsync();
 
-                // Try to deserialize as a reference-tracked array
                 try 
                 {
                     var appointments = new List<AppointmentDto>();
                     var jsonDoc = JsonDocument.Parse(responseBody);
 
-                    // Function to parse appointment from JsonElement
                     void ParseAppointment(JsonElement element)
                     {
                         try
                         {
-                            // Handle reference
                             if (element.TryGetProperty("$ref", out var refElement))
                             {
-                                // Skip already processed references
                                 return;
                             }
 
@@ -141,7 +137,6 @@ namespace HMS.Shared.Proxies.Implementations
 
                             if (appointment.Id.HasValue && appointment.DoctorId != 0 && appointment.PatientId != 0)
                             {
-                                // Only add if not already in the list
                                 if (!appointments.Any(a => a.Id == appointment.Id))
                                 {
                                     appointments.Add(appointment);
@@ -154,7 +149,6 @@ namespace HMS.Shared.Proxies.Implementations
                         }
                     }
 
-                    // Process root values
                     if (jsonDoc.RootElement.TryGetProperty("$values", out var valuesElement))
                     {
                         foreach (var element in valuesElement.EnumerateArray())
@@ -163,7 +157,6 @@ namespace HMS.Shared.Proxies.Implementations
                         }
                     }
 
-                    // Also check doctor's appointments if present
                     if (jsonDoc.RootElement.TryGetProperty("$values", out var rootValues))
                     {
                         foreach (var element in rootValues.EnumerateArray())
@@ -187,7 +180,6 @@ namespace HMS.Shared.Proxies.Implementations
                     Console.WriteLine($"Error parsing reference-tracked response: {ex.Message}");
                 }
 
-                // Fallback to direct deserialization
                 return JsonSerializer.Deserialize<List<AppointmentDto>>(responseBody, _jsonOptions) ?? new List<AppointmentDto>();
             }
             catch (Exception ex)
