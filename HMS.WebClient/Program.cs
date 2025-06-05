@@ -69,6 +69,13 @@ builder.Services.AddScoped<IScheduleRepository>(provider =>
     return new ScheduleProxy(httpClient, authService.GetToken() ?? string.Empty);
 });
 
+builder.Services.AddScoped<IProcedureRepository>(provider =>
+{
+    var authService = provider.GetRequiredService<AuthService>();
+    var httpClient = authService.CreateAuthorizedClient();
+    return new ProcedureProxy(httpClient, authService.GetToken() ?? string.Empty);
+});
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
