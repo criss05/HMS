@@ -1,24 +1,17 @@
-using Microsoft.UI.Xaml;
+using HMS.DesktopClient.ViewModels;
 using Microsoft.UI.Xaml.Controls;
-using System;
 
 namespace HMS.DesktopClient.Views.Patient
 {
     public sealed partial class PatientProfilePage : Page
     {
+        public PatientProfileViewModel ViewModel { get; set; }
+
         public PatientProfilePage()
         {
             this.InitializeComponent();
-
-            // Set the NameTextBlock to show the current user's name
-            if (App.CurrentUser != null)
-            {
-                NameTextBlock.Text = App.CurrentUser.Name;
-            }
-            else
-            {
-                NameTextBlock.Text = "Unknown User";
-            }
+            ViewModel = new PatientProfileViewModel(App.CurrentUser);
+            this.DataContext = ViewModel;
         }
     }
 }

@@ -5,10 +5,25 @@
     xmlns:local="using:HMS.DesktopClient.Views.Patient"
     Background="White">
 
-    <Grid>
-        <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
-            <TextBlock Text="Name:" FontSize="20" Margin="0,0,0,5"/>
-            <TextBlock x:Name="NameTextBlock" FontSize="24"/>
+    <ScrollViewer>
+        <StackPanel Padding="20" Spacing="10">
+            <TextBlock Text="Name" FontWeight="Bold" />
+            <TextBox Text="{Binding Name, Mode=TwoWay}" />
+
+            <TextBlock Text="Phone Number" FontWeight="Bold" />
+            <TextBox Text="{Binding PhoneNumber, Mode=TwoWay}" />
+
+            <TextBlock Text="CNP" FontWeight="Bold" />
+            <TextBox Text="{Binding CNP, Mode=TwoWay}" />
+
+            <TextBlock Text="Email" FontWeight="Bold" />
+            <TextBox Text="{Binding Email}" IsEnabled="False" />
+
+            <TextBlock Text="Role" FontWeight="Bold" />
+            <TextBox Text="{Binding Role}" IsEnabled="False" />
+
+            <TextBlock Text="Created At" FontWeight="Bold" />
+            <TextBox Text="{Binding CreatedAt}" IsEnabled="False" />
         </StackPanel>
-    </Grid>
+    </ScrollViewer>
 </Page>
