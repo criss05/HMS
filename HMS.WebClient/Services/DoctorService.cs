@@ -46,21 +46,37 @@ namespace HMS.WebClient.Services
 
         public async Task<bool> UpdateDoctorAsync(DoctorViewModel viewModel)
         {
-            var existingDoctor = await _doctorRepository.GetByIdAsync(viewModel.Id);
-            if (existingDoctor == null) return false;
-
-            var dto = MapToDoctorDto(viewModel);
-            
-            if (string.IsNullOrWhiteSpace(viewModel.Password))
+            try
             {
-                dto.Password = existingDoctor.Password;
+                var existingDoctor = await _doctorRepository.GetByIdAsync(viewModel.Id);
+                if (existingDoctor == null) return false;
+
+                var dto = MapToDoctorDto(viewModel);
+                
+                // Preserve password if not changed
+                if (string.IsNullOrWhiteSpace(viewModel.Password))
+                {
+                    dto.Password = existingDoctor.Password;
+                }
+
+                // Preserve collections
+                dto.ScheduleIds = existingDoctor.ScheduleIds ?? new List<int>();
+                dto.ReviewIds = existingDoctor.ReviewIds ?? new List<int>();
+                dto.AppointmentIds = existingDoctor.AppointmentIds ?? new List<int>();
+
+                var success = await _doctorRepository.UpdateAsync(dto);
+                if (!success) return false;
+
+                // Refresh the data to ensure we have the latest state
+                var updatedDoctor = await _doctorRepository.GetByIdAsync(viewModel.Id);
+                if (updatedDoctor == null) return false;
+
+                return true;
             }
-
-            dto.ScheduleIds = existingDoctor.ScheduleIds;
-            dto.ReviewIds = existingDoctor.ReviewIds;
-            dto.AppointmentIds = existingDoctor.AppointmentIds;
-
-            return await _doctorRepository.UpdateAsync(dto);
+            catch (Exception)
+            {
+                return false;
+            }
         }
 
         public async Task<bool> DeleteDoctorAsync(int id)

@@ -26,11 +26,14 @@
     <div class="card">
         <div class="card-body">
             <form asp-action="Edit" method="post" id="editForm">
-                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <div asp-validation-summary="All" class="text-danger"></div>
                 <input type="hidden" asp-for="Id" />
                 <input type="hidden" asp-for="Role" />
                 <input type="hidden" asp-for="CreatedAt" />
                 <input type="hidden" asp-for="DepartmentName" />
+                <input type="hidden" asp-for="ScheduleIds" />
+                <input type="hidden" asp-for="ReviewIds" />
+                <input type="hidden" asp-for="AppointmentIds" />
 
                 <div class="row">
                     <div class="col-md-6">
@@ -74,7 +77,7 @@
 
                         <div class="mb-3">
                             <label asp-for="YearsOfExperience" class="form-label"></label>
-                            <input asp-for="YearsOfExperience" class="form-control" type="number" />
+                            <input asp-for="YearsOfExperience" class="form-control" type="number" min="0" max="100" />
                             <span asp-validation-for="YearsOfExperience" class="text-danger"></span>
                         </div>
 
@@ -100,11 +103,12 @@
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
-    <script src="https://kit.fontawesome.com/your-font-awesome-kit.js"></script>
     <script>
         $(document).ready(function() {
-            $('#editForm').on('submit', function() {
-                $('#saveButton').prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Saving...');
+            $('#editForm').on('submit', function(e) {
+                if ($(this).valid()) {
+                    $('#saveButton').prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Saving...');
+                }
             });
         });
     </script>

@@ -90,7 +90,10 @@ namespace HMS.WebClient.Controllers
 
             if (!ModelState.IsValid)
             {
-                TempData["ErrorMessage"] = "Please correct the validation errors below.";
+                foreach (var error in ModelState.Values.SelectMany(v => v.Errors))
+                {
+                    ModelState.AddModelError("", error.ErrorMessage);
+                }
                 return View(doctorViewModel);
             }
 
@@ -99,7 +102,15 @@ namespace HMS.WebClient.Controllers
                 var success = await _doctorService.UpdateDoctorAsync(doctorViewModel);
                 if (!success)
                 {
-                    TempData["ErrorMessage"] = "Failed to update doctor profile. Please try again.";
+                    ModelState.AddModelError("", "Failed to update doctor profile. Please try again.");
+                    return View(doctorViewModel);
+                }
+
+                // Get the updated doctor data
+                var updatedDoctor = await _doctorService.GetDoctorByIdAsync(doctorViewModel.Id);
+                if (updatedDoctor == null)
+                {
+                    ModelState.AddModelError("", "Failed to retrieve updated profile. Please try again.");
                     return View(doctorViewModel);
                 }
 
@@ -108,7 +119,7 @@ namespace HMS.WebClient.Controllers
             }
             catch (Exception ex)
             {
-                TempData["ErrorMessage"] = "An error occurred while updating the profile. Please try again later.";
+                ModelState.AddModelError("", "An error occurred while updating the profile. Please try again later.");
                 return View(doctorViewModel);
             }
         }
