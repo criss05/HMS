@@ -59,8 +59,7 @@ builder.Services.AddScoped<IAppointmentRepository>(provider =>
 {
     var authService = provider.GetRequiredService<AuthService>();
     var httpClient = authService.CreateAuthorizedClient();
-    var logger = provider.GetRequiredService<ILogger<AppointmentProxy>>();
-    return new AppointmentProxy(httpClient, authService.GetToken() ?? string.Empty, logger);
+    return new AppointmentProxy(httpClient, authService.GetToken() ?? string.Empty);
 });
 
 builder.Services.AddScoped<IScheduleRepository>(provider =>

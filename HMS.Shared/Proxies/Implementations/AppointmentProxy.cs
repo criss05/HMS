@@ -7,7 +7,6 @@ using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
 
 namespace HMS.Shared.Proxies.Implementations
 {
@@ -17,9 +16,8 @@ namespace HMS.Shared.Proxies.Implementations
         private readonly string _baseUrl = Config._base_api_url;
         private readonly string _token;
         private readonly JsonSerializerOptions _jsonOptions;
-        private readonly ILogger<AppointmentProxy>? _logger;
 
-        public AppointmentProxy(HttpClient httpClient, string token, ILogger<AppointmentProxy>? logger)
+        public AppointmentProxy(HttpClient httpClient, string token)
         {
             _httpClient = httpClient;
             _token = token;
@@ -30,7 +28,6 @@ namespace HMS.Shared.Proxies.Implementations
                 DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
                 Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) }
             };
-            _logger = logger;
         }
 
         public AppointmentProxy(string token)
@@ -102,7 +99,7 @@ namespace HMS.Shared.Proxies.Implementations
                 response.EnsureSuccessStatusCode();
 
                 string responseBody = await response.Content.ReadAsStringAsync();
-                _logger?.LogInformation($"Appointment response: {responseBody}"); // Debug log
+                Console.WriteLine($"Debug - Appointment response: {responseBody}"); // Debug log
 
                 // Try to deserialize as a wrapper first
                 try 
