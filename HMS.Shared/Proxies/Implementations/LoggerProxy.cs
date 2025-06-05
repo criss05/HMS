@@ -6,8 +6,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Json;
-using System.Runtime.CompilerServices;
-using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 
@@ -29,7 +27,9 @@ namespace HMS.Shared.Proxies.Implementations
 
             this._json_options = new JsonSerializerOptions
             {
-                PropertyNameCaseInsensitive = true
+                PropertyNameCaseInsensitive = true,
+                ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles,
+                Converters = { new System.Text.Json.Serialization.JsonStringEnumConverter() }
             };
 
             this._token = token;
@@ -53,12 +53,25 @@ namespace HMS.Shared.Proxies.Implementations
                 HttpResponseMessage response = await this._http_client.GetAsync(s_base_api_url + "log");
                 response.EnsureSuccessStatusCode();
 
-                IEnumerable<Log> logs = await response.Content.ReadFromJsonAsync<List<Log>>(this._json_options);
-                return logs;
+                string json = await response.Content.ReadAsStringAsync();
+                using (JsonDocument document = JsonDocument.Parse(json))
+                {
+                    if (document.RootElement.TryGetProperty("$values", out JsonElement valuesElement))
+                    {
+                        string valuesJson = valuesElement.GetRawText();
+                        var logs = JsonSerializer.Deserialize<List<Log>>(valuesJson, _json_options);
+                        return logs ?? new List<Log>();
+                    }
+                    else
+                    {
+                        var logs = JsonSerializer.Deserialize<List<Log>>(json, _json_options);
+                        return logs ?? new List<Log>();
+                    }
+                }
             }
             catch (Exception exception)
             {
-                Console.WriteLine($"Exception: {exception.Message}");
+                System.Diagnostics.Debug.WriteLine($"Exception in GetAllAsync: {exception.Message}");
                 return new List<Log>();
             }
         }
