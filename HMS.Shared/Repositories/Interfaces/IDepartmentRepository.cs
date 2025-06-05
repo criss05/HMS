@@ -35,7 +35,7 @@ namespace HMS.Shared.Repositories.Interfaces
         /// </summary>
         /// <param name="department">The department with updated information.</param>
         /// <returns>True if update succeeded, otherwise false.</returns>
-        Task<bool> UpdateAsync(DepartmentDto department);
+        Task<bool> UpdateAsync(Department department);
 
         /// <summary>
         /// Deletes a department by its unique identifier asynchronously.
