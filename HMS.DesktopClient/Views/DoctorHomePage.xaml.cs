@@ -1,3 +1,4 @@
+using HMS.DesktopClient.Views.Patient;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
@@ -30,7 +31,7 @@ namespace HMS.DesktopClient.Views
 
         private void PatientsButton_Click(object sender, RoutedEventArgs e)
         {
-            MainFrame.Navigate(typeof(DoctorHomePage));
+            MainFrame.Navigate(typeof(PatientsDisplayPage));
         }
     }
 

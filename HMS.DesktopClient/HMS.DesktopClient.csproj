@@ -22,6 +22,7 @@
     <None Remove="Views\PatientsPage.xaml" />
     <None Remove="Views\MedicalRecordsPage.xaml" />
     <None Remove="Views\Patient\PatientProfilePage.xaml" />
+    <None Remove="Views\Patient\PatientsDisplayPage.xaml" />
   </ItemGroup>
 
   <ItemGroup>
@@ -98,6 +99,11 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="ViewModels\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Views\Patient\PatientsDisplayPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
 
   <!--
