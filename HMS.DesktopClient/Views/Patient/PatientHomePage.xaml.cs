@@ -23,11 +23,10 @@ namespace HMS.DesktopClient.Views.Patient
             await dialog.ShowAsync();
         }
 
-        private async void MedicalRecords_Click(object sender, RoutedEventArgs e)
+        private void MedicalRecords_Click(object sender, RoutedEventArgs e)
         {
             var patientId = App.CurrentUser!.Id;
-            var recordsWindow = new MedicalRecordsPage(patientId);
-            recordsWindow.Activate();
+            MainFrame.Navigate(typeof(MedicalRecordsPage), patientId);
         }
 
         private async void Profile_Click(object sender, RoutedEventArgs e)
