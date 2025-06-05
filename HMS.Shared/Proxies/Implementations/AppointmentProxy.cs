@@ -111,16 +111,32 @@ namespace HMS.Shared.Proxies.Implementations
                         {
                             try
                             {
-                                var appointment = new AppointmentDto
+                                var appointment = new AppointmentDto();
+
+                                // Safely get each property
+                                if (element.TryGetProperty("id", out var idElement))
+                                    appointment.Id = idElement.GetInt32();
+
+                                if (element.TryGetProperty("patientId", out var patientIdElement))
+                                    appointment.PatientId = patientIdElement.GetInt32();
+
+                                if (element.TryGetProperty("doctorId", out var doctorIdElement))
+                                    appointment.DoctorId = doctorIdElement.GetInt32();
+
+                                if (element.TryGetProperty("procedureId", out var procedureIdElement))
+                                    appointment.ProcedureId = procedureIdElement.GetInt32();
+
+                                if (element.TryGetProperty("roomId", out var roomIdElement))
+                                    appointment.RoomId = roomIdElement.GetInt32();
+
+                                if (element.TryGetProperty("dateTime", out var dateTimeElement))
+                                    appointment.DateTime = dateTimeElement.GetDateTime();
+
+                                // Only add if we have the minimum required fields
+                                if (appointment.Id.HasValue && appointment.DoctorId != 0 && appointment.PatientId != 0)
                                 {
-                                    Id = element.GetProperty("id").GetInt32(),
-                                    PatientId = element.GetProperty("patientId").GetInt32(),
-                                    DoctorId = element.GetProperty("doctorId").GetInt32(),
-                                    ProcedureId = element.GetProperty("procedureId").GetInt32(),
-                                    RoomId = element.GetProperty("roomId").GetInt32(),
-                                    DateTime = element.GetProperty("dateTime").GetDateTime()
-                                };
-                                appointments.Add(appointment);
+                                    appointments.Add(appointment);
+                                }
                             }
                             catch (Exception ex)
                             {
