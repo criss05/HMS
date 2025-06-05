@@ -108,7 +108,9 @@ namespace HMS.WebClient.Controllers
                 doctorViewModel.ReviewIds = JsonSerializer.Deserialize<List<int>>(reviewIdsJson) ?? new List<int>();
                 doctorViewModel.AppointmentIds = JsonSerializer.Deserialize<List<int>>(appointmentIdsJson) ?? new List<int>();
 
-                if (!ModelState.IsValid)
+                // Re-validate model after preserving data
+                ModelState.Clear();
+                if (!TryValidateModel(doctorViewModel))
                 {
                     foreach (var error in ModelState.Values.SelectMany(v => v.Errors))
                     {
