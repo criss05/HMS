@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using HMS.WebClient.Models;
 using System.Diagnostics;
 using HMS.WebClient.Attributes;
+using HMS.WebClient.Services;
 
 namespace HMS.WebClient.Controllers
 {
