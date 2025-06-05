@@ -11,7 +11,6 @@ using HMS.WebClient.Attributes;
 using HMS.Shared.Enums;
 using System.Text.Json;
 using Microsoft.Extensions.Logging;
-using HMS.Shared.DTOs.Patient;
 
 namespace HMS.WebClient.Controllers
 {
@@ -271,7 +270,6 @@ namespace HMS.WebClient.Controllers
                 if (procedure != null)
                 {
                     ViewData["ProcedureName"] = procedure.Name;
-                    ViewData["ProcedureDepartment"] = procedure.DepartmentName;
                 }
 
                 // Get doctor name and department
