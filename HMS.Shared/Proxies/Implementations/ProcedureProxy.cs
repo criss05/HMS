@@ -2,25 +2,24 @@
 using HMS.Shared.Repositories.Interfaces;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
+using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json.Serialization;
 using System.Text.Json;
 using System.Threading.Tasks;
-using HMS.Shared.DTOs.Patient;
+using HMS.Shared.DTOs;
 
 namespace HMS.Shared.Proxies.Implementations
 {
-    public class PatientProxy : IPatientRepository
+    public class ProcedureProxy : IProcedureRepository
     {
         private readonly HttpClient _httpClient;
         private readonly string _baseUrl = Config._base_api_url;
         private readonly string _token;
         private readonly JsonSerializerOptions _jsonOptions;
 
-        // Constructor cu HttpClient + token
-        public PatientProxy(HttpClient httpClient, string token)
+        public ProcedureProxy(HttpClient httpClient, string token)
         {
             _httpClient = httpClient;
             _token = token;
@@ -32,10 +31,9 @@ namespace HMS.Shared.Proxies.Implementations
             };
         }
 
-        // Constructor doar cu token (creează HttpClient cu BaseAddress)
-        public PatientProxy(string token)
+        public ProcedureProxy(string token)
         {
-            _httpClient = new HttpClient { BaseAddress = new Uri(_baseUrl) };
+            this._httpClient = new HttpClient { BaseAddress = new Uri(this._baseUrl) };
             _token = token;
             _jsonOptions = new JsonSerializerOptions
             {
@@ -47,55 +45,55 @@ namespace HMS.Shared.Proxies.Implementations
 
         private void AddAuthorizationHeader()
         {
-            _httpClient.DefaultRequestHeaders.Authorization =
-                new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", _token);
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _token);
         }
 
-        public async Task<IEnumerable<PatientDto>> GetAllAsync()
+        public async Task<IEnumerable<ProcedureDto>> GetAllAsync()
         {
             AddAuthorizationHeader();
-            HttpResponseMessage response = await _httpClient.GetAsync(_baseUrl + "patient");
+            HttpResponseMessage response = await _httpClient.GetAsync(_baseUrl + "procedure");
             response.EnsureSuccessStatusCode();
 
             string responseBody = await response.Content.ReadAsStringAsync();
-            return JsonSerializer.Deserialize<IEnumerable<PatientDto>>(responseBody, _jsonOptions) ?? new List<PatientDto>();
+            var procedures = JsonSerializer.Deserialize<IEnumerable<ProcedureDto>>(responseBody, _jsonOptions);
+
+            return procedures ?? new List<ProcedureDto>();
         }
 
-        public async Task<PatientDto> GetByIdAsync(int id)
+        public async Task<ProcedureDto?> GetByIdAsync(int id)
         {
             AddAuthorizationHeader();
-            HttpResponseMessage response = await _httpClient.GetAsync($"{_baseUrl}patient/{id}");
+            HttpResponseMessage response = await _httpClient.GetAsync($"{_baseUrl}procedure/{id}");
+
+            if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
+                return null;
+
+            response.EnsureSuccessStatusCode();
+            string responseBody = await response.Content.ReadAsStringAsync();
+
+            return JsonSerializer.Deserialize<ProcedureDto>(responseBody, _jsonOptions);
+        }
+
+        public async Task<ProcedureDto> AddAsync(ProcedureDto procedure)
+        {
+            AddAuthorizationHeader();
+            string procedureJson = JsonSerializer.Serialize(procedure, _jsonOptions);
+            StringContent content = new StringContent(procedureJson, Encoding.UTF8, "application/json");
+
+            HttpResponseMessage response = await _httpClient.PostAsync($"{_baseUrl}procedure", content);
             response.EnsureSuccessStatusCode();
 
             string responseBody = await response.Content.ReadAsStringAsync();
-            PatientDto? patient = JsonSerializer.Deserialize<PatientDto>(responseBody, _jsonOptions);
-
-            if (patient == null)
-                throw new Exception($"No patient found with user id {id}");
-
-            return patient;
+            return JsonSerializer.Deserialize<ProcedureDto>(responseBody, _jsonOptions)!;
         }
 
-        public async Task<PatientDto> AddAsync(PatientDto patient)
+        public async Task<bool> UpdateAsync(ProcedureDto procedure)
         {
             AddAuthorizationHeader();
-            string jsonContent = JsonSerializer.Serialize(patient, _jsonOptions);
-            StringContent content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
+            string procedureJson = JsonSerializer.Serialize(procedure, _jsonOptions);
+            StringContent content = new StringContent(procedureJson, Encoding.UTF8, "application/json");
 
-            HttpResponseMessage response = await _httpClient.PostAsync(_baseUrl + "patient", content);
-            response.EnsureSuccessStatusCode();
-
-            string responseBody = await response.Content.ReadAsStringAsync();
-            return JsonSerializer.Deserialize<PatientDto>(responseBody, _jsonOptions)!;
-        }
-
-        public async Task<bool> UpdateAsync(PatientDto patient)
-        {
-            AddAuthorizationHeader();
-            string jsonContent = JsonSerializer.Serialize(patient, _jsonOptions);
-            StringContent content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
-
-            HttpResponseMessage response = await _httpClient.PutAsync($"{_baseUrl}patient/{patient.Id}", content);
+            HttpResponseMessage response = await _httpClient.PutAsync($"{_baseUrl}procedure/{procedure.Id}", content);
 
             if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
                 return false;
@@ -107,7 +105,7 @@ namespace HMS.Shared.Proxies.Implementations
         public async Task<bool> DeleteAsync(int id)
         {
             AddAuthorizationHeader();
-            HttpResponseMessage response = await _httpClient.DeleteAsync($"{_baseUrl}patient/{id}");
+            HttpResponseMessage response = await _httpClient.DeleteAsync($"{_baseUrl}procedure/{id}");
 
             if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
                 return false;

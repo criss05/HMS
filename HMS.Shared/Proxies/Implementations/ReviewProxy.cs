@@ -2,25 +2,25 @@
 using HMS.Shared.Repositories.Interfaces;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
+using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json.Serialization;
 using System.Text.Json;
 using System.Threading.Tasks;
-using HMS.Shared.DTOs.Patient;
+using HMS.Shared.DTOs;
+using System.Diagnostics;
 
 namespace HMS.Shared.Proxies.Implementations
 {
-    public class PatientProxy : IPatientRepository
+    public class ReviewProxy : IReviewRepository
     {
         private readonly HttpClient _httpClient;
         private readonly string _baseUrl = Config._base_api_url;
         private readonly string _token;
         private readonly JsonSerializerOptions _jsonOptions;
 
-        // Constructor cu HttpClient + token
-        public PatientProxy(HttpClient httpClient, string token)
+        public ReviewProxy(HttpClient httpClient, string token)
         {
             _httpClient = httpClient;
             _token = token;
@@ -32,10 +32,9 @@ namespace HMS.Shared.Proxies.Implementations
             };
         }
 
-        // Constructor doar cu token (creează HttpClient cu BaseAddress)
-        public PatientProxy(string token)
+        public ReviewProxy(string token)
         {
-            _httpClient = new HttpClient { BaseAddress = new Uri(_baseUrl) };
+            this._httpClient = new HttpClient { BaseAddress = new Uri(this._baseUrl) };
             _token = token;
             _jsonOptions = new JsonSerializerOptions
             {
@@ -47,55 +46,56 @@ namespace HMS.Shared.Proxies.Implementations
 
         private void AddAuthorizationHeader()
         {
-            _httpClient.DefaultRequestHeaders.Authorization =
-                new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", _token);
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _token);
         }
 
-        public async Task<IEnumerable<PatientDto>> GetAllAsync()
+        public async Task<IEnumerable<ReviewDto>> GetAllAsync()
         {
             AddAuthorizationHeader();
-            HttpResponseMessage response = await _httpClient.GetAsync(_baseUrl + "patient");
+            HttpResponseMessage response = await _httpClient.GetAsync($"{_baseUrl}review");
             response.EnsureSuccessStatusCode();
 
             string responseBody = await response.Content.ReadAsStringAsync();
-            return JsonSerializer.Deserialize<IEnumerable<PatientDto>>(responseBody, _jsonOptions) ?? new List<PatientDto>();
+            var reviews = JsonSerializer.Deserialize<IEnumerable<ReviewDto>>(responseBody, _jsonOptions);
+            return reviews ?? new List<ReviewDto>();
         }
 
-        public async Task<PatientDto> GetByIdAsync(int id)
+        public async Task<ReviewDto?> GetByIdAsync(int id)
         {
             AddAuthorizationHeader();
-            HttpResponseMessage response = await _httpClient.GetAsync($"{_baseUrl}patient/{id}");
+            HttpResponseMessage response = await _httpClient.GetAsync($"{_baseUrl}review/{id}");
+
+            if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
+                return null;
+
+            response.EnsureSuccessStatusCode();
+            string responseBody = await response.Content.ReadAsStringAsync();
+
+            return JsonSerializer.Deserialize<ReviewDto>(responseBody, _jsonOptions);
+        }
+
+        public async Task<ReviewDto> AddAsync(ReviewDto review)
+        {
+            AddAuthorizationHeader();
+            string reviewJson = JsonSerializer.Serialize(review, _jsonOptions);
+            StringContent content = new StringContent(reviewJson, Encoding.UTF8, "application/json");
+
+            HttpResponseMessage response = await _httpClient.PostAsync($"{_baseUrl}review", content);
             response.EnsureSuccessStatusCode();
 
             string responseBody = await response.Content.ReadAsStringAsync();
-            PatientDto? patient = JsonSerializer.Deserialize<PatientDto>(responseBody, _jsonOptions);
-
-            if (patient == null)
-                throw new Exception($"No patient found with user id {id}");
-
-            return patient;
+            Debug.WriteLine($"StatusCode: {response.StatusCode}");
+            Debug.WriteLine($"ResponseBody: {responseBody}");
+            return JsonSerializer.Deserialize<ReviewDto>(responseBody, _jsonOptions)!;
         }
 
-        public async Task<PatientDto> AddAsync(PatientDto patient)
+        public async Task<bool> UpdateAsync(ReviewDto review)
         {
             AddAuthorizationHeader();
-            string jsonContent = JsonSerializer.Serialize(patient, _jsonOptions);
-            StringContent content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
+            string reviewJson = JsonSerializer.Serialize(review, _jsonOptions);
+            StringContent content = new StringContent(reviewJson, Encoding.UTF8, "application/json");
 
-            HttpResponseMessage response = await _httpClient.PostAsync(_baseUrl + "patient", content);
-            response.EnsureSuccessStatusCode();
-
-            string responseBody = await response.Content.ReadAsStringAsync();
-            return JsonSerializer.Deserialize<PatientDto>(responseBody, _jsonOptions)!;
-        }
-
-        public async Task<bool> UpdateAsync(PatientDto patient)
-        {
-            AddAuthorizationHeader();
-            string jsonContent = JsonSerializer.Serialize(patient, _jsonOptions);
-            StringContent content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
-
-            HttpResponseMessage response = await _httpClient.PutAsync($"{_baseUrl}patient/{patient.Id}", content);
+            HttpResponseMessage response = await _httpClient.PutAsync($"{_baseUrl}review/{review.Id}", content);
 
             if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
                 return false;
@@ -107,7 +107,7 @@ namespace HMS.Shared.Proxies.Implementations
         public async Task<bool> DeleteAsync(int id)
         {
             AddAuthorizationHeader();
-            HttpResponseMessage response = await _httpClient.DeleteAsync($"{_baseUrl}patient/{id}");
+            HttpResponseMessage response = await _httpClient.DeleteAsync($"{_baseUrl}review/{id}");
 
             if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
                 return false;
