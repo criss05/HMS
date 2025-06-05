@@ -5,31 +5,61 @@
 }
 
 <div class="container mt-4">
-    <h2>@ViewData["Title"]</h2>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>@ViewData["Title"]</h2>
+        <a asp-action="MedicalHistory" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Back to Medical History
+        </a>
+    </div>
 
     <div class="card">
         <div class="card-body">
             <dl class="row">
                 <dt class="col-sm-3">Date</dt>
+                <dd class="col-sm-9">@(Model.CreatedAt?.ToString("MMMM dd, yyyy HH:mm") ?? "No date")</dd>
 
-                <dt class="col-sm-3">Patient ID</dt>
-                <dd class="col-sm-9">@Model.PatientId</dd>
+                <dt class="col-sm-3">Patient</dt>
+                <dd class="col-sm-9">
+                    @(ViewData["PatientName"] ?? "Unknown") 
+                    <small class="text-muted">(ID: @Model.PatientId)</small>
+                </dd>
 
-                <dt class="col-sm-3">Doctor ID</dt>
-                <dd class="col-sm-9">@Model.DoctorId</dd>
+                <dt class="col-sm-3">Doctor</dt>
+                <dd class="col-sm-9">
+                    @(Model.DoctorName ?? "Unknown")
+                    <small class="text-muted">
+                        (ID: @Model.DoctorId)
+                        @if (!string.IsNullOrEmpty(Model.DoctorDepartment))
+                        {
+                            <span> - @Model.DoctorDepartment Department</span>
+                        }
+                    </small>
+                </dd>
 
-                <dt class="col-sm-3">Procedure ID</dt>
-                <dd class="col-sm-9">@Model.ProcedureId</dd>
+                <dt class="col-sm-3">Procedure</dt>
+                <dd class="col-sm-9">
+                    @(Model.ProcedureName ?? "Unknown")
+                    <small class="text-muted">
+                        (ID: @Model.ProcedureId)
+                        @if (!string.IsNullOrEmpty(Model.ProcedureDepartment))
+                        {
+                            <span> - @Model.ProcedureDepartment Department</span>
+                        }
+                    </small>
+                </dd>
 
                 <dt class="col-sm-3">Diagnosis</dt>
-                <dd class="col-sm-9">@Model.Diagnosis</dd>
+                <dd class="col-sm-9">
+                    @if (string.IsNullOrEmpty(Model.Diagnosis))
+                    {
+                        <span class="text-muted">No diagnosis recorded</span>
+                    }
+                    else
+                    {
+                        @Model.Diagnosis
+                    }
+                </dd>
             </dl>
-
-            <div class="mt-4">
-                <a asp-action="MedicalHistory" class="btn btn-secondary">
-                    <i class="fas fa-arrow-left"></i> Back to Medical History
-                </a>
-            </div>
         </div>
     </div>
 </div>

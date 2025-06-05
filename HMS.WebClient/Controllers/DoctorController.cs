@@ -20,6 +20,7 @@ namespace HMS.WebClient.Controllers
         private readonly DoctorService _doctorService;
         private readonly IMedicalRecordRepository _medicalRecordRepository;
         private readonly IAppointmentRepository _appointmentRepository;
+        private readonly IPatientRepository _patientRepository;
         private readonly AuthService _authService;
         private readonly ILogger<DoctorController> _logger;
 
@@ -27,12 +28,14 @@ namespace HMS.WebClient.Controllers
             DoctorService doctorService,
             IMedicalRecordRepository medicalRecordRepository,
             IAppointmentRepository appointmentRepository,
+            IPatientRepository patientRepository,
             AuthService authService,
             ILogger<DoctorController> logger)
         {
             _doctorService = doctorService;
             _medicalRecordRepository = medicalRecordRepository;
             _appointmentRepository = appointmentRepository;
+            _patientRepository = patientRepository;
             _authService = authService;
             _logger = logger;
         }
@@ -231,6 +234,13 @@ namespace HMS.WebClient.Controllers
                 if (record == null)
                 {
                     return NotFound("Medical record not found or you don't have permission to view it.");
+                }
+
+                // Get patient name
+                var patient = await _patientRepository.GetByIdAsync(record.PatientId);
+                if (patient != null)
+                {
+                    ViewData["PatientName"] = patient.Name;
                 }
 
                 return View(record);
