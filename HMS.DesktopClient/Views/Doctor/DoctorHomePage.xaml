@@ -12,52 +12,44 @@
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
-            <!-- Nav -->
             <RowDefinition Height="*"/>
-            <!-- MainFrame -->
-            <RowDefinition Height="Auto"/>
-            <!-- Footer -->
         </Grid.RowDefinitions>
 
-        <!-- Navigation Bar -->
-        <Grid Background="White" Padding="20,10">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="Auto"/>
-            </Grid.ColumnDefinitions>
+        <!-- Top Navigation -->
+        <Border Background="White" BorderBrush="#E0E0E0" BorderThickness="0,0,0,1" Height="60" VerticalAlignment="Top">
+            <Grid Height="60">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="200"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <!-- HMS Logo -->
+                <TextBlock Text="HMS" Foreground="Red" FontWeight="ExtraBlack" FontSize="20" VerticalAlignment="Center" Margin="20,0,0,0"/>
+                <!-- All Navigation Buttons, HOME, and Profile Icon together -->
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center" Grid.Column="1" Margin="0,0,20,0">
+                    <Button Content="Patients"  Background="Transparent" BorderThickness="0" FontSize="14" Foreground="Black" Click="Patients_Click"/>
+                    <Button Content="Appointments"  Background="Transparent" BorderThickness="0" FontSize="14" Foreground="Black" Click="Appointments_Click"/>
+                    <Button Content="Equipments"  Background="Transparent" BorderThickness="0" FontSize="14" Foreground="Black" Click="Equipments_Click"/>
+                    <Button Content="Rooms"  Background="Transparent" BorderThickness="0" FontSize="14" Foreground="Black" Click="Rooms_Click"/>
+                    <Button Content="Schedule"  Background="Transparent" BorderThickness="0" FontSize="14" Foreground="Black" Click="Schedule_Click"/>
+                    <Button Content="Medical Records"  Background="Transparent" BorderThickness="0" FontSize="14" Foreground="Black" Click="MedicalRecords_Click"/>
+                    <Button Content="HOME" Background="Red" Foreground="White" FontWeight="Bold" Padding="10,5" BorderThickness="0" Margin="10,0,10,0" FontSize="14" Click="Home_Click"/>
+                    <Button Background="Transparent" BorderThickness="0" Padding="0" Width="32" Height="32" Click="Profile_Click">
+                        <Viewbox Width="28" Height="28" VerticalAlignment="Center">
+                            <Canvas Width="24" Height="24">
+                                <!-- Head (circle) -->
+                                <Path Stroke="Red" StrokeThickness="2" Fill="Transparent"
+              Data="M12,7 A4,4 0 1 1 11.99,7 Z"/>
+                                <!-- Shoulders/body -->
+                                <Path Stroke="Red" StrokeThickness="2" Fill="Transparent"
+              Data="M5,18 Q12,14 19,18"/>
+                            </Canvas>
+                        </Viewbox>
+                    </Button>
+                </StackPanel>
+            </Grid>
+        </Border>
 
-            <!-- Logo -->
-            <TextBlock Text="HMS" FontSize="20" FontWeight="Bold" Foreground="Red" VerticalAlignment="Center"/>
-
-            <!-- Nav Buttons -->
-            <StackPanel Orientation="Horizontal" Grid.Column="1" HorizontalAlignment="Center" Spacing="20">
-                <Button Content="Patients" Foreground="Black" Background="LightGray"/>
-                <Button Content="Equipments" Foreground="Black" Background="LightGray"/>
-                <Button Content="Rooms" Foreground="Black" Background="LightGray"/>
-                <Button Content="Schedule" Foreground="Black" Background="LightGray"/>
-                <Button Content="Medical Records" Foreground="Black" Background="LightGray"/>
-            </StackPanel>
-
-            <!-- Profile + Home -->
-            <StackPanel Orientation="Horizontal" Grid.Column="2" HorizontalAlignment="Right" Spacing="10">
-                <Button Content="HOME" Background="Red" Foreground="White" Click="Home_Click"/>
-                <Button Click="Profile_Click" Background="Transparent" BorderBrush="Transparent">
-                    <FontIcon Glyph="&#xE77B;" FontSize="24" Foreground="Black"/>
-                </Button>
-            </StackPanel>
-        </Grid>
-
-        <!-- Main Content -->
+        <!-- Frame for View Navigation -->
         <Frame x:Name="MainFrame" Grid.Row="1"/>
-
-        <!-- Footer Image -->
-        <Image Grid.Row="2"
-               Source="/Assets/heartbeat.png"
-               Stretch="Uniform"
-               Height="80"
-               HorizontalAlignment="Center"
-               VerticalAlignment="Bottom"
-               Margin="0,10"/>
     </Grid>
 </Window>
