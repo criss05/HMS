@@ -49,18 +49,18 @@ namespace HMS.Shared.Proxies.Implementations
             _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _token);
         }
 
-        public async Task<IEnumerable<Review>> GetAllAsync()
+        public async Task<IEnumerable<ReviewDto>> GetAllAsync()
         {
             AddAuthorizationHeader();
             HttpResponseMessage response = await _httpClient.GetAsync($"{_baseUrl}review");
             response.EnsureSuccessStatusCode();
 
             string responseBody = await response.Content.ReadAsStringAsync();
-            var reviews = JsonSerializer.Deserialize<IEnumerable<Review>>(responseBody, _jsonOptions);
-            return reviews ?? new List<Review>();
+            var reviews = JsonSerializer.Deserialize<IEnumerable<ReviewDto>>(responseBody, _jsonOptions);
+            return reviews ?? new List<ReviewDto>();
         }
 
-        public async Task<Review?> GetByIdAsync(int id)
+        public async Task<ReviewDto?> GetByIdAsync(int id)
         {
             AddAuthorizationHeader();
             HttpResponseMessage response = await _httpClient.GetAsync($"{_baseUrl}review/{id}");
@@ -71,20 +71,13 @@ namespace HMS.Shared.Proxies.Implementations
             response.EnsureSuccessStatusCode();
             string responseBody = await response.Content.ReadAsStringAsync();
 
-            return JsonSerializer.Deserialize<Review>(responseBody, _jsonOptions);
+            return JsonSerializer.Deserialize<ReviewDto>(responseBody, _jsonOptions);
         }
 
-        public async Task<Review> AddAsync(Review review)
+        public async Task<ReviewDto> AddAsync(ReviewDto review)
         {
-            var dto = new ReviewDto
-            {
-                PatientId = review.PatientId,
-                DoctorId = review.DoctorId,
-                Value = review.Value
-            };
-
             AddAuthorizationHeader();
-            string reviewJson = JsonSerializer.Serialize(dto, _jsonOptions);
+            string reviewJson = JsonSerializer.Serialize(review, _jsonOptions);
             StringContent content = new StringContent(reviewJson, Encoding.UTF8, "application/json");
 
             HttpResponseMessage response = await _httpClient.PostAsync($"{_baseUrl}review", content);
@@ -93,21 +86,13 @@ namespace HMS.Shared.Proxies.Implementations
             string responseBody = await response.Content.ReadAsStringAsync();
             Debug.WriteLine($"StatusCode: {response.StatusCode}");
             Debug.WriteLine($"ResponseBody: {responseBody}");
-            return JsonSerializer.Deserialize<Review>(responseBody, _jsonOptions)!;
+            return JsonSerializer.Deserialize<ReviewDto>(responseBody, _jsonOptions)!;
         }
 
-        public async Task<bool> UpdateAsync(Review review)
+        public async Task<bool> UpdateAsync(ReviewDto review)
         {
-            var dto = new ReviewDto
-            {
-                Id = review.Id,
-                PatientId = review.PatientId,
-                DoctorId = review.DoctorId,
-                Value = review.Value
-            };
-
             AddAuthorizationHeader();
-            string reviewJson = JsonSerializer.Serialize(dto, _jsonOptions);
+            string reviewJson = JsonSerializer.Serialize(review, _jsonOptions);
             StringContent content = new StringContent(reviewJson, Encoding.UTF8, "application/json");
 
             HttpResponseMessage response = await _httpClient.PutAsync($"{_baseUrl}review/{review.Id}", content);
