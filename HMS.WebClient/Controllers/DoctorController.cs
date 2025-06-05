@@ -175,22 +175,18 @@ namespace HMS.WebClient.Controllers
                 }
                 var doctorRecords = records.Where(r => r.DoctorId == currentUser.Id).ToList();
 
-                // Get upcoming appointments
-                _logger.LogInformation($"MedicalHistory: Fetching appointments for doctor ID {currentUser.Id}");
+                // Get ALL appointments without filtering
+                _logger.LogInformation("MedicalHistory: Fetching all appointments");
                 var allAppointments = await _appointmentRepository.GetAllAsync();
                 if (allAppointments == null)
                 {
                     _logger.LogWarning("MedicalHistory: GetAllAsync returned null for appointments");
                     allAppointments = new List<AppointmentDto>();
                 }
-                var upcomingAppointments = allAppointments
-                    .Where(a => a.DoctorId == currentUser.Id && a.DateTime > DateTime.Now)
-                    .OrderBy(a => a.DateTime)
-                    .ToList();
 
-                // Get patient names for upcoming appointments
+                // Get patient names for all appointments
                 var appointmentsWithPatients = new List<AppointmentDto>();
-                foreach (var appointment in upcomingAppointments)
+                foreach (var appointment in allAppointments)
                 {
                     var patient = await _patientRepository.GetByIdAsync(appointment.PatientId);
                     if (patient != null)
@@ -198,6 +194,13 @@ namespace HMS.WebClient.Controllers
                         ViewData[$"PatientName_{appointment.PatientId}"] = patient.Name;
                     }
                     appointmentsWithPatients.Add(appointment);
+
+                    // Log appointment details for debugging
+                    _logger.LogInformation($"Appointment found - ID: {appointment.Id}, " +
+                        $"DoctorId: {appointment.DoctorId}, " +
+                        $"PatientId: {appointment.PatientId}, " +
+                        $"DateTime: {appointment.DateTime}, " +
+                        $"PatientName: {(patient?.Name ?? "Unknown")}");
                 }
 
                 // Get patient names for recent patients
