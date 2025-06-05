@@ -1,58 +1,60 @@
-using Hospital.ApiClients;
-using Hospital.Managers;
-using Hospital.Models;
 using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading.Tasks;
+using HMS.Shared.DTOs;
+using HMS.Shared.DTOs.Patient;
+using HMS.Shared.Proxies.Implementations;
 
-namespace Hospital.ViewModels
+namespace HMS.DesktopClient.ViewModels
 {
     public class MedicalRecordCreationFormViewModel : INotifyPropertyChanged
     {
         // Dependencies
-        private readonly IDoctorManager _doctorManager;
-        private readonly IMedicalProcedureManager _procedureManager;
-        private readonly MedicalRecordsApiService _medicalRecordsDbService;
+        private readonly DoctorProxy _doctorProxy;
+        private readonly ProcedureProxy _procedureProxy;
+        private readonly DepartmentProxy _departmentProxy;
+        private readonly PatientProxy _patientProxy;
 
         // Lists
-        public ObservableCollection<DoctorJointModel> DoctorsList { get; } = new();
-        public ObservableCollection<DepartmentModel> DepartmentsList { get; } = new();
-        public ObservableCollection<PatientJointModel> PatientsList { get; } = new();
-        public ObservableCollection<ProcedureModel> ProceduresList { get; } = new();
+        public ObservableCollection<DoctorDto> DoctorsList { get; } = new();
+        public ObservableCollection<DepartmentDto> DepartmentsList { get; } = new();
+        public ObservableCollection<PatientDto> PatientsList { get; } = new();
+        public ObservableCollection<ProcedureDto> ProceduresList { get; } = new();
 
         // Selections
-        private DoctorJointModel _selectedDoctor;
-        public DoctorJointModel SelectedDoctor
+        private DoctorDto? _selectedDoctor;
+        public DoctorDto? SelectedDoctor
         {
             get => _selectedDoctor;
             set { _selectedDoctor = value; OnPropertyChanged(nameof(SelectedDoctor)); }
         }
 
-        private PatientJointModel _selectedPatient;
-        public PatientJointModel SelectedPatient
+        private PatientDto? _selectedPatient;
+        public PatientDto? SelectedPatient
         {
             get => _selectedPatient;
             set { _selectedPatient = value; OnPropertyChanged(nameof(SelectedPatient)); }
         }
 
-        private ProcedureModel _selectedProcedure;
-        public ProcedureModel SelectedProcedure
+        private ProcedureDto? _selectedProcedure;
+        public ProcedureDto? SelectedProcedure
         {
             get => _selectedProcedure;
             set { _selectedProcedure = value; OnPropertyChanged(nameof(SelectedProcedure)); }
         }
 
-        private DepartmentModel _selectedDepartment;
-        public DepartmentModel SelectedDepartment
+        private DepartmentDto? _selectedDepartment;
+        public DepartmentDto? SelectedDepartment
         {
             get => _selectedDepartment;
             set
             {
                 _selectedDepartment = value;
                 OnPropertyChanged(nameof(SelectedDepartment));
-                _ = LoadDoctorsAndProceduresAsync(_selectedDepartment?.DepartmentID ?? 0);
+            _ = LoadDoctorsAndProceduresAsync(DepartmentsList.IndexOf(_selectedDepartment) + 1);
             }
         }
 
@@ -96,6 +98,19 @@ namespace Hospital.ViewModels
             }
         }
 
+        public async Task InitializeAsync()
+        {
+            var departments = await _departmentProxy.GetAllAsync();
+            DepartmentsList.Clear();
+            foreach (var dept in departments)
+                DepartmentsList.Add(dept);
+
+            var patients = await _patientProxy.GetAllAsync();
+            PatientsList.Clear();
+            foreach (var patient in patients)
+                PatientsList.Add(patient);
+        }
+
         // Load doctors and procedures by department
         private async Task LoadDoctorsAndProceduresAsync(int departmentId)
         {
@@ -104,12 +119,12 @@ namespace Hospital.ViewModels
 
             if (departmentId == 0) return;
 
-            await _doctorManager.LoadDoctors(departmentId);
-            foreach (var doctor in _doctorManager.GetDoctorsWithRatings())
+            var doctors = await _doctorProxy.GetAllAsync();
+            foreach (var doctor in doctors.Where(d => _selectedDepartment?.DoctorIds?.Contains(d.Id) == true))
                 DoctorsList.Add(doctor);
 
-            await _procedureManager.LoadProceduresByDepartmentId(departmentId);
-            foreach (var proc in _procedureManager.GetProcedures())
+            var procedures = await _procedureProxy.GetAllAsync();
+            foreach (var proc in procedures.Where(p => p.DepartmentId == departmentId))
                 ProceduresList.Add(proc);
 
             SelectedDoctor = null;
@@ -120,13 +135,15 @@ namespace Hospital.ViewModels
 
         // Constructor
         public MedicalRecordCreationFormViewModel(
-            IDoctorManager doctorManager,
-            IMedicalProcedureManager procedureManager,
-            MedicalRecordsApiService medicalRecordsDbService)
+            DoctorProxy doctorProxy,
+            ProcedureProxy procedureProxy,
+            DepartmentProxy departmentProxy,
+            PatientProxy patientProxy)
         {
-            _doctorManager = doctorManager;
-            _procedureManager = procedureManager;
-            _medicalRecordsDbService = medicalRecordsDbService;
+            _doctorProxy = doctorProxy;
+            _procedureProxy = procedureProxy;
+            _departmentProxy = departmentProxy;
+            _patientProxy = patientProxy;
         }
 
         // INotifyPropertyChanged
