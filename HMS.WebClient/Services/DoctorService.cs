@@ -46,7 +46,16 @@ namespace HMS.WebClient.Services
 
         public async Task<bool> UpdateDoctorAsync(DoctorViewModel viewModel)
         {
+            var existingDoctor = await _doctorRepository.GetByIdAsync(viewModel.Id);
+            if (existingDoctor == null) return false;
+
             var dto = MapToDoctorDto(viewModel);
+            
+            if (string.IsNullOrWhiteSpace(viewModel.Password))
+            {
+                dto.Password = existingDoctor.Password;
+            }
+
             return await _doctorRepository.UpdateAsync(dto);
         }
 

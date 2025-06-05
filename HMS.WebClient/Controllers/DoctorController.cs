@@ -132,5 +132,32 @@ namespace HMS.WebClient.Controllers
                 return View(new List<MedicalRecordDto>());
             }
         }
+
+        public async Task<IActionResult> ViewRecord(int id)
+        {
+            try
+            {
+                var currentUser = _authService.GetCurrentUser();
+                if (currentUser == null)
+                {
+                    return RedirectToAction("Login", "Account");
+                }
+
+                var records = await _medicalRecordRepository.GetAllAsync();
+                var record = records?.FirstOrDefault(r => r.Id == id && r.DoctorId == currentUser.Id);
+
+                if (record == null)
+                {
+                    return NotFound("Medical record not found or you don't have permission to view it.");
+                }
+
+                return View(record);
+            }
+            catch (Exception)
+            {
+                ModelState.AddModelError("", "An error occurred while loading the medical record. Please try again later.");
+                return RedirectToAction(nameof(MedicalHistory));
+            }
+        }
     }
 } 
