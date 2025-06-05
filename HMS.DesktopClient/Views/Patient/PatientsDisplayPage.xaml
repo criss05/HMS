@@ -1,13 +1,15 @@
-<Window
-    x:Class="HMS.DesktopClient.Views.Patient.PatientsPage"
+<?xml version="1.0" encoding="utf-8"?>
+<Page
+    x:Class="HMS.DesktopClient.Views.Patient.PatientsDisplayPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:controls="using:CommunityToolkit.WinUI.UI.Controls"
+    xmlns:local="using:HMS.DesktopClient.Views.Patient"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:viewModels="using:HMS.DesktopClient.ViewModels.Patient"
     mc:Ignorable="d"
-    Title="Patients Page">
+    xmlns:controls="using:CommunityToolkit.WinUI.UI.Controls"
+    xmlns:viewModels="using:HMS.DesktopClient.ViewModels.Patient"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
     <StackPanel Padding="20" Spacing="10">
         <controls:DataGrid 
@@ -29,4 +31,4 @@
             </controls:DataGrid.Columns>
         </controls:DataGrid>
     </StackPanel>
-</Window>
+</Page>

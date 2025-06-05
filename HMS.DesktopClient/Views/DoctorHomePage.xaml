@@ -6,17 +6,14 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
-    Title="DoctorHomePage"
-    Height="450" Width="800">
+    Title="DoctorHomePage">
 
     <Grid>
         <!-- Top Navigation Bar -->
-        <DockPanel Background="#FFEEEEEE" LastChildFill="True" Height="50" VerticalAlignment="Top">
-            <Button Content="Patients"
+        <Button Content="Patients"
                     Margin="10,5"
                     Padding="10,5"
                     Click="PatientsButton_Click"/>
-        </DockPanel>
 
         <!-- Main Content Area (Frame for navigation) -->
         <Frame x:Name="MainFrame" Margin="0,50,0,0"/>
