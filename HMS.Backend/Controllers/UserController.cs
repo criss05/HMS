@@ -71,6 +71,26 @@ namespace HMS.Backend.Controllers
         }
 
         /// <summary>
+        /// Gets a user by their email address.
+        /// </summary>
+        /// <param name="email">The email of the user.</param>
+        /// <returns>The <see cref="UserDto"/> if found.</returns>
+        /// <response code="200">Returns the requested user.</response>
+        /// <response code="404">If the user is not found.</response>
+        [HttpGet("email/{email}")]
+        [Authorize]
+        [ProducesResponseType(typeof(UserDto), 200)]
+        [ProducesResponseType(404)]
+        public async Task<ActionResult<UserDto>> GetByEmail(string email)
+        {
+            var user = await _repository.GetByEmailAsync(email);
+            if (user == null)
+                return NotFound();
+
+            return Ok(MapToDto(user));
+        }
+
+        /// <summary>
         /// Creates a new user.
         /// </summary>
         /// <param name="dto">The user DTO to create.</param>

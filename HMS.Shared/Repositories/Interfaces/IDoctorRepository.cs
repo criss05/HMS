@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace HMS.Backend.Repositories.Interfaces
+namespace HMS.Shared.Repositories.Interfaces
 {
     /// <summary>
     /// Interface for managing Doctor entities in the data store.
@@ -21,13 +21,6 @@ namespace HMS.Backend.Repositories.Interfaces
         /// <param name="id">The unique identifier of the doctor.</param>
         /// <returns>The doctor if found, otherwise null.</returns>
         Task<Doctor?> GetByIdAsync(int id);
-
-        /// <summary>
-        /// Gets all doctors associated with a specific department asynchronously.
-        /// </summary>
-        /// <param name="departmentId">The unique  identifier of the department.</param>
-        /// <returns>The doctors in the departnemt if found, otherwise empty list.</returns>
-        Task<IEnumerable<Doctor>> GetByDepartmentIdAsync(int departmentId);
 
         /// <summary>
         /// Adds a new doctor asynchronously.

@@ -66,6 +66,26 @@ namespace HMS.Backend.Controllers
         }
 
         /// <summary>
+        /// Retrieves a list of notifications by user_id.
+        /// </summary>
+        /// <param name="user_id">User's unique id.</param>
+        /// <returns>The requested Notifications.</returns>
+        /// <response code="200">Returns the list of notification.</response>
+        /// <response code="404">If user not found.</response>
+        [HttpGet("user/{id}")]
+        [Authorize]
+        [ProducesResponseType(typeof(IEnumerable<Notification>), 200)]
+        [ProducesResponseType(404)]
+        public async Task<ActionResult> GetByUserId(int id)
+        {
+            var notifications = await _repository.GetByUserIdAsync(id);
+            if (notifications == null)
+                return NotFound();
+
+            return Ok(notifications);
+        }
+
+        /// <summary>
         /// Creates a new notification.
         /// </summary>
         /// <param name="dto">Notification DTO to create.</param>
