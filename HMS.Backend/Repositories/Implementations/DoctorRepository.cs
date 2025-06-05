@@ -3,6 +3,7 @@ using HMS.Backend.Repositories.Interfaces;
 using HMS.Shared.Entities;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Threading.Tasks;
 
 namespace HMS.Backend.Repositories.Implementations
@@ -69,6 +70,19 @@ namespace HMS.Backend.Repositories.Implementations
             _context.Doctors.Remove(doctor);
             await _context.SaveChangesAsync();
             return true;
+        }
+
+        public async Task<IEnumerable<Doctor>> GetByDepartmentIdAsync(int departmentId)
+        {
+            var doctors = await _context.Doctors
+                .Include(d => d.Department)
+                .Include(d => d.Schedules)
+                .Include(d => d.Reviews)
+                .Include(d => d.Appointments)
+                .Where(d => d.DepartmentId == departmentId)
+                .ToListAsync();
+
+            return doctors;
         }
     }
 }

@@ -35,6 +35,14 @@ namespace HMS.Backend.Repositories.Implementations
             return await _context.Notifications.Include(n => n.User).FirstOrDefaultAsync(n => n.Id == id);
         }
 
+        public async Task<IEnumerable<Notification>> GetByUserIdAsync(int id)
+        {
+            return await _context.Notifications
+                .Include(n => n.User)
+                .Where(n => n.UserId == id)
+                .ToListAsync();
+        }
+
         /// <inheritdoc />
         public async Task AddAsync(Notification notification)
         {
