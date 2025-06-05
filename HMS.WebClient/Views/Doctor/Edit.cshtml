@@ -87,23 +87,9 @@
                             <span asp-validation-for="YearsOfExperience" class="text-danger"></span>
                         </div>
 
-                        <div class="mb-3">
-                            <label class="form-label">Department</label>
-                            <div class="form-control-plaintext">
-                                <i class="fas fa-hospital-alt"></i> 
-                                @if (!string.IsNullOrEmpty(Model.DepartmentName))
-                                {
-                                    @Model.DepartmentName
-                                }
-                                else
-                                {
-                                    <span class="text-muted">No Department Assigned</span>
-                                }
-                            </div>
-                            <input type="hidden" asp-for="DepartmentId" />
-                            <input type="hidden" asp-for="DepartmentName" />
-                            <span asp-validation-for="DepartmentId" class="text-danger"></span>
-                        </div>
+                        <!-- Hidden fields for department data -->
+                        <input type="hidden" asp-for="DepartmentId" />
+                        <input type="hidden" asp-for="DepartmentName" />
                     </div>
                 </div>
 
