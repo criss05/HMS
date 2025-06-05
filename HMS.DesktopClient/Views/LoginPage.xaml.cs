@@ -58,9 +58,21 @@ namespace HMS.DesktopClient.Views
 
             this.errorMessage.Visibility = Visibility.Collapsed;
 
-            // Navigate back to the main page
-            var homePage = new HomePage();
-            homePage.Activate();
+            if(App.CurrentUser.Role == Shared.Enums.UserRole.Patient)
+            {
+                var patientHomePage = new PatientHomePage();
+                patientHomePage.Activate();
+            }
+            else if(App.CurrentUser.Role == Shared.Enums.UserRole.Doctor)
+            {
+                var doctorHomePage = new DoctorHomePage();
+                doctorHomePage.Activate();
+            }
+            else if(App.CurrentUser.Role == Shared.Enums.UserRole.Admin)
+            {
+                var adminHomePage = new AdminHomePage();
+                adminHomePage.Activate();
+            }
             this.Close();
         }
     }
