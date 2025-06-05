@@ -185,7 +185,36 @@ namespace HMS.WebClient.Controllers
                     .OrderBy(a => a.DateTime)
                     .ToList();
 
-                _logger.LogInformation($"MedicalHistory: Creating view model with {doctorRecords.Count} records and {upcomingAppointments.Count} appointments");
+                // Get patient names for upcoming appointments
+                var appointmentsWithPatients = new List<AppointmentDto>();
+                foreach (var appointment in upcomingAppointments)
+                {
+                    var patient = await _patientRepository.GetByIdAsync(appointment.PatientId);
+                    if (patient != null)
+                    {
+                        ViewData[$"PatientName_{appointment.PatientId}"] = patient.Name;
+                    }
+                    appointmentsWithPatients.Add(appointment);
+                }
+
+                // Get patient names for recent patients
+                var recentPatients = doctorRecords
+                    .GroupBy(r => new { r.PatientId })
+                    .Select(async g => {
+                        var patient = await _patientRepository.GetByIdAsync(g.Key.PatientId);
+                        return new PatientSummaryViewModel
+                        {
+                            Id = g.Key.PatientId,
+                            Name = patient?.Name ?? $"Patient {g.Key.PatientId}",
+                            LastVisit = g.Max(r => r.CreatedAt ?? DateTime.MinValue),
+                            VisitCount = g.Count()
+                        };
+                    })
+                    .ToList();
+
+                var resolvedRecentPatients = await Task.WhenAll(recentPatients);
+
+                _logger.LogInformation($"MedicalHistory: Creating view model with {doctorRecords.Count} records and {appointmentsWithPatients.Count} appointments");
 
                 // Create view model with all sections
                 var viewModel = new DoctorMedicalHistoryViewModel
@@ -193,18 +222,8 @@ namespace HMS.WebClient.Controllers
                     DoctorName = doctorViewModel.Name,
                     DepartmentName = doctorViewModel.DepartmentName,
                     MedicalRecords = doctorRecords.OrderByDescending(r => r.CreatedAt).ToList(),
-                    RecentPatients = doctorRecords
-                        .GroupBy(r => new { r.PatientId })
-                        .Select(g => new PatientSummaryViewModel
-                        {
-                            Id = g.Key.PatientId,
-                            Name = $"Patient {g.Key.PatientId}", // Using ID as we don't have names in DTO
-                            LastVisit = g.Max(r => r.CreatedAt ?? DateTime.MinValue),
-                            VisitCount = g.Count()
-                        })
-                        .OrderByDescending(p => p.LastVisit)
-                        .ToList(),
-                    UpcomingAppointments = upcomingAppointments
+                    RecentPatients = resolvedRecentPatients.OrderByDescending(p => p.LastVisit).ToList(),
+                    UpcomingAppointments = appointmentsWithPatients
                 };
 
                 _logger.LogInformation("MedicalHistory: Successfully created view model");
