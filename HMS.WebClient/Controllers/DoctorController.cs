@@ -142,15 +142,43 @@ namespace HMS.WebClient.Controllers
                     return RedirectToAction("Login", "Account");
                 }
 
+                var doctorViewModel = await _doctorService.GetDoctorByIdAsync(currentUser.Id);
+                if (doctorViewModel == null)
+                {
+                    TempData["ErrorMessage"] = "Doctor profile not found.";
+                    return RedirectToAction(nameof(Profile));
+                }
+
+                // Get medical records
                 var records = await _medicalRecordRepository.GetAllAsync();
-                var doctorRecords = records?.Where(r => r.DoctorId == currentUser.Id).ToList();
-                
-                return View(doctorRecords ?? new List<MedicalRecordDto>());
+                var doctorRecords = records?.Where(r => r.DoctorId == currentUser.Id).ToList() ?? new List<MedicalRecordDto>();
+
+                // Create view model with all sections
+                var viewModel = new DoctorMedicalHistoryViewModel
+                {
+                    DoctorName = doctorViewModel.Name,
+                    DepartmentName = doctorViewModel.DepartmentName,
+                    MedicalRecords = doctorRecords.OrderByDescending(r => r.CreatedAt).ToList(),
+                    RecentPatients = doctorRecords
+                        .GroupBy(r => new { r.PatientId, r.PatientName })
+                        .Select(g => new PatientSummaryViewModel
+                        {
+                            Id = g.Key.PatientId,
+                            Name = g.Key.PatientName ?? "Unknown",
+                            LastVisit = g.Max(r => r.CreatedAt),
+                            VisitCount = g.Count()
+                        })
+                        .OrderByDescending(p => p.LastVisit)
+                        .ToList(),
+                    UpcomingAppointments = new List<AppointmentDto>() // TODO: Add appointments when available
+                };
+
+                return View(viewModel);
             }
             catch (Exception)
             {
-                ModelState.AddModelError("", "An error occurred while loading the medical history. Please try again later.");
-                return View(new List<MedicalRecordDto>());
+                TempData["ErrorMessage"] = "An error occurred while loading the medical history.";
+                return RedirectToAction(nameof(Profile));
             }
         }
 
