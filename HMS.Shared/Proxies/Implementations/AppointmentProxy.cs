@@ -1,3 +1,4 @@
+using HMS.Shared.DTOs;
 using HMS.Shared.Entities;
 using HMS.Shared.Repositories.Interfaces;
 using System;
@@ -6,8 +7,6 @@ using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
-using System.Transactions;
-using HMS.Shared.DTOs;
 
 namespace HMS.Shared.Proxies.Implementations
 {
@@ -25,7 +24,8 @@ namespace HMS.Shared.Proxies.Implementations
             _jsonOptions = new JsonSerializerOptions
             {
                 PropertyNameCaseInsensitive = true,
-                ReferenceHandler = ReferenceHandler.Preserve,
+                ReferenceHandler = ReferenceHandler.IgnoreCycles,
+                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
                 Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) }
             };
         }
@@ -37,7 +37,8 @@ namespace HMS.Shared.Proxies.Implementations
             _jsonOptions = new JsonSerializerOptions
             {
                 PropertyNameCaseInsensitive = true,
-                ReferenceHandler = ReferenceHandler.Preserve,
+                ReferenceHandler = ReferenceHandler.IgnoreCycles,
+                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
                 Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) }
             };
         }
@@ -98,7 +99,8 @@ namespace HMS.Shared.Proxies.Implementations
                 response.EnsureSuccessStatusCode();
 
                 string responseBody = await response.Content.ReadAsStringAsync();
-                return JsonSerializer.Deserialize<IEnumerable<AppointmentDto>>(responseBody, _jsonOptions)!;
+                var wrapper = JsonSerializer.Deserialize<AppointmentResponseDto>(responseBody, _jsonOptions);
+                return wrapper?.Records ?? new List<AppointmentDto>();
             }
             catch (Exception ex)
             {
