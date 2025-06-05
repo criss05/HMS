@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using HMS.Shared.DTOs;
 using HMS.WebClient.Attributes;
 using HMS.Shared.Enums;
+using System.Text.Json;
 
 namespace HMS.WebClient.Controllers
 {
@@ -80,7 +81,7 @@ namespace HMS.WebClient.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(DoctorViewModel doctorViewModel)
+        public async Task<IActionResult> Edit(DoctorViewModel doctorViewModel, string scheduleIdsJson, string reviewIdsJson, string appointmentIdsJson)
         {
             var currentUser = _authService.GetCurrentUser();
             if (currentUser == null || currentUser.Id != doctorViewModel.Id)
@@ -88,29 +89,38 @@ namespace HMS.WebClient.Controllers
                 return Forbid();
             }
 
-            if (!ModelState.IsValid)
-            {
-                foreach (var error in ModelState.Values.SelectMany(v => v.Errors))
-                {
-                    ModelState.AddModelError("", error.ErrorMessage);
-                }
-                return View(doctorViewModel);
-            }
-
             try
             {
+                // Get the existing doctor to preserve data
+                var existingDoctor = await _doctorService.GetDoctorByIdAsync(doctorViewModel.Id);
+                if (existingDoctor == null)
+                {
+                    ModelState.AddModelError("", "Doctor not found. Please try again.");
+                    return View(doctorViewModel);
+                }
+
+                // Preserve department data
+                doctorViewModel.DepartmentId = existingDoctor.DepartmentId;
+                doctorViewModel.DepartmentName = existingDoctor.DepartmentName;
+
+                // Deserialize the JSON strings back to lists
+                doctorViewModel.ScheduleIds = JsonSerializer.Deserialize<List<int>>(scheduleIdsJson) ?? new List<int>();
+                doctorViewModel.ReviewIds = JsonSerializer.Deserialize<List<int>>(reviewIdsJson) ?? new List<int>();
+                doctorViewModel.AppointmentIds = JsonSerializer.Deserialize<List<int>>(appointmentIdsJson) ?? new List<int>();
+
+                if (!ModelState.IsValid)
+                {
+                    foreach (var error in ModelState.Values.SelectMany(v => v.Errors))
+                    {
+                        ModelState.AddModelError("", error.ErrorMessage);
+                    }
+                    return View(doctorViewModel);
+                }
+
                 var success = await _doctorService.UpdateDoctorAsync(doctorViewModel);
                 if (!success)
                 {
                     ModelState.AddModelError("", "Failed to update doctor profile. Please try again.");
-                    return View(doctorViewModel);
-                }
-
-                // Get the updated doctor data
-                var updatedDoctor = await _doctorService.GetDoctorByIdAsync(doctorViewModel.Id);
-                if (updatedDoctor == null)
-                {
-                    ModelState.AddModelError("", "Failed to retrieve updated profile. Please try again.");
                     return View(doctorViewModel);
                 }
 
