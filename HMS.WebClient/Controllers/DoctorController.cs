@@ -21,32 +21,29 @@ namespace HMS.WebClient.Controllers
         private readonly IMedicalRecordRepository _medicalRecordRepository;
         private readonly IAppointmentRepository _appointmentRepository;
         private readonly IPatientRepository _patientRepository;
+        private readonly IProcedureRepository _procedureRepository;
         private readonly AuthService _authService;
         private readonly ILogger<DoctorController> _logger;
-        private readonly IProcedureRepository _procedureRepository;
 
         public DoctorController(
             DoctorService doctorService,
             IMedicalRecordRepository medicalRecordRepository,
             IAppointmentRepository appointmentRepository,
             IPatientRepository patientRepository,
+            IProcedureRepository procedureRepository,
             AuthService authService,
-            ILogger<DoctorController> logger,
-            IProcedureRepository procedureRepository)
+            ILogger<DoctorController> logger)
         {
             _doctorService = doctorService;
             _medicalRecordRepository = medicalRecordRepository;
             _appointmentRepository = appointmentRepository;
             _patientRepository = patientRepository;
+            _procedureRepository = procedureRepository;
             _authService = authService;
             _logger = logger;
-            _procedureRepository = procedureRepository;
         }
 
-        public IActionResult Index()
-        {
-            return RedirectToAction(nameof(Profile));
-        }
+        public IActionResult Index() => RedirectToAction(nameof(Profile));
 
         public async Task<IActionResult> Profile()
         {
@@ -54,22 +51,18 @@ namespace HMS.WebClient.Controllers
             {
                 var currentUser = _authService.GetCurrentUser();
                 if (currentUser == null)
-                {
                     return RedirectToAction("Login", "Account");
-                }
 
                 var doctorViewModel = await _doctorService.GetDoctorByIdAsync(currentUser.Id);
-                
                 if (doctorViewModel == null)
-                {
                     return NotFound("Doctor not found. Please make sure you are logged in with a valid doctor account.");
-                }
 
                 return View(doctorViewModel);
             }
             catch (Exception ex)
             {
-                ModelState.AddModelError("", "An error occurred while loading the profile. Please try again later.");
+                _logger.LogError(ex, "Error in Profile action");
+                ModelState.AddModelError("", "An error occurred while loading the profile.");
                 return View(new DoctorViewModel());
             }
         }
@@ -79,17 +72,10 @@ namespace HMS.WebClient.Controllers
         {
             var currentUser = _authService.GetCurrentUser();
             if (currentUser == null || currentUser.Id != id)
-            {
                 return Forbid();
-            }
 
             var doctorViewModel = await _doctorService.GetDoctorByIdAsync(id);
-            if (doctorViewModel == null)
-            {
-                return NotFound();
-            }
-
-            return View(doctorViewModel);
+            return doctorViewModel == null ? NotFound() : View(doctorViewModel);
         }
 
         [HttpPost]
@@ -98,40 +84,31 @@ namespace HMS.WebClient.Controllers
         {
             var currentUser = _authService.GetCurrentUser();
             if (currentUser == null || currentUser.Id != doctorViewModel.Id)
-            {
                 return Forbid();
-            }
 
             try
             {
                 var existingDoctor = await _doctorService.GetDoctorByIdAsync(doctorViewModel.Id);
                 if (existingDoctor == null)
                 {
-                    ModelState.AddModelError("", "Doctor not found. Please try again.");
+                    ModelState.AddModelError("", "Doctor not found.");
                     return View(doctorViewModel);
                 }
 
                 doctorViewModel.DepartmentId = existingDoctor.DepartmentId;
                 doctorViewModel.DepartmentName = existingDoctor.DepartmentName;
-
                 doctorViewModel.ScheduleIds = JsonSerializer.Deserialize<List<int>>(scheduleIdsJson) ?? new List<int>();
                 doctorViewModel.ReviewIds = JsonSerializer.Deserialize<List<int>>(reviewIdsJson) ?? new List<int>();
                 doctorViewModel.AppointmentIds = JsonSerializer.Deserialize<List<int>>(appointmentIdsJson) ?? new List<int>();
 
                 ModelState.Clear();
                 if (!TryValidateModel(doctorViewModel))
-                {
-                    foreach (var error in ModelState.Values.SelectMany(v => v.Errors))
-                    {
-                        ModelState.AddModelError("", error.ErrorMessage);
-                    }
                     return View(doctorViewModel);
-                }
 
                 var success = await _doctorService.UpdateDoctorAsync(doctorViewModel);
                 if (!success)
                 {
-                    ModelState.AddModelError("", "Failed to update doctor profile. Please try again.");
+                    ModelState.AddModelError("", "Failed to update doctor profile.");
                     return View(doctorViewModel);
                 }
 
@@ -140,7 +117,8 @@ namespace HMS.WebClient.Controllers
             }
             catch (Exception ex)
             {
-                ModelState.AddModelError("", "An error occurred while updating the profile. Please try again later.");
+                _logger.LogError(ex, "Error in Edit action");
+                ModelState.AddModelError("", "An error occurred while updating the profile.");
                 return View(doctorViewModel);
             }
         }
@@ -152,104 +130,62 @@ namespace HMS.WebClient.Controllers
                 var currentUser = _authService.GetCurrentUser();
                 if (currentUser == null)
                 {
-                    _logger.LogWarning("MedicalHistory: No current user found");
+                    _logger.LogWarning("No current user found");
                     return RedirectToAction("Login", "Account");
                 }
 
-                _logger.LogInformation($"MedicalHistory: Fetching doctor profile for ID {currentUser.Id}");
                 var doctorViewModel = await _doctorService.GetDoctorByIdAsync(currentUser.Id);
                 if (doctorViewModel == null)
                 {
-                    _logger.LogWarning($"MedicalHistory: Doctor profile not found for ID {currentUser.Id}");
+                    _logger.LogWarning($"Doctor profile not found for ID {currentUser.Id}");
                     TempData["ErrorMessage"] = "Doctor profile not found.";
                     return RedirectToAction(nameof(Profile));
                 }
 
-                // Get medical records
-                _logger.LogInformation($"MedicalHistory: Fetching medical records for doctor ID {currentUser.Id}");
-                var records = await _medicalRecordRepository.GetAllAsync();
-                if (records == null)
-                {
-                    _logger.LogWarning("MedicalHistory: GetAllAsync returned null for medical records");
-                    records = new List<MedicalRecordDto>();
-                }
+                var records = await _medicalRecordRepository.GetAllAsync() ?? new List<MedicalRecordDto>();
                 var doctorRecords = records.Where(r => r.DoctorId == currentUser.Id).ToList();
 
-                // Get ALL appointments without filtering
-                _logger.LogInformation("MedicalHistory: Fetching all appointments");
-                var allAppointments = await _appointmentRepository.GetAllAsync();
-                if (allAppointments == null)
-                {
-                    _logger.LogWarning("MedicalHistory: GetAllAsync returned null for appointments");
-                    allAppointments = new List<AppointmentDto>();
-                }
-
-                // Debug log all appointments
-                foreach (var apt in allAppointments)
-                {
-                    _logger.LogInformation($"DEBUG: Found appointment - ID: {apt.Id}, DoctorId: {apt.DoctorId}, PatientId: {apt.PatientId}, DateTime: {apt.DateTime}");
-                }
-                _logger.LogInformation($"DEBUG: Current doctor ID: {currentUser.Id}");
-
-                // Filter appointments for current doctor
+                var allAppointments = await _appointmentRepository.GetAllAsync() ?? new List<AppointmentDto>();
                 var doctorAppointments = allAppointments.Where(a => a.DoctorId == currentUser.Id).ToList();
-                _logger.LogInformation($"MedicalHistory: Found {doctorAppointments.Count} appointments for doctor {currentUser.Id}");
 
-                // Get patient names for all appointments
                 var appointmentsWithPatients = new List<AppointmentDto>();
                 foreach (var appointment in doctorAppointments)
                 {
                     var patient = await _patientRepository.GetByIdAsync(appointment.PatientId);
                     if (patient != null)
-                    {
                         ViewData[$"PatientName_{appointment.PatientId}"] = patient.Name;
-                    }
                     appointmentsWithPatients.Add(appointment);
-
-                    // Log appointment details for debugging
-                    _logger.LogInformation($"Appointment found - ID: {appointment.Id}, " +
-                        $"DoctorId: {appointment.DoctorId}, " +
-                        $"PatientId: {appointment.PatientId}, " +
-                        $"DateTime: {appointment.DateTime}, " +
-                        $"PatientName: {(patient?.Name ?? "Unknown")}");
                 }
 
-                // Get patient names for recent patients
-                var recentPatients = doctorRecords
-                    .GroupBy(r => new { r.PatientId })
-                    .Select(async g => {
-                        var patient = await _patientRepository.GetByIdAsync(g.Key.PatientId);
-                        return new PatientSummaryViewModel
-                        {
-                            Id = g.Key.PatientId,
-                            Name = patient?.Name ?? $"Patient {g.Key.PatientId}",
-                            LastVisit = g.Max(r => r.CreatedAt ?? DateTime.MinValue),
-                            VisitCount = g.Count()
-                        };
-                    })
-                    .ToList();
+                var recentPatients = await Task.WhenAll(
+                    doctorRecords
+                        .GroupBy(r => r.PatientId)
+                        .Select(async g => {
+                            var patient = await _patientRepository.GetByIdAsync(g.Key);
+                            return new PatientSummaryViewModel
+                            {
+                                Id = g.Key,
+                                Name = patient?.Name ?? $"Patient {g.Key}",
+                                LastVisit = g.Max(r => r.CreatedAt ?? DateTime.MinValue),
+                                VisitCount = g.Count()
+                            };
+                        }));
 
-                var resolvedRecentPatients = await Task.WhenAll(recentPatients);
-
-                _logger.LogInformation($"MedicalHistory: Creating view model with {doctorRecords.Count} records and {appointmentsWithPatients.Count} appointments");
-
-                // Create view model with all sections
                 var viewModel = new DoctorMedicalHistoryViewModel
                 {
                     DoctorName = doctorViewModel.Name,
                     DepartmentName = doctorViewModel.DepartmentName,
                     MedicalRecords = doctorRecords.OrderByDescending(r => r.CreatedAt).ToList(),
-                    RecentPatients = resolvedRecentPatients.OrderByDescending(p => p.LastVisit).ToList(),
+                    RecentPatients = recentPatients.OrderByDescending(p => p.LastVisit).ToList(),
                     UpcomingAppointments = appointmentsWithPatients
                 };
 
-                _logger.LogInformation("MedicalHistory: Successfully created view model");
                 return View(viewModel);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "An error occurred in MedicalHistory action");
-                TempData["ErrorMessage"] = $"An error occurred while loading the medical history: {ex.Message}";
+                _logger.LogError(ex, "Error in MedicalHistory action");
+                TempData["ErrorMessage"] = "An error occurred while loading the medical history.";
                 return RedirectToAction(nameof(Profile));
             }
         }
@@ -260,33 +196,21 @@ namespace HMS.WebClient.Controllers
             {
                 var currentUser = _authService.GetCurrentUser();
                 if (currentUser == null)
-                {
                     return RedirectToAction("Login", "Account");
-                }
 
                 var records = await _medicalRecordRepository.GetAllAsync();
                 var record = records?.FirstOrDefault(r => r.Id == id && r.DoctorId == currentUser.Id);
-
                 if (record == null)
-                {
                     return NotFound("Medical record not found or you don't have permission to view it.");
-                }
 
-                // Get patient name
                 var patient = await _patientRepository.GetByIdAsync(record.PatientId);
                 if (patient != null)
-                {
                     ViewData["PatientName"] = patient.Name;
-                }
 
-                // Get procedure name and department
                 var procedure = await _procedureRepository.GetByIdAsync(record.ProcedureId);
                 if (procedure != null)
-                {
                     ViewData["ProcedureName"] = procedure.Name;
-                }
 
-                // Get doctor name and department
                 var doctor = await _doctorService.GetDoctorByIdAsync(record.DoctorId);
                 if (doctor != null)
                 {
@@ -296,9 +220,10 @@ namespace HMS.WebClient.Controllers
 
                 return View(record);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                ModelState.AddModelError("", "An error occurred while loading the medical record. Please try again later.");
+                _logger.LogError(ex, "Error in ViewRecord action");
+                ModelState.AddModelError("", "An error occurred while loading the medical record.");
                 return RedirectToAction(nameof(MedicalHistory));
             }
         }
