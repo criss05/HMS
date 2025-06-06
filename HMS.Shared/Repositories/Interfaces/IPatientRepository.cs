@@ -1,4 +1,5 @@
-﻿using HMS.Shared.DTOs.Patient;
+﻿using HMS.Shared.DTOs.Doctor;
+using HMS.Shared.DTOs.Patient;
 using HMS.Shared.Entities;
 using System.Collections.Generic;
 using System.Threading.Tasks;

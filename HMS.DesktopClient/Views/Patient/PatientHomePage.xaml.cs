@@ -26,14 +26,7 @@ namespace HMS.DesktopClient.Views.Patient
 
         private async void Doctors_Click(object sender, RoutedEventArgs e)
         {
-            ContentDialog dialog = new ContentDialog
-            {
-                Title = "Doctors",
-                Content = "Doctors button clicked.",
-                CloseButtonText = "OK",
-                XamlRoot = this.Content.XamlRoot
-            };
-            await dialog.ShowAsync();
+            MainFrame.Navigate(typeof(DoctorsSummaryPage));
         }
 
         private void MedicalRecords_Click(object sender, RoutedEventArgs e)

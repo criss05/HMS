@@ -1,4 +1,5 @@
-﻿using HMS.Shared.Entities;
+﻿using HMS.Shared.DTOs.Doctor;
+using HMS.Shared.Entities;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -28,6 +29,12 @@ namespace HMS.Backend.Repositories.Interfaces
         /// <param name="departmentId">The unique  identifier of the department.</param>
         /// <returns>The doctors in the departnemt if found, otherwise empty list.</returns>
         Task<IEnumerable<Doctor>> GetByDepartmentIdAsync(int departmentId);
+
+        /// <summary>
+        /// Gets a list of doctor items for display purposes asynchronously.
+        /// </summary>
+        /// <returns>A collection of doctor list items.</returns>
+        Task<IEnumerable<DoctorListItemDto>> GetDoctorListItemsAsync();
 
         /// <summary>
         /// Adds a new doctor asynchronously.

@@ -20,6 +20,7 @@
     <None Remove="Views\PatientHomePage.xaml" />
     <None Remove="Views\PatientsPage.xaml" />
     <None Remove="Views\MedicalRecordsPage.xaml" />
+    <None Remove="Views\Patient\DoctorsSummaryPage.xaml" />
     <None Remove="Views\Patient\PatientProfilePage.xaml" />
     <None Remove="Views\Patient\PatientsDisplayPage.xaml" />
     <None Remove="Views\RegisterPage.xaml" />
@@ -58,6 +59,11 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\HMS.Shared\HMS.Shared.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Views\Patient\DoctorsSummaryPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Page Update="Views\RegisterPage.xaml">

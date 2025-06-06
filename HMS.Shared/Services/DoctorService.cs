@@ -1,4 +1,5 @@
 ﻿using HMS.Shared.DTOs;
+using HMS.Shared.DTOs.Doctor;
 using HMS.Shared.Repositories.Interfaces;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -22,6 +23,11 @@ namespace HMS.Shared.Services
         public async Task<DoctorDto?> GetDoctorByIdAsync(int id)
         {
             return await _doctorRepository.GetByIdAsync(id);
+        }
+
+        public async Task<IEnumerable<DoctorListItemDto>> GetDoctorsSummaryAsync()
+        {
+            return await _doctorRepository.GetDoctorsSummaryAsync();
         }
 
         public async Task<IEnumerable<DoctorDto>> GetAllDoctorsAsync()

@@ -1,4 +1,5 @@
 ﻿using HMS.Shared.DTOs;
+using HMS.Shared.DTOs.Doctor;
 using HMS.Shared.Entities;
 using HMS.Shared.Repositories.Interfaces;
 using System;
@@ -84,6 +85,15 @@ namespace HMS.Shared.Proxies.Implementations
 
             string responseBody = await response.Content.ReadAsStringAsync();
             return JsonSerializer.Deserialize<IEnumerable<DoctorDto>>(responseBody, _jsonOptions)!;
+        }
+
+        public async Task<IEnumerable<DoctorListItemDto>> GetDoctorsSummaryAsync()
+        {
+            AddAuthorizationHeader();
+            HttpResponseMessage response = await _httpClient.GetAsync(_baseUrl + "Doctor/DoctorSummary");
+            response.EnsureSuccessStatusCode();
+            string responseBody = await response.Content.ReadAsStringAsync();
+            return JsonSerializer.Deserialize<IEnumerable<DoctorListItemDto>>(responseBody, _jsonOptions) ?? new List<DoctorListItemDto>();
         }
 
         public async Task<DoctorDto?> GetByIdAsync(int id)
