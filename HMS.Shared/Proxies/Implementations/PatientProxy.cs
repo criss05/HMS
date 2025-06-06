@@ -76,9 +76,8 @@ namespace HMS.Shared.Proxies.Implementations
             return patient;
         }
 
-        public async Task<PatientDto> AddAsync(PatientDto patient)
+        public async Task<PatientCreateDto> AddAsync(PatientCreateDto patient)
         {
-            AddAuthorizationHeader();
             string jsonContent = JsonSerializer.Serialize(patient, _jsonOptions);
             StringContent content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
 
@@ -86,7 +85,7 @@ namespace HMS.Shared.Proxies.Implementations
             response.EnsureSuccessStatusCode();
 
             string responseBody = await response.Content.ReadAsStringAsync();
-            return JsonSerializer.Deserialize<PatientDto>(responseBody, _jsonOptions)!;
+            return JsonSerializer.Deserialize<PatientCreateDto>(responseBody, _jsonOptions)!;
         }
 
         public async Task<bool> UpdateAsync(PatientUpdateDto patient, int id)
