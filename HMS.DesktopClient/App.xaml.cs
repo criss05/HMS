@@ -5,6 +5,7 @@ using HMS.Shared.DTOs;
 using HMS.Shared.DTOs.Patient;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Xaml;
+using System.Net.Http;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -34,6 +35,11 @@ namespace HMS.DesktopClient
         private void ConfigureServices(IServiceCollection services)
         {
             services.AddSingleton<UserApiClient>();
+
+            // Register and configure HttpClient
+            services.AddSingleton<HttpClient>(sp => new HttpClient { BaseAddress = new Uri("http://localhost:5203/api/") });
+
+            // TODO: Register other services here
         }
 
         /// <summary>
