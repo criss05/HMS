@@ -16,6 +16,23 @@ namespace HMS.Shared.Services
             "A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"
         };
 
+        private static bool IsOnlyLettersOrSpaces(string text)
+        {
+            return text.All(c => char.IsLetter(c) || char.IsWhiteSpace(c));
+        }
+
+        private static bool IsDigitsOnly(string str)
+        {
+            if (string.IsNullOrEmpty(str))
+                return false;
+            foreach (char c in str)
+            {
+                if (c < '0' || c > '9')
+                    return false;
+            }
+            return true;
+        }
+
         public PatientService(IPatientRepository patientRepository)
         {
             _patientRepository = patientRepository;
@@ -23,8 +40,21 @@ namespace HMS.Shared.Services
 
         public async Task<bool> UpdatePatientAsync(PatientDto patient)
         {
+            if (!IsOnlyLettersOrSpaces(patient.Name))
+                throw new Exception("The name can contain only letters.");
+
+            if (!IsDigitsOnly(patient.PhoneNumber) || patient.PhoneNumber.Length != 10)
+                throw new Exception("The phone number is invalid. It need to have 10 digits.");
+
+            if (!IsDigitsOnly(patient.CNP) || patient.CNP.Length != 13)
+                throw new Exception("The CNP format is invalid. It need to have 13 digits.");
+
             if (!TryFormatBloodTypeForServer(patient.BloodType, out string formattedBloodType))
                 throw new Exception("Invalid blood type. Must be one of: A+, A-, B+, B-, AB+, AB-, O+, or O-.");
+
+            if (!IsDigitsOnly(patient.EmergencyContact) || patient.EmergencyContact.Length != 10)
+                throw new Exception("The emercy contact isn't a valid phone number.");
+
 
             var updateDto = MapToUpdateDto(patient);
             updateDto.BloodType = formattedBloodType; // e.g., "A_Positive"
@@ -50,8 +80,20 @@ namespace HMS.Shared.Services
 
         public async Task<PatientDto> AddPatientAsync(PatientDto patient)
         {
+            if (!IsOnlyLettersOrSpaces(patient.Name))
+                throw new Exception("The name can contain only letters.");
+
+            if (!IsDigitsOnly(patient.PhoneNumber) || patient.PhoneNumber.Length != 10)
+                throw new Exception("The phone number is invalid. It need to have 10 digits.");
+
+            if (!IsDigitsOnly(patient.CNP) || patient.CNP.Length != 13)
+                throw new Exception("The CNP format is invalid. It need to have 13 digits.");
+
             if (!IsValidBloodType(patient.BloodType))
                 throw new Exception("Invalid blood type. Must be one of: A+, A-, B+, B-, AB+, AB-, O+, or O-.");
+
+            if (!IsDigitsOnly(patient.EmergencyContact) || patient.EmergencyContact.Length != 10)
+                throw new Exception("The emercy contact isn't a valid phone number.");
 
             return await _patientRepository.AddAsync(patient);
         }
