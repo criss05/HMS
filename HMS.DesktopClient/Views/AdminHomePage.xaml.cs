@@ -39,108 +39,47 @@ namespace HMS.DesktopClient.Views
 
         private async void Procedures_Click(object sender, RoutedEventArgs e)
         {
-            ContentDialog dialog = new ContentDialog
-            {
-                Title = "Procedures",
-                Content = "Procedures button clicked.",
-                CloseButtonText = "OK",
-                XamlRoot = this.Content.XamlRoot
-            };
-            await dialog.ShowAsync();
+            //MainFrame.Navigate(typeof(ProceduresDisplayPage));
         }
 
         private async void Rooms_Click(object sender, RoutedEventArgs e)
         {
-            ContentDialog dialog = new ContentDialog
-            {
-                Title = "Rooms",
-                Content = "Rooms button clicked.",
-                CloseButtonText = "OK",
-                XamlRoot = this.Content.XamlRoot
-            };
-            await dialog.ShowAsync();
+            // MainFrame.Navigate(typeof(RoomsDisplayPage));
         }
 
         private async void Equipments_Click(object sender, RoutedEventArgs e)
         {
-            ContentDialog dialog = new ContentDialog
-            {
-                Title = "Equipments",
-                Content = "Equipments button clicked.",
-                CloseButtonText = "OK",
-                XamlRoot = this.Content.XamlRoot
-            };
-            await dialog.ShowAsync();
+            // MainFrame.Navigate(typeof(EquipmentDisplayPage));
         }
 
-        private async void Doctors_Click(object sender, RoutedEventArgs e)
+        private void Users_Click(object sender, RoutedEventArgs e)
         {
-            ContentDialog dialog = new ContentDialog
-            {
-                Title = "Doctors",
-                Content = "Doctors button clicked.",
-                CloseButtonText = "OK",
-                XamlRoot = this.Content.XamlRoot
-            };
-            await dialog.ShowAsync();
-        }
-
-        private void Patients_Click(object sender, RoutedEventArgs e)
-        {
-            MainFrame.Navigate(typeof(PatientsDisplayPage));
+            //MainFrame.Navigate(typeof(UsersDisplayPage));
         }
 
         private async void Appointments_Click(object sender, RoutedEventArgs e)
         {
-            ContentDialog dialog = new ContentDialog
-            {
-                Title = "Appointments",
-                Content = "Appointments button clicked.",
-                CloseButtonText = "OK",
-                XamlRoot = this.Content.XamlRoot
-            };
-            await dialog.ShowAsync();
+            // MainFrame.Navigate(typeof(AppointmentsDisplayPage));
         }
 
         private async void Schedules_Click(object sender, RoutedEventArgs e)
         {
-            ContentDialog dialog = new ContentDialog
-            {
-                Title = "Schedules",
-                Content = "Schedules button clicked.",
-                CloseButtonText = "OK",
-                XamlRoot = this.Content.XamlRoot
-            };
-            await dialog.ShowAsync();
+            // MainFrame.Navigate(typeof(SchedulesDisplayPage));
         }
 
         private async void Shifts_Click(object sender, RoutedEventArgs e)
         {
-            ContentDialog dialog = new ContentDialog
-            {
-                Title = "Shifts",
-                Content = "Shifts button clicked.",
-                CloseButtonText = "OK",
-                XamlRoot = this.Content.XamlRoot
-            };
-            await dialog.ShowAsync();
+            // MainFrame.Navigate(typeof(ShiftsDisplayPage));
         }
 
         private async void MedicalRecords_Click(object sender, RoutedEventArgs e)
         {
-            ContentDialog dialog = new ContentDialog
-            {
-                Title = "Medical Records",
-                Content = "Medical Records button clicked.",
-                CloseButtonText = "OK",
-                XamlRoot = this.Content.XamlRoot
-            };
-            await dialog.ShowAsync();
+            MainFrame.Navigate(typeof(MedicalRecordsPage));
         }
 
         private async void Home_Click(object sender, RoutedEventArgs e)
         {
-            MainFrame.Navigate(typeof(AdminHomePage));
+            MainFrame.Content = null; 
         }
 
         private async void Profile_Click(object sender, RoutedEventArgs e)

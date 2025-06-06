@@ -9,8 +9,8 @@
    mc:Ignorable="d"  
    Title="LoginPage">  
 
-   <Grid>  
-       <Image Source="D:\HMS\HMS.DesktopClient\ViewResources\loginPageBackground.png" Stretch="Fill"></Image>
+   <Grid>
+        <Image Source="D:\HMSFinal\HMS\HMS.DesktopClient\ViewResources\loginPageBackground.png" Stretch="Fill"></Image>
 
         <Grid HorizontalAlignment="Center" VerticalAlignment="Center" Width="650" Height="400">
             <Border Background="LightGray" CornerRadius="10" Translation="0,0,52">  

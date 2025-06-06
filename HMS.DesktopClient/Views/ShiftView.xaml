@@ -7,64 +7,148 @@
         xmlns:controls="using:CommunityToolkit.WinUI.UI.Controls"
         mc:Ignorable="d">
 
-    <Grid>
+    <Grid Background="#FAFAFA">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <TextBlock Text="Shifts" HorizontalAlignment="Center" FontSize="20" Margin="10"/>
+        <!-- Hospital Red Accent Bar -->
+        <Border Grid.Row="0" Height="8" Background="#D32F2F" CornerRadius="0,0,8,8" HorizontalAlignment="Stretch" VerticalAlignment="Top"/>
 
-        <!-- DataGrid for displaying shifts -->
-        <controls:DataGrid Grid.Row="1" 
-                           ItemsSource="{Binding Shifts}" 
-                           AutoGenerateColumns="False" 
-                           SelectedItem="{Binding SelectedShift, Mode=TwoWay}">
-            <controls:DataGrid.Columns>
-                <!-- Define columns manually with TwoWay binding for editing -->
-                <controls:DataGridTextColumn Header="Id" Binding="{Binding Id, Mode=TwoWay}" IsReadOnly="True"/>
-                <controls:DataGridTextColumn Header="Date" Binding="{Binding DateString, Mode=TwoWay}"/>
-                <controls:DataGridTextColumn Header="StartTime" Binding="{Binding StartTimeString, Mode=TwoWay}"/>
-                <controls:DataGridTextColumn Header="EndTime" Binding="{Binding EndTimeString, Mode=TwoWay}"/>
-            </controls:DataGrid.Columns>
-        </controls:DataGrid>
-        
-        <!-- Input fields and buttons for CRUD operations -->
-        <StackPanel Grid.Row="2" Orientation="Vertical" Margin="10">
-            <TextBlock Text="Shift Details (for Add operation)" FontSize="18" FontWeight="Bold" Margin="0,0,0,10"/>
+        <!-- Title -->
+        <TextBlock
+            Text="SHIFTS"
+            FontSize="32"
+            FontWeight="Bold"
+            Margin="0,24,0,24"
+            HorizontalAlignment="Center"
+            Foreground="#B71C1C"
+            Grid.Row="0"
+            VerticalAlignment="Bottom"/>
 
-            <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
-                <TextBlock Text="Date:" Width="80" VerticalAlignment="Center"/>
-                <DatePicker SelectedDate="{Binding InputShiftDate, Mode=TwoWay}"/>
+        <!-- Scrollable Content -->
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" Background="Transparent">
+            <StackPanel>
+                <!-- Card Container for DataGrid -->
+                <Border
+                    HorizontalAlignment="Center"
+                    Width="1100"
+                    Padding="0,24"
+                    Background="White"
+                    CornerRadius="16"
+                    BorderBrush="#FFCDD2"
+                    BorderThickness="1"
+                    Margin="0,0,0,24" Translation="0,0,52">
+                    <Border.Shadow>
+                        <ThemeShadow></ThemeShadow>
+                    </Border.Shadow>
+                    <StackPanel>
+                        <controls:DataGrid 
+                            ItemsSource="{Binding Shifts}" 
+                            AutoGenerateColumns="False" 
+                            SelectedItem="{Binding SelectedShift, Mode=TwoWay}"
+                            SelectionMode="Single"
+                            HeadersVisibility="Column"
+                            GridLinesVisibility="None"
+                            RowHeight="56"
+                            ColumnHeaderHeight="48"
+                            BorderThickness="0"
+                            Background="White"
+                            HorizontalAlignment="Stretch"
+                            FontSize="16"
+                            Foreground="#333"
+                            RequestedTheme="Light">
+                            <controls:DataGrid.Columns>
+                                <controls:DataGridTextColumn Header="Id" Binding="{Binding Id, Mode=TwoWay}" IsReadOnly="True"/>
+                                <controls:DataGridTextColumn Header="Date" Binding="{Binding DateString, Mode=TwoWay}"/>
+                                <controls:DataGridTextColumn Header="Start Time" Binding="{Binding StartTimeString, Mode=TwoWay}"/>
+                                <controls:DataGridTextColumn Header="End Time" Binding="{Binding EndTimeString, Mode=TwoWay}"/>
+                            </controls:DataGrid.Columns>
+                        </controls:DataGrid>
+                    </StackPanel>
+                </Border>
+
+                <!-- Card Container for Input Section -->
+                <Border
+                    HorizontalAlignment="Center"
+                    Width="1100"
+                    Padding="24"
+                    Background="White"
+                    CornerRadius="16"
+                    BorderBrush="#FFCDD2"
+                    BorderThickness="1"
+                    Margin="0,0,0,24" Translation="0,0,52">
+                    <Border.Shadow>
+                        <ThemeShadow></ThemeShadow>
+                    </Border.Shadow>
+                    <StackPanel>
+                        <TextBlock 
+                            Text="Shift Details" 
+                            FontSize="24" 
+                            FontWeight="Bold" 
+                            Foreground="#B71C1C"
+                            Margin="0,0,0,24"/>
+
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+
+                            <StackPanel Grid.Column="0" Margin="0,0,16,0">
+                                <TextBlock Text="Date" Foreground="#B71C1C" Margin="0,0,0,8"/>
+                                <DatePicker SelectedDate="{Binding InputShiftDate, Mode=TwoWay}" Foreground="#333"/>
+                            </StackPanel>
+
+                            <StackPanel Grid.Column="1" Margin="0,0,16,0">
+                                <TextBlock Text="Start Time" Foreground="#B71C1C" Margin="0,0,0,8"/>
+                                <TextBox PlaceholderText="hh:mm" Text="{Binding InputShiftStartTimeString, Mode=TwoWay}" Foreground="#333"/>
+                            </StackPanel>
+
+                            <StackPanel Grid.Column="2" Margin="0,0,16,0">
+                                <TextBlock Text="End Time" Foreground="#B71C1C" Margin="0,0,0,8"/>
+                                <TextBox PlaceholderText="hh:mm" Text="{Binding InputShiftEndTimeString, Mode=TwoWay}" Foreground="#333"/>
+                            </StackPanel>
+
+                            <StackPanel Grid.Column="3">
+                                <TextBlock Text="Doctor IDs" Foreground="#B71C1C" Margin="0,0,0,8"/>
+                                <TextBox PlaceholderText="e.g., 1, 5, 10" Text="{Binding InputShiftDoctorIdsString, Mode=TwoWay}" Foreground="#333"/>
+                            </StackPanel>
+                        </Grid>
+                    </StackPanel>
+                </Border>
             </StackPanel>
+        </ScrollViewer>
 
-            <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
-                <TextBlock Text="Start Time:" Width="80" VerticalAlignment="Center"/>
-                <TextBox PlaceholderText="HH:mm" Width="100" Text="{Binding InputShiftStartTimeString, Mode=TwoWay}"/>
+        <!-- Fixed Button Section -->
+        <Border
+            Grid.Row="2"
+            Background="White"
+            BorderBrush="#FFCDD2"
+            BorderThickness="0,1,0,0"
+            Padding="24">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="16">
+                <Button Content="Add Shift" Command="{Binding AddShiftCommand}" 
+                        Padding="24,12" Background="#D32F2F" Foreground="White" FontWeight="Bold" BorderThickness="0" CornerRadius="8"/>
+                <Button Content="Update Selected" Command="{Binding UpdateShiftCommand}" 
+                        Padding="24,12" Background="#B71C1C" Foreground="White" FontWeight="Bold" BorderThickness="0" CornerRadius="8"/>
+                <Button Content="Delete Selected" Command="{Binding DeleteShiftCommand}"
+                        Padding="24,12" Background="#FF5252" Foreground="White" FontWeight="Bold" BorderThickness="0" CornerRadius="8"/>
             </StackPanel>
+        </Border>
 
-            <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
-                <TextBlock Text="End Time:" Width="80" VerticalAlignment="Center"/>
-                <TextBox PlaceholderText="HH:mm" Width="100" Text="{Binding InputShiftEndTimeString, Mode=TwoWay}"/>
-            </StackPanel>
-             <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
-                <TextBlock Text="Doctor IDs (comma-separated):" Width="180" VerticalAlignment="Center"/>
-                <TextBox PlaceholderText="e.g., 1, 5, 10" Width="200" Text="{Binding InputShiftDoctorIdsString, Mode=TwoWay}"/>
-            </StackPanel>
-
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                <Button Content="Add Shift" Command="{Binding AddShiftCommand}" Margin="0,0,10,0"/>
-                <Button Content="Update Selected" Command="{Binding UpdateShiftCommand}" Margin="0,0,10,0"/>
-                <Button Content="Delete Selected" Command="{Binding DeleteShiftCommand}"/>
-            </StackPanel>
-        </StackPanel>
-
-        <!-- Add a TextBlock to display messages, e.g., if user is not admin -->
-        <!-- You might control visibility of DataGrid and this TextBlock based on UserRole in ViewModel and binding -->
-        <TextBlock x:Name="NoAccessMessage" Text="You do not have access to view shifts."
-                   Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Center"
-                   FontSize="16" Foreground="Red" Visibility="Collapsed"/>
-
+        <!-- No Access Message -->
+        <TextBlock x:Name="NoAccessMessage" 
+                   Text="You do not have access to view shifts."
+                   Grid.Row="1" 
+                   HorizontalAlignment="Center" 
+                   VerticalAlignment="Center"
+                   FontSize="16" 
+                   Foreground="#D32F2F" 
+                   Visibility="Collapsed"/>
     </Grid>
-</Window> 
+</Window>
