@@ -1,5 +1,6 @@
 ﻿using HMS.Backend.Data;
 using HMS.Backend.Repositories.Interfaces;
+using HMS.Shared.DTOs.Doctor;
 using HMS.Shared.Entities;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
@@ -40,6 +41,19 @@ namespace HMS.Backend.Repositories.Implementations
                 .Include(d => d.Reviews)
                 .Include(d => d.Appointments)
                 .FirstOrDefaultAsync(d => d.Id == id);
+        }
+
+        public async Task<IEnumerable<DoctorListItemDto>> GetDoctorListItemsAsync()
+        {
+            return await _context.Doctors
+                .Include(d => d.Department)
+                .Select(d => new DoctorListItemDto
+                {
+                    Name = d.Name,
+                    DepartmentName = d.Department.Name,
+                    YearsOfExperience = d.YearsOfExperience
+                })
+                .ToListAsync();
         }
 
         /// <inheritdoc />
