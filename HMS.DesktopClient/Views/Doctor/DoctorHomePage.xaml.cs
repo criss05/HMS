@@ -1,3 +1,4 @@
+using HMS.DesktopClient.Views.Patient;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
@@ -28,7 +29,7 @@ namespace HMS.DesktopClient.Views.Doctor
             this.InitializeComponent();
         }
 
-        private async void Appointments_Click(object sender, RoutedEventArgs e)
+       private void Appointments_Click(object sender, RoutedEventArgs e)
         {
             ContentDialog dialog = new ContentDialog
             {
@@ -37,10 +38,42 @@ namespace HMS.DesktopClient.Views.Doctor
                 CloseButtonText = "OK",
                 XamlRoot = this.Content.XamlRoot
             };
-            await dialog.ShowAsync();
         }
 
-        private async void Schedule_Click(object sender, RoutedEventArgs e)
+        private void MedicalRecords_Click(object sender, RoutedEventArgs e)
+        {
+            var doctorId = App.CurrentUser!.Id;
+            MainFrame.Navigate(typeof(MedicalRecordsPage), doctorId);
+        }
+
+        private void Patients_Click(object sender, RoutedEventArgs e)
+        {
+            MainFrame.Navigate(typeof(PatientsDisplayPage));
+        }
+
+        private void Equipments_Click(object sender, RoutedEventArgs e)
+        {
+            ContentDialog dialog = new ContentDialog
+            {
+                Title = "Equipments",
+                Content = "Equipments button clicked.",
+                CloseButtonText = "OK",
+                XamlRoot = this.Content.XamlRoot
+            };
+        }
+
+        private void Rooms_Click(object sender, RoutedEventArgs e)
+        {
+            ContentDialog dialog = new ContentDialog
+            {
+                Title = "Rooms",
+                Content = "Rooms button clicked.",
+                CloseButtonText = "OK",
+                XamlRoot = this.Content.XamlRoot
+            };
+        }
+
+        private void Schedule_Click(object sender, RoutedEventArgs e)
         {
             ContentDialog dialog = new ContentDialog
             {
@@ -49,9 +82,7 @@ namespace HMS.DesktopClient.Views.Doctor
                 CloseButtonText = "OK",
                 XamlRoot = this.Content.XamlRoot
             };
-            await dialog.ShowAsync();
         }
-
         private void Profile_Click(object sender, RoutedEventArgs e)
         {
             MainFrame.Navigate(typeof(DoctorProfilePage));
