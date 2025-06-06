@@ -61,10 +61,10 @@
                             Foreground="#333"
                             RequestedTheme="Light">
                             <controls:DataGrid.Columns>
-                                <controls:DataGridTextColumn Header="Id" Binding="{Binding Id, Mode=TwoWay}" IsReadOnly="True"/>
-                                <controls:DataGridTextColumn Header="Date" Binding="{Binding DateString, Mode=TwoWay}"/>
-                                <controls:DataGridTextColumn Header="Start Time" Binding="{Binding StartTimeString, Mode=TwoWay}"/>
-                                <controls:DataGridTextColumn Header="End Time" Binding="{Binding EndTimeString, Mode=TwoWay}"/>
+                                <controls:DataGridTextColumn Header="Id" Binding="{Binding Id, Mode=TwoWay}" IsReadOnly="True" Width="*"/>
+                                <controls:DataGridTextColumn Header="Date" Binding="{Binding DateString, Mode=TwoWay}" Width="*"/>
+                                <controls:DataGridTextColumn Header="Start Time" Binding="{Binding StartTimeString, Mode=TwoWay}" Width="*"/>
+                                <controls:DataGridTextColumn Header="End Time" Binding="{Binding EndTimeString, Mode=TwoWay}" Width="*"/>
                             </controls:DataGrid.Columns>
                         </controls:DataGrid>
                     </StackPanel>

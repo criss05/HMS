@@ -14,7 +14,10 @@
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
                 <StackPanel Grid.Column="1" VerticalAlignment="Top" Margin="0,40,0,0">
-                    <Border Background="#F9F6F6" CornerRadius="10" Padding="30">
+                    <Border Background="#F9F6F6" CornerRadius="10" Padding="30" Translation="0,0,52">
+                        <Border.Shadow>
+                            <ThemeShadow/>
+                        </Border.Shadow>
                         <StackPanel>
                             <!-- User Info -->
                             <TextBlock Text="{Binding Name}" FontWeight="Bold" FontSize="16" Margin="0,0,0,0" Foreground="Black"/>
@@ -42,15 +45,15 @@
                             </StackPanel>
                             <StackPanel Margin="0,0,0,10">
                                 <TextBlock Text="Email" FontSize="12" Foreground="Black"/>
-                                <TextBox Text="{Binding Email}" Height="32" Background="#F5F0F0" BorderThickness="0" Margin="0,5,0,0" Padding="8,0" IsEnabled="False" Foreground="Black"/>
+                                <TextBox Text="{Binding Email}" Height="32" Background="#F5F0F0" BorderThickness="0" Margin="0,5,0,0" Padding="8,0" IsEnabled="False" Foreground="LightGray"/>
                             </StackPanel>
                             <StackPanel Margin="0,0,0,10">
                                 <TextBlock Text="Role" FontSize="12" Foreground="Black"/>
-                                <TextBox Text="{Binding Role}" Height="32" Background="#F5F0F0" BorderThickness="0" Margin="0,5,0,0" Padding="8,0" IsEnabled="False" Foreground="Black"/>
+                                <TextBox Text="{Binding Role}" Height="32" Background="#F5F0F0" BorderThickness="0" Margin="0,5,0,0" Padding="8,0" IsEnabled="False" Foreground="LightGray"/>
                             </StackPanel>
                             <StackPanel Margin="0,0,0,10">
                                 <TextBlock Text="Created At" FontSize="12" Foreground="Black"/>
-                                <TextBox Text="{Binding CreatedAt}" Height="32" Background="#F5F0F0" BorderThickness="0" Margin="0,5,0,0" Padding="8,0" IsEnabled="False" Foreground="Black"/>
+                                <TextBox Text="{Binding CreatedAt}" Height="32" Background="#F5F0F0" BorderThickness="0" Margin="0,5,0,0" Padding="8,0" IsEnabled="False" Foreground="LightGray"/>
                             </StackPanel>
                             <!-- Doctor-specific fields -->
                             <StackPanel Margin="0,0,0,10">
@@ -67,7 +70,8 @@
                             </StackPanel>
 
                             <!-- Update Button -->
-                            <Button Content="Update Profile"
+                            <StackPanel HorizontalAlignment="Stretch" Margin="0,20,0,0">
+                                <Button Content="Update Profile"
                                    Background="#F5F0F0"
                                    Foreground="Black"
                                    FontWeight="Bold"
@@ -77,6 +81,17 @@
                                    Padding="0"
                                    HorizontalAlignment="Stretch"
                                    Click="OnUpdateButtonClick"/>
+                                <Button Content="LOG OUT"
+                                    Background="#F5F0F0"
+                                    Foreground="Black"
+                                    FontWeight="Bold"
+                                    Height="36"
+                                    BorderThickness="0"
+                                    Margin="0,20,0,0"
+                                    Padding="0"
+                                    HorizontalAlignment="Stretch"
+                                    Click="LogOutClick"/>       
+                            </StackPanel>
                         </StackPanel>
                     </Border>
                 </StackPanel>
