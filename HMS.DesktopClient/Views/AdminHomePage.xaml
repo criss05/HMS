@@ -14,6 +14,7 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
+
         <!-- Top Navigation -->
         <Border Background="White" BorderBrush="#E0E0E0" BorderThickness="0,0,0,1" Height="60" VerticalAlignment="Top">
             <Grid Height="60">
@@ -25,6 +26,9 @@
                 <TextBlock Text="HMS" Foreground="Red" FontWeight="ExtraBlack" FontSize="20" VerticalAlignment="Center" Margin="20,0,0,0"/>
                 <!-- All Navigation Buttons, HOME, and Profile Icon together -->
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center" Grid.Column="1" Margin="0,0,20,0">
+                  <Button x:Name="Logs" Grid.Row="8" Grid.Column="0" Grid.ColumnSpan="2" 
+                Content="Logs page" Click="LogsButton_Click" 
+                HorizontalAlignment="Left" Margin="0,20,0,0"/>
                     <Button Content="Procedures" Background="Transparent" BorderThickness="0" FontSize="14" Foreground="Black" Click="Procedures_Click"/>
                     <Button Content="Rooms" Background="Transparent" BorderThickness="0" FontSize="14" Foreground="Black" Click="Rooms_Click"/>
                     <Button Content="Equipments" Background="Transparent" BorderThickness="0" FontSize="14" Foreground="Black" Click="Equipments_Click"/>
@@ -32,7 +36,7 @@
                     <Button Content="Patients" Background="Transparent" BorderThickness="0" FontSize="14" Foreground="Black" Click="Patients_Click"/>
                     <Button Content="Appointments" Background="Transparent" BorderThickness="0" FontSize="14" Foreground="Black" Click="Appointments_Click"/>
                     <Button Content="Schedules" Background="Transparent" BorderThickness="0" FontSize="14" Foreground="Black" Click="Schedules_Click"/>
-                    <Button Content="Shifts" Background="Transparent" BorderThickness="0" FontSize="14" Foreground="Black" Click="Shifts_Click"/>
+                    <Button Content="Shifts" Background="Transparent" BorderThickness="0" FontSize="14" Foreground="Black" Click="ShiftsButton_Click"/>
                     <Button Content="Medical Records" Background="Transparent" BorderThickness="0" FontSize="14" Foreground="Black" Click="MedicalRecords_Click"/>
                     <Button Content="HOME" Background="Red" Foreground="White" FontWeight="Bold" Padding="10,5" BorderThickness="0" Margin="10,0,10,0" FontSize="14" Click="Home_Click"/>
                     <Button Background="Transparent" BorderThickness="0" Width="40" Height="40" Click="Profile_Click">
@@ -53,5 +57,6 @@
 
         <!-- Frame for View Navigation -->
         <Frame x:Name="MainFrame" Grid.Row="1"/>
+
     </Grid>
 </Window>
