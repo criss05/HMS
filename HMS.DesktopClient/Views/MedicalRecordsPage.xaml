@@ -6,24 +6,28 @@
     xmlns:fonticon="using:Microsoft.UI.Xaml.Controls"
     xmlns:viewmodels="using:HMS.DesktopClient.ViewModels"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    Background="White">
+    Background="#FAFAFA">
 
-    <Grid>
+    <Grid Background="#FAFAFA">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
+        <!-- Hospital Red Accent Bar -->
+        <Border Grid.Row="0" Height="8" Background="#D32F2F" CornerRadius="0,0,8,8" HorizontalAlignment="Stretch" VerticalAlignment="Top"/>
+
         <!-- Title -->
         <TextBlock
             Text="Medical Records"
             FontSize="32"
             FontWeight="Bold"
-            Margin="0,48,0,32"
+            Margin="0,24,0,24"
             HorizontalAlignment="Center"
-            Foreground="#222"
-            Grid.Row="0"/>
+            Foreground="#B71C1C"
+            Grid.Row="0"
+            VerticalAlignment="Bottom"/>
 
         <!-- Card Container -->
         <Border
@@ -33,9 +37,9 @@
             Padding="0,24"
             Background="White"
             CornerRadius="16"
-            BorderBrush="#E5E5E5"
+            BorderBrush="#FFCDD2"
             BorderThickness="1"
-            Margin="0,0,0,0">
+            Margin="0,0,0,24">
             <StackPanel>
                 <controls:DataGrid
                         x:Name="RecordsGrid"
@@ -51,9 +55,9 @@
                         Background="White"
                         HorizontalAlignment="Stretch"
                         FontSize="16"
-                        Foreground="#6B6B6B"
-                        >               
-                        <controls:DataGrid.Columns>
+                        Foreground="#333"
+                        >
+                    <controls:DataGrid.Columns>
                         <controls:DataGridTextColumn Header="ID" Binding="{Binding Id}" IsReadOnly="True"/>
                         <controls:DataGridTextColumn Header="Patient ID" Binding="{Binding PatientId}" />
                         <controls:DataGridTextColumn Header="Procedure ID" Binding="{Binding ProcedureId}" />
@@ -64,7 +68,7 @@
                             <controls:DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
                                     <Button Background="Transparent" BorderThickness="0" HorizontalAlignment="Center" VerticalAlignment="Center">
-                                        <FontIcon Glyph="&#xE74D;" Foreground="#E53935" FontSize="28"/>
+                                        <FontIcon Glyph="&#xE74D;" Foreground="#D32F2F" FontSize="28"/>
                                     </Button>
                                 </DataTemplate>
                             </controls:DataGridTemplateColumn.CellTemplate>
@@ -75,20 +79,20 @@
         </Border>
 
         <!-- Add New Button -->
-        <Button
-            Grid.Row="2"
-            Content="Add new"
-            Width="200"
-            Height="44"
-            Margin="0,40,0,0"
-            HorizontalAlignment="Center"
-            Background="#F8F4F4"
-            Foreground="#222"
-            FontWeight="Bold"
-            BorderThickness="0"
-            CornerRadius="10"
-            FontSize="16"
-            >
-        </Button>
+        <Border Grid.Row="2" Background="White" BorderBrush="#FFCDD2" BorderThickness="0,1,0,0" Padding="24">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                <Button
+                    Content="Add new"
+                    Width="200"
+                    Height="44"
+                    Margin="0,0,0,0"
+                    Background="#D32F2F"
+                    Foreground="White"
+                    FontWeight="Bold"
+                    BorderThickness="0"
+                    CornerRadius="10"
+                    FontSize="16"/>
+            </StackPanel>
+        </Border>
     </Grid>
 </Page>
