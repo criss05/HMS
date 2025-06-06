@@ -1,37 +1,34 @@
 using HMS.DesktopClient.ViewModels;
-using System.Net.Http; // Assuming HttpClient is needed
-using Microsoft.UI.Xaml.Controls; // Corrected namespace
-using Microsoft.UI.Xaml; // Corrected namespace
-using HMS.Shared.Enums; // Add using directive for UserRole enum
+using System.Net.Http;
+using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml;
+using HMS.Shared.Enums;
 using System;
+using Microsoft.UI.Xaml.Navigation;
+using static HMS.DesktopClient.Views.AdminHomePage;
 
 namespace HMS.DesktopClient.Views
 {
-    public partial class ShiftView : Window
+    public partial class ShiftView : Page
     {
-        private ShiftViewModel viewModel; // Declare viewModel at class level
+        private ShiftViewModel viewModel;
 
-        // Modify the constructor to accept HttpClient, token, and user role
-        public ShiftView(HttpClient httpClient, string token, int userRole)
+        public ShiftView()
         {
-            InitializeComponent();
+            this.InitializeComponent();
+        }
 
-            // Create the ViewModel and pass dependencies
-            viewModel = new ShiftViewModel(httpClient, token);
+        protected override void OnNavigatedTo(NavigationEventArgs e)
+        {
+            base.OnNavigatedTo(e);
 
-            // Set the user role
-            viewModel.UserRole = userRole;
-
-            // Set DataContext on the root element of the Window's content
-            if (Content is FrameworkElement rootElement)
+            if (e.Parameter is ShiftViewParams navParams)
             {
-                rootElement.DataContext = viewModel;
+                viewModel = new ShiftViewModel(navParams.HttpClient, navParams.Token);
+                viewModel.UserRole = navParams.UserRole;
+                this.DataContext = viewModel;
+                _ = viewModel.LoadShiftsAsync();
             }
-
-            // Load shifts directly after setting DataContext
-            _ = viewModel.LoadShiftsAsync();
-
-            // NoAccessMessage visibility handled based on UserRole within the viewmodel or XAML binding
         }
     }
-} 
+}

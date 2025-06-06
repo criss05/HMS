@@ -31,6 +31,13 @@ namespace HMS.DesktopClient.Views
     {
         private readonly UserApiClient _userApiClient;
 
+        public class ShiftViewParams
+        {
+            public HttpClient HttpClient { get; set; }
+            public string Token { get; set; }
+            public int UserRole { get; set; }
+        }
+
         public AdminHomePage()
         {
             _userApiClient = App.Services.GetRequiredService<UserApiClient>();
@@ -95,15 +102,23 @@ namespace HMS.DesktopClient.Views
 
         private void ShiftsButton_Click(object sender, RoutedEventArgs e)
         {
-            HttpClient httpClient = App.Services.GetRequiredService<HttpClient>();
 
             if (App.CurrentUser != null)
             {
+                var httpClient = App.Services.GetRequiredService<HttpClient>();
                 var authToken = App.CurrentUser.Token;
                 var userRole = (int)App.CurrentUser.Role;
 
-                var shiftWindow = new ShiftView(httpClient, authToken, userRole);
-                shiftWindow.Activate();
+                // Create a parameter object to pass to the page
+                var navParams = new ShiftViewParams
+                {
+                    HttpClient = httpClient,
+                    Token = authToken,
+                    UserRole = userRole
+                };
+
+                // Navigate to ShiftView, passing the parameter
+                MainFrame.Navigate(typeof(ShiftView), navParams);
             }
             else
             {
