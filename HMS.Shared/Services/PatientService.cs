@@ -141,11 +141,16 @@ namespace HMS.Shared.Services
                 { "A+", "A_Positive" }, { "A-", "A_Negative" },
                 { "B+", "B_Positive" }, { "B-", "B_Negative" },
                 { "AB+", "AB_Positive" }, { "AB-", "AB_Negative" },
-                { "O+", "O_Positive" }, { "O-", "O_Negative" }
+                { "O+", "O_Positive" }, { "O-", "O_Negative" },
+                { "A_POSITIVE", "A_Positive" }, { "A_NEGATIVE", "A_Negative" },
+                { "B_POSITIVE", "B_Positive" }, { "B_NEGATIVE", "B_Negative" },
+                { "AB_POSITIVE", "AB_Positive" }, { "AB_NEGATIVE", "AB_Negative" },
+                { "O_POSITIVE", "O_Positive" }, { "O_NEGATIVE", "O_Negative" }
             };
 
             return valid.TryGetValue(normalized, out formatted);
         }
+
 
     }
 }
