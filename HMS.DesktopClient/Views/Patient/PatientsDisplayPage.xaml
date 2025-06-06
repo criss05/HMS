@@ -8,65 +8,75 @@
     mc:Ignorable="d"
     xmlns:controls="using:CommunityToolkit.WinUI.UI.Controls"
     xmlns:viewModels="using:HMS.DesktopClient.ViewModels.Patient"
-    Background="White">
+    Background="#FAFAFA">
 
-    <Grid>
+    <Grid Background="#FAFAFA">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
+        <!-- Hospital Red Accent Bar -->
+        <Border Grid.Row="0" Height="8" Background="#D32F2F" CornerRadius="0,0,8,8" HorizontalAlignment="Stretch" VerticalAlignment="Top"/>
+
         <!-- Title -->
         <TextBlock
-            Text="Patients"
+            Text="PATIENTS"
             FontSize="32"
             FontWeight="Bold"
-            Margin="0,48,0,32"
+            Margin="0,24,0,24"
             HorizontalAlignment="Center"
-            Foreground="#222"
-            Grid.Row="0"/>
+            Foreground="#B71C1C"
+            Grid.Row="0"
+            VerticalAlignment="Bottom"/>
 
-        <!-- Card Container -->
-        <Border
-            Grid.Row="1"
-            HorizontalAlignment="Center"
-            Width="1100"
-            Padding="0,24"
-            Background="White"
-            CornerRadius="16"
-            BorderBrush="#E5E5E5"
-            BorderThickness="1"
-            Margin="0,0,0,0">
+        <!-- Scrollable Content -->
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" Background="Transparent">
             <StackPanel>
-                <controls:DataGrid 
-                    x:Name="PatientsGrid"
-                    ItemsSource="{x:Bind ViewModel.Patients, Mode=OneWay}"
-                    AutoGenerateColumns="False"
-                    SelectionMode="Single"
-                    HeadersVisibility="Column"
-                    GridLinesVisibility="None"
-                    RowHeight="56"
-                    ColumnHeaderHeight="48"
-                    BorderThickness="0"
+                <!-- Card Container for DataGrid -->
+                <Border
+                    HorizontalAlignment="Center"
+                    Width="1100"
+                    Padding="0,24"
                     Background="White"
-                    HorizontalAlignment="Stretch"
-                    FontSize="16"
-                    Foreground="#6B6B6B"
-                    RequestedTheme="Light"
-                    >
-                    <controls:DataGrid.Columns>
-                        <controls:DataGridTextColumn Header="ID" Binding="{Binding Id}" IsReadOnly="True"/>
-                        <controls:DataGridTextColumn Header="Blood Type" Binding="{Binding BloodType}" />
-                        <controls:DataGridTextColumn Header="Emergency Contact" Binding="{Binding EmergencyContact}" />
-                        <controls:DataGridTextColumn Header="Allergies" Binding="{Binding Allergies}" />
-                        <controls:DataGridTextColumn Header="Weight" Binding="{Binding Weight}" />
-                        <controls:DataGridTextColumn Header="Height" Binding="{Binding Height}" />
-                        <controls:DataGridTextColumn Header="Birth Date" Binding="{Binding BirthDate}" />
-                        <controls:DataGridTextColumn Header="Address" Binding="{Binding Address}" />
-                    </controls:DataGrid.Columns>
-                </controls:DataGrid>
+                    CornerRadius="16"
+                    BorderBrush="#FFCDD2"
+                    BorderThickness="1"
+                    Margin="0,0,0,24">
+                    <Border.Shadow>
+                        <ThemeShadow></ThemeShadow>
+                    </Border.Shadow>
+                    <StackPanel>
+                        <controls:DataGrid 
+                            x:Name="PatientsGrid"
+                            ItemsSource="{x:Bind ViewModel.Patients, Mode=OneWay}"
+                            AutoGenerateColumns="False"
+                            SelectionMode="Single"
+                            HeadersVisibility="Column"
+                            GridLinesVisibility="None"
+                            RowHeight="56"
+                            ColumnHeaderHeight="48"
+                            BorderThickness="0"
+                            Background="White"
+                            HorizontalAlignment="Stretch"
+                            FontSize="16"
+                            Foreground="#333"
+                            RequestedTheme="Light">
+                            <controls:DataGrid.Columns>
+                                <controls:DataGridTextColumn Header="ID" Binding="{Binding Id}" IsReadOnly="True" Width="*"/>
+                                <controls:DataGridTextColumn Header="Blood Type" Binding="{Binding BloodType}" Width="*" />
+                                <controls:DataGridTextColumn Header="Emergency Contact" Binding="{Binding EmergencyContact}" Width="*" />
+                                <controls:DataGridTextColumn Header="Allergies" Binding="{Binding Allergies}" Width="*" />
+                                <controls:DataGridTextColumn Header="Weight" Binding="{Binding Weight}" Width="*" />
+                                <controls:DataGridTextColumn Header="Height" Binding="{Binding Height}" Width="*" />
+                                <controls:DataGridTextColumn Header="Birth Date" Binding="{Binding BirthDate}"  Width="*"/>
+                                <controls:DataGridTextColumn Header="Address" Binding="{Binding Address}" Width="*" />
+                            </controls:DataGrid.Columns>
+                        </controls:DataGrid>
+                    </StackPanel>
+                </Border>
             </StackPanel>
-        </Border>
+        </ScrollViewer>
     </Grid>
 </Page>

@@ -46,7 +46,7 @@ namespace HMS.DesktopClient.Views
                 ErrorTextBlock.Visibility = Visibility.Visible;
 
                 await Task.Delay(3000);
-                
+
                 var loginPage = new LoginPage();
                 loginPage.Activate();
 
@@ -57,6 +57,13 @@ namespace HMS.DesktopClient.Views
                 ErrorTextBlock.Text = $"Error: {ex.Message}";
                 ErrorTextBlock.Visibility = Visibility.Visible;
             }
+        }
+
+        private void BackButton_Click(object sender, RoutedEventArgs e)
+        {
+            var loginPage = new LoginPage();
+            loginPage.Activate();
+            this.Close();
         }
     }
 }

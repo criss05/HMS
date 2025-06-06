@@ -20,7 +20,7 @@
 
         <!-- Title -->
         <TextBlock
-            Text="Medical Records"
+            Text="MEDICAL RECORDS"
             FontSize="32"
             FontWeight="Bold"
             Margin="0,24,0,24"
@@ -29,63 +29,68 @@
             Grid.Row="0"
             VerticalAlignment="Bottom"/>
 
-        <!-- Card Container -->
-        <Border
-            Grid.Row="1"
-            HorizontalAlignment="Center"
-            Width="1100"
-            Padding="0,24"
-            Background="White"
-            CornerRadius="16"
-            BorderBrush="#FFCDD2"
-            BorderThickness="1"
-            Margin="0,0,0,24">
+        <!-- Scrollable Content -->
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" Background="Transparent">
             <StackPanel>
-                <controls:DataGrid
-                        x:Name="RecordsGrid"
-                        RequestedTheme="Light"
-                        ItemsSource="{Binding MedicalRecords}"
-                        AutoGenerateColumns="False"
-                        SelectionMode="Single"
-                        HeadersVisibility="Column"
-                        GridLinesVisibility="None"
-                        RowHeight="56"
-                        ColumnHeaderHeight="48"
-                        BorderThickness="0"
-                        Background="White"
-                        HorizontalAlignment="Stretch"
-                        FontSize="16"
-                        Foreground="#333"
-                        >
-                    <controls:DataGrid.Columns>
-                        <controls:DataGridTextColumn Header="ID" Binding="{Binding Id}" IsReadOnly="True"/>
-                        <controls:DataGridTextColumn Header="Patient ID" Binding="{Binding PatientId}" />
-                        <controls:DataGridTextColumn Header="Procedure ID" Binding="{Binding ProcedureId}" />
-                        <controls:DataGridTextColumn Header="Diagnosis" Binding="{Binding Diagnosis}" />
-                        <controls:DataGridTextColumn Header="Created At" Binding="{Binding CreatedAt}" />
-                        <!-- Delete Icon Column -->
-                        <controls:DataGridTemplateColumn Header="Delete" Width="80">
-                            <controls:DataGridTemplateColumn.CellTemplate>
-                                <DataTemplate>
-                                    <Button Background="Transparent" BorderThickness="0" HorizontalAlignment="Center" VerticalAlignment="Center">
-                                        <FontIcon Glyph="&#xE74D;" Foreground="#D32F2F" FontSize="28"/>
-                                    </Button>
-                                </DataTemplate>
-                            </controls:DataGridTemplateColumn.CellTemplate>
-                        </controls:DataGridTemplateColumn>
-                    </controls:DataGrid.Columns>
-                </controls:DataGrid>
+                <!-- Card Container for DataGrid -->
+                <Border
+                    HorizontalAlignment="Center"
+                    Width="1100"
+                    Padding="0,24"
+                    Background="White"
+                    CornerRadius="16"
+                    BorderBrush="#FFCDD2"
+                    BorderThickness="1"
+                    Margin="0,0,0,24">
+                    <Border.Shadow>
+                        <ThemeShadow></ThemeShadow>
+                    </Border.Shadow>
+                    <StackPanel>
+                        <controls:DataGrid
+                                x:Name="RecordsGrid"
+                                RequestedTheme="Light"
+                                ItemsSource="{Binding MedicalRecords}"
+                                AutoGenerateColumns="False"
+                                SelectionMode="Single"
+                                HeadersVisibility="Column"
+                                GridLinesVisibility="None"
+                                RowHeight="56"
+                                ColumnHeaderHeight="48"
+                                BorderThickness="0"
+                                Background="White"
+                                HorizontalAlignment="Stretch"
+                                FontSize="16"
+                                Foreground="#333">
+                            <controls:DataGrid.Columns>
+                                <controls:DataGridTextColumn Header="ID" Binding="{Binding Id}" IsReadOnly="True" Width="*"/>
+                                <controls:DataGridTextColumn Header="Patient ID" Binding="{Binding PatientId}" Width="*"/>
+                                <controls:DataGridTextColumn Header="Procedure ID" Binding="{Binding ProcedureId}" Width="*"/>
+                                <controls:DataGridTextColumn Header="Diagnosis" Binding="{Binding Diagnosis}" Width="*"/>
+                                <controls:DataGridTextColumn Header="Created At" Binding="{Binding CreatedAt}" Width="*"/>
+                                <!-- Delete Icon Column -->
+                                <controls:DataGridTemplateColumn Header="Delete" Width="80">
+                                    <controls:DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <Button Background="Transparent" BorderThickness="0" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                                <FontIcon Glyph="&#xE74D;" Foreground="#D32F2F" FontSize="28"/>
+                                            </Button>
+                                        </DataTemplate>
+                                    </controls:DataGridTemplateColumn.CellTemplate>
+                                </controls:DataGridTemplateColumn>
+                            </controls:DataGrid.Columns>
+                        </controls:DataGrid>
+                    </StackPanel>
+                </Border>
             </StackPanel>
-        </Border>
+        </ScrollViewer>
 
-        <!-- Add New Button -->
+        <!-- Fixed Button Section -->
         <Border Grid.Row="2" Background="White" BorderBrush="#FFCDD2" BorderThickness="0,1,0,0" Padding="24">
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="16">
                 <Button
                     Content="Add new"
                     Width="200"
                     Height="44"
-                    Margin="0,0,0,0"
                     Background="#D32F2F"
                     Foreground="White"
                     FontWeight="Bold"
