@@ -45,6 +45,19 @@ namespace HMS.DesktopClient.ViewModels.Patient
             try
             {
                 Patients = new ObservableCollection<PatientDto>();
+                if (App.CurrentDoctor == null)
+                {
+                    var patients = await PatientService.GetAllPatientsAsync();
+                    if (patients != null)
+                    {
+                        foreach (var patient in patients)
+                        {
+                            Patients.Add(patient);
+                        }
+                    }
+                    Debug.WriteLine("No current doctor set, loaded all patients.");
+                    return;
+                }
                 var appointments = await AppointmentService.GetAppointmentsForDoctor(App.CurrentDoctor.Id);
                 var patientIds = appointments.Select(a => a.PatientId).Distinct().ToList();
                 if (patientIds.Count == 0)
