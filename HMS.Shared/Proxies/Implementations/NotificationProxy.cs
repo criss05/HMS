@@ -75,6 +75,15 @@ namespace HMS.Shared.Proxies.Implementations
             return JsonSerializer.Deserialize<NotificationDto>(json, _jsonOptions);
         }
 
+        public async Task<IEnumerable<NotificationDto>> GetNotificationsByUserIdAsync(int userId)
+        {
+            AddAuthorizationHeader();
+            HttpResponseMessage response = await _httpClient.GetAsync(_baseUrl + $"notification/user/{userId}");
+            response.EnsureSuccessStatusCode();
+            string json = await response.Content.ReadAsStringAsync();
+            return JsonSerializer.Deserialize<List<NotificationDto>>(json, _jsonOptions) ?? new List<NotificationDto>();
+        }
+
         public async Task<NotificationDto> AddAsync(NotificationDto notification)
         {
             AddAuthorizationHeader();
