@@ -102,7 +102,6 @@ namespace HMS.Backend.Controllers
         /// <response code="201">Returns the newly created patient.</response>
         /// <response code="400">If the input data is invalid.</response>
         [HttpPost]
-        [Authorize]
         [ProducesResponseType(typeof(Patient), 201)]
         [ProducesResponseType(400)]
         public async Task<IActionResult> Create([FromBody] PatientCreateDto dto)
@@ -111,10 +110,10 @@ namespace HMS.Backend.Controllers
             {
                 Email = dto.Email,
                 Password = dto.Password,
+                Role = Enum.Parse<HMS.Shared.Enums.UserRole>(dto.Role),
                 Name = dto.Name,
                 CNP = dto.CNP,
                 PhoneNumber = dto.PhoneNumber,
-                Role = Enum.Parse<HMS.Shared.Enums.UserRole>(dto.Role),
                 BloodType = Enum.Parse<HMS.Shared.Enums.BloodType>(dto.BloodType),
                 EmergencyContact = dto.EmergencyContact,
                 Allergies = dto.Allergies,

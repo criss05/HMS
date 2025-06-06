@@ -60,7 +60,7 @@
                    <!-- Register Section -->  
                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">  
                        <TextBlock Text="Not a member yet? " FontSize="14" Foreground="Black" Margin="0,4,5,0"/>  
-                       <Button Content="REGISTER NOW" FontWeight="Bold" FontSize="14"  
+                       <Button x:Name="registerButton" Content="REGISTER NOW" FontWeight="Bold" FontSize="14" Click="RegisterButton_Click"  
                                Background="White" Foreground="#222" BorderBrush="White"  
                                Padding="8,0" Height="24" >  
                            <Button.Template>  

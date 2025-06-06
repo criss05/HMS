@@ -101,6 +101,13 @@ namespace HMS.DesktopClient.Views
                 this.errorMessage.Visibility = Visibility.Visible;
             }
         }
+
+        private async void RegisterButton_Click(object sender, RoutedEventArgs e)
+        {
+            RegisterPage registerPage = new RegisterPage();
+            registerPage.Activate();
+            this.Close();
+        }
     }
 
 }

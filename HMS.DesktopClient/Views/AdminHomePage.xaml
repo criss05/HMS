@@ -32,8 +32,7 @@
                     <Button Content="Procedures" Background="Transparent" BorderThickness="0" FontSize="14" Foreground="Black" Click="Procedures_Click"/>
                     <Button Content="Rooms" Background="Transparent" BorderThickness="0" FontSize="14" Foreground="Black" Click="Rooms_Click"/>
                     <Button Content="Equipments" Background="Transparent" BorderThickness="0" FontSize="14" Foreground="Black" Click="Equipments_Click"/>
-                    <Button Content="Doctors" Background="Transparent" BorderThickness="0" FontSize="14" Foreground="Black" Click="Doctors_Click"/>
-                    <Button Content="Patients" Background="Transparent" BorderThickness="0" FontSize="14" Foreground="Black" Click="Patients_Click"/>
+                    <Button Content="Users" Background="Transparent" BorderThickness="0" FontSize="14" Foreground="Black" Click="Users_Click"/>
                     <Button Content="Appointments" Background="Transparent" BorderThickness="0" FontSize="14" Foreground="Black" Click="Appointments_Click"/>
                     <Button Content="Schedules" Background="Transparent" BorderThickness="0" FontSize="14" Foreground="Black" Click="Schedules_Click"/>
                     <Button Content="Shifts" Background="Transparent" BorderThickness="0" FontSize="14" Foreground="Black" Click="ShiftsButton_Click"/>

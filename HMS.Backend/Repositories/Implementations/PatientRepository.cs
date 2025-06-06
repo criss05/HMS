@@ -42,6 +42,12 @@ namespace HMS.Backend.Repositories.Implementations
         /// <inheritdoc />
         public async Task<Patient> AddAsync(Patient patient)
         {
+            bool exists = await _context.Patients.AnyAsync(p =>
+        p.Email == patient.Email || p.CNP == patient.CNP);
+
+            if (exists)
+                throw new Exception("A patient with the same email or CNP already exists.");
+
             _context.Patients.Add(patient);
             await _context.SaveChangesAsync();
             return patient;
