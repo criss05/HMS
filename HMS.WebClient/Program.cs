@@ -26,10 +26,14 @@ builder.Services.AddSession(options =>
     options.IdleTimeout = TimeSpan.FromHours(2);
     options.Cookie.HttpOnly = true;
     options.Cookie.IsEssential = true;
+    options.Cookie.SameSite = SameSiteMode.Lax;
 });
 
-// Register auth service
+// Register service
 builder.Services.AddScoped<AuthService>();
+builder.Services.AddScoped<PatientService>();
+
+builder.Services.AddScoped<DoctorService>();
 
 // Register repositories with proxy
 builder.Services.AddScoped<IDoctorRepository>(provider =>
@@ -65,6 +69,13 @@ builder.Services.AddScoped<IScheduleRepository>(provider =>
     var authService = provider.GetRequiredService<AuthService>();
     var httpClient = authService.CreateAuthorizedClient();
     return new ScheduleProxy(httpClient, authService.GetToken() ?? string.Empty);
+});
+
+builder.Services.AddScoped<IProcedureRepository>(provider =>
+{
+    var authService = provider.GetRequiredService<AuthService>();
+    var httpClient = authService.CreateAuthorizedClient();
+    return new ProcedureProxy(httpClient, authService.GetToken() ?? string.Empty);
 });
 
 var app = builder.Build();
