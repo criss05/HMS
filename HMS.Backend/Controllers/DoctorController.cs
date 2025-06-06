@@ -1,5 +1,6 @@
 ﻿using HMS.Backend.Repositories.Interfaces;
 using HMS.Shared.DTOs;
+using HMS.Shared.DTOs.Doctor;
 using HMS.Shared.Entities;
 using HMS.Shared.Enums;
 using Microsoft.AspNetCore.Authorization;
@@ -63,6 +64,16 @@ namespace HMS.Backend.Controllers
             if (!doctors.Any()) return NotFound();
             var serializedDoctors = JsonSerializer.Serialize(doctors, _jsonOptions);
             return Content(serializedDoctors, "application/json");
+        }
+
+        [HttpGet("DoctorSummary")]
+        [Authorize]
+        [ProducesResponseType(typeof(IEnumerable<DoctorListItemDto>), 200)]
+        public async Task<IActionResult> GetDoctorListItems()
+        {
+            var doctorListItems = await _doctorRepository.GetDoctorListItemsAsync();
+            var serializedItems = JsonSerializer.Serialize(doctorListItems, _jsonOptions);
+            return Content(serializedItems, "application/json");
         }
 
         [HttpPost]
