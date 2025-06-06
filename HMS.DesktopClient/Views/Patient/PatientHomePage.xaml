@@ -45,6 +45,27 @@
             </Grid>
         </Border>
 
+        <!-- Notification Panel -->
+        <Expander Header="Notifications" Background="#FFF5F5F5" Foreground="Black"
+          FontWeight="Bold" Padding="10" Margin="10,70,10,0" 
+          Grid.Row="1" IsExpanded="True">
+            <ScrollViewer Height="150">
+                <ItemsControl x:Name="NotificationsList">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Border BorderThickness="0,0,0,1" BorderBrush="#DDD" Padding="5">
+                                <StackPanel>
+                                    <TextBlock Text="{Binding Title}" FontWeight="Bold"/>
+                                    <TextBlock Text="{Binding Message}" TextWrapping="Wrap"/>
+                                    <TextBlock Text="{Binding Date}" FontStyle="Italic" FontSize="10" Foreground="Gray"/>
+                                </StackPanel>
+                            </Border>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </ScrollViewer>
+        </Expander>
+
         <!-- Frame for View Navigation -->
         <Frame x:Name="MainFrame" Grid.Row="1"/>
     </Grid>
