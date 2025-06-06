@@ -1,4 +1,5 @@
 ﻿using HMS.Shared.DTOs;
+using HMS.Shared.DTOs.Doctor;
 using HMS.Shared.Entities;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -22,6 +23,8 @@ namespace HMS.Shared.Repositories.Interfaces
         /// <param name="id">The unique identifier of the doctor.</param>
         /// <returns>The doctor if found, otherwise null.</returns>
         Task<DoctorDto?> GetByIdAsync(int id);
+
+        Task<IEnumerable<DoctorListItemDto>> GetDoctorsSummaryAsync();
 
         /// <summary>
         /// Adds a new doctor asynchronously.
