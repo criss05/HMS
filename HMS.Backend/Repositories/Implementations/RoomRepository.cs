@@ -19,25 +19,27 @@ namespace HMS.Backend.Repositories
         public async Task<List<Room>> GetAllAsync()
         {
             return await _context.Rooms
+                .Include(r => r.Department)
                 .Include(r => r.Equipments)
                 .Include(r => r.Appointments)
                 .ToListAsync();
         }
 
-        /// <inheritdoc/>
         public async Task<Room?> GetByIdAsync(int id)
         {
             return await _context.Rooms
+                .Include(r => r.Department)
                 .Include(r => r.Equipments)
                 .Include(r => r.Appointments)
                 .FirstOrDefaultAsync(r => r.Id == id);
         }
 
         /// <inheritdoc/>
-        public async Task AddAsync(Room room)
+        public async Task<Room> AddAsync(Room room)
         {
             _context.Rooms.Add(room);
             await _context.SaveChangesAsync();
+            return room;
         }
 
         /// <inheritdoc/>

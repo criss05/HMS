@@ -214,14 +214,12 @@ namespace HMS.DesktopClient.ViewModels
 
         private async void LoadAvailableRoomsAsync()
         {
+            var rooms = await roomProxy.GetAllAsync();
             AvailableRooms.Clear();
-
-            //var rooms = await roomProxy.GetAllAsync();
-            //AvailableRooms.Clear();
-            //foreach (var room in rooms)
-            //{
-            //    AvailableRooms.Add(room);
-            //}
+            foreach (var room in rooms)
+            {
+                AvailableRooms.Add(room);
+            }
         }
 
         public async 
