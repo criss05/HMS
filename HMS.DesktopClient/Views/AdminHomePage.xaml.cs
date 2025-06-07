@@ -76,7 +76,7 @@ namespace HMS.DesktopClient.Views
 
         private async void MedicalRecords_Click(object sender, RoutedEventArgs e)
         {
-            MainFrame.Navigate(typeof(MedicalRecordsPage));
+            MainFrame.Navigate(typeof(AdminMedicalRecordsPage));
         }
 
         private async void Home_Click(object sender, RoutedEventArgs e)
