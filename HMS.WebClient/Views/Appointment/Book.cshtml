@@ -1,0 +1,165 @@
+﻿@model AppointmentDto
+@{
+    ViewData["Title"] = "Book Appointment";
+}
+
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+            <h2>Book New Appointment</h2>
+            <a asp-action="Index" class="btn btn-light">
+                <i class="fas fa-arrow-left"></i> Back to Appointments
+            </a>
+        </div>
+        <div class="card-body">
+            @if (ViewBag.ErrorMessage != null)
+            {
+                <div class="alert alert-danger">@ViewBag.ErrorMessage</div>
+            }
+
+            <form asp-action="Book" method="post">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label class="form-label">Doctor</label>
+                            <select asp-for="DoctorId" id="doctorSelect" class="form-select" required>
+                                <option value="">-- Select Doctor --</option>
+                                @if (ViewBag.Doctors != null)
+                                {
+                                    foreach (var doctor in ViewBag.Doctors)
+                                    {
+                                        <option value="@doctor.Id">@doctor.Name (@doctor.DepartmentName)</option>
+                                    }
+                                }
+                            </select>
+                            <span asp-validation-for="DoctorId" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label class="form-label">Date & Time</label>
+                            <input asp-for="DateTime" type="datetime-local" class="form-control" min="@DateTime.Now.ToString("yyyy-MM-ddTHH:mm")" required />
+                            <span asp-validation-for="DateTime" class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label class="form-label">Procedure</label>
+                            <select asp-for="ProcedureId" id="procedureSelect" class="form-select" required>
+                                <option value="">-- Select Procedure --</option>
+                                <!-- Procedures will be populated dynamically -->
+                            </select>
+                            <div id="procedureLoading" class="text-muted small mt-1" style="display:none;">
+                                Loading procedures...
+                            </div>
+                            <div id="procedureError" class="text-danger small mt-1" style="display:none;">
+                                Error loading procedures. Please try selecting a doctor again.
+                            </div>
+                            <span asp-validation-for="ProcedureId" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label class="form-label">Room</label>
+                            <select asp-for="RoomId" id="roomSelect" class="form-select" required>
+                                <option value="">-- Room will be assigned --</option>
+                                <option value="1">Room 101</option>
+                                <option value="2">Room 102</option>
+                                <option value="3">Room 103</option>
+                                <option value="4">Room 204</option>
+                                <option value="5">Room 205</option>
+                            </select>
+                            <span asp-validation-for="RoomId" class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="text-center mt-4">
+                    <button type="submit" class="btn btn-primary px-5">Book Appointment</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" integrity="sha512-1ycn6IcaQQ40/MKBW2W4Rhis/DbILU74C1vSrLJxCq57o941Ym01SwNsOMqvEBFlcgUa6xLiPY/NS5R+E6ztJQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+    <script>
+        $(document).ready(function() {
+            // When doctor is selected, fetch available procedures
+            $('#doctorSelect').change(function() {
+                var doctorId = $(this).val();
+                console.log("Doctor selected:", doctorId);
+
+                if (doctorId) {
+                    $('#procedureLoading').show();
+                    $('#procedureError').hide();
+                    $('#procedureSelect').prop('disabled', true);
+
+                    // Add timestamp to prevent caching
+                    var timestamp = new Date().getTime();
+
+                    $.ajax({
+                        url: '/Appointment/GetProceduresByDoctor?doctorId=' + doctorId + '&_=' + timestamp,
+                        type: 'GET',
+                        success: function(data) {
+                            console.log("Procedures received:", data);
+                            $('#procedureSelect').empty();
+                            $('#procedureSelect').append('<option value="">-- Select Procedure --</option>');
+
+                            if (data && data.length > 0) {
+                                $.each(data, function(i, item) {
+                                    $('#procedureSelect').append('<option value="' + item.id + '">' + item.name + '</option>');
+                                });
+                                console.log("Procedures added to dropdown");
+                            } else {
+                                console.log("No procedures found for this doctor");
+
+                                // Add some hardcoded fallback procedures
+                                $('#procedureSelect').append('<option value="1">Consultation</option>');
+                                $('#procedureSelect').append('<option value="2">General Examination</option>');
+                                $('#procedureSelect').append('<option value="3">Medical Check-up</option>');
+                            }
+
+                            $('#procedureLoading').hide();
+                            $('#procedureSelect').prop('disabled', false);
+                        },
+                        error: function(xhr, status, error) {
+                            console.error("Failed to load procedures:", error);
+                            console.error("Status:", status);
+                            console.error("Response:", xhr.responseText);
+
+                            $('#procedureSelect').empty();
+                            $('#procedureSelect').append('<option value="">-- Select Procedure --</option>');
+
+                            // Add some hardcoded fallback procedures
+                            $('#procedureSelect').append('<option value="1">Consultation</option>');
+                            $('#procedureSelect').append('<option value="2">General Examination</option>');
+                            $('#procedureSelect').append('<option value="3">Medical Check-up</option>');
+
+                            $('#procedureLoading').hide();
+                            $('#procedureError').show();
+                            $('#procedureSelect').prop('disabled', false);
+                        }
+                    });
+                } else {
+                    $('#procedureSelect').empty();
+                    $('#procedureSelect').append('<option value="">-- Select Procedure --</option>');
+                    $('#procedureLoading').hide();
+                    $('#procedureError').hide();
+                }
+            });
+        });
+    </script>
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

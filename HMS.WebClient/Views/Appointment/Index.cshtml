@@ -1,0 +1,115 @@
+﻿@model IEnumerable<AppointmentDto>
+@{
+    ViewData["Title"] = "My Appointments";
+}
+
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+            <h2>My Appointments</h2>
+            <a asp-action="Book" class="btn btn-light">
+                <i class="fas fa-plus"></i> Book New Appointment
+            </a>
+        </div>
+        <div class="card-body">
+            <ul class="nav nav-tabs mb-4" id="appointmentsTabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="upcoming-tab" data-bs-toggle="tab" data-bs-target="#upcoming" type="button" role="tab" aria-controls="upcoming" aria-selected="true">Upcoming</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="past-tab" data-bs-toggle="tab" data-bs-target="#past" type="button" role="tab" aria-controls="past" aria-selected="false">Past</button>
+                </li>
+            </ul>
+            <div class="tab-content" id="appointmentsTabContent">
+                <div class="tab-pane fade show active" id="upcoming" role="tabpanel" aria-labelledby="upcoming-tab">
+                    @{
+                        var upcomingAppointments = Model?.Where(a => a.DateTime > DateTime.Now).OrderBy(a => a.DateTime);
+                    }
+                    @if (upcomingAppointments != null && upcomingAppointments.Any())
+                    {
+                            <div class="table-responsive">
+                                <table class="table table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>Date & Time</th>
+                                            <th>Doctor ID</th>
+                                            <th>Procedure ID</th>
+                                            <th>Room ID</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                    @foreach (var appointment in upcomingAppointments)
+                                    {
+                                                <tr>
+                                                    <td>@appointment.DateTime.ToString("MMM dd, yyyy HH:mm")</td>
+                                                    <td>@appointment.DoctorId</td>
+                                                    <td>@appointment.ProcedureId</td>
+                                                    <td>@appointment.RoomId</td>
+                                                    <td>
+                                                        <form asp-action="Cancel" method="post" onsubmit="return confirm('Are you sure you want to cancel this appointment?');">
+                                                            <input type="hidden" name="id" value="@appointment.Id" />
+                                                            <button type="submit" class="btn btn-danger btn-sm">
+                                                                <i class="fas fa-times"></i> Cancel
+                                                            </button>
+                                                        </form>
+                                                    </td>
+                                                </tr>
+                                    }
+                                    </tbody>
+                                </table>
+                            </div>
+                    }
+                    else
+                    {
+                            <div class="alert alert-info">
+                                You don't have any upcoming appointments.
+                                <a asp-action="Book" class="alert-link">Book an appointment now</a>.
+                            </div>
+                    }
+                </div>
+                <div class="tab-pane fade" id="past" role="tabpanel" aria-labelledby="past-tab">
+                    @{
+                        var pastAppointments = Model?.Where(a => a.DateTime <= DateTime.Now).OrderByDescending(a => a.DateTime);
+                    }
+                    @if (pastAppointments != null && pastAppointments.Any())
+                    {
+                            <div class="table-responsive">
+                                <table class="table table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>Date & Time</th>
+                                            <th>Doctor ID</th>
+                                            <th>Procedure ID</th>
+                                            <th>Room ID</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                    @foreach (var appointment in pastAppointments)
+                                    {
+                                                <tr>
+                                                    <td>@appointment.DateTime.ToString("MMM dd, yyyy HH:mm")</td>
+                                                    <td>@appointment.DoctorId</td>
+                                                    <td>@appointment.ProcedureId</td>
+                                                    <td>@appointment.RoomId</td>
+                                                </tr>
+                                    }
+                                    </tbody>
+                                </table>
+                            </div>
+                    }
+                    else
+                    {
+                            <div class="alert alert-info">
+                                You don't have any past appointments.
+                            </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" integrity="sha512-1ycn6IcaQQ40/MKBW2W4Rhis/DbILU74C1vSrLJxCq57o941Ym01SwNsOMqvEBFlcgUa6xLiPY/NS5R+E6ztJQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+}

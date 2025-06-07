@@ -1,0 +1,73 @@
+﻿@model HMS.Shared.DTOs.MedicalRecordDto
+@{
+    ViewData["Title"] = "Medical Record Details";
+}
+
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+            <h2>Medical Record Details</h2>
+            <a asp-action="Index" class="btn btn-light">
+                <i class="fas fa-arrow-left"></i> Back to Records
+            </a>
+        </div>
+        <div class="card-body">
+            @if (Model != null)
+            {
+                <div class="row">
+                    <div class="col-md-6">
+                        <h4 class="mb-3">Record Information</h4>
+                        <table class="table">
+                            <tbody>
+                                <tr>
+                                    <th>Date</th>
+                                    <td>@(Model.CreatedAt?.ToString("MMMM dd, yyyy HH:mm") ?? "Unknown")</td>
+                                </tr>
+                                <tr>
+                                    <th>Doctor</th>
+                                    <td>Doctor #@Model.DoctorId</td>
+                                </tr>
+                                <tr>
+                                    <th>Procedure</th>
+                                    <td>Procedure #@Model.ProcedureId</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="col-md-6">
+                        <h4 class="mb-3">Actions</h4>
+                        <a asp-action="Download" asp-route-id="@Model.Id" class="btn btn-primary mb-2 d-block">
+                            <i class="fas fa-download me-2"></i> Download as PDF
+                        </a>
+                    </div>
+                </div>
+
+                <div class="mt-4">
+                    <h4>Diagnosis</h4>
+                    <div class="card">
+                        <div class="card-body">
+                            @if (!string.IsNullOrEmpty(Model.Diagnosis))
+                            {
+                                <p>@Model.Diagnosis</p>
+                            }
+                            else
+                            {
+                                <p class="text-muted">No diagnosis information provided.</p>
+                            }
+                        </div>
+                    </div>
+                </div>
+            }
+            else
+            {
+                <div class="alert alert-warning">
+                    Medical record not found.
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" integrity="sha512-1ycn6IcaQQ40/MKBW2W4Rhis/DbILU74C1vSrLJxCq57o941Ym01SwNsOMqvEBFlcgUa6xLiPY/NS5R+E6ztJQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+}

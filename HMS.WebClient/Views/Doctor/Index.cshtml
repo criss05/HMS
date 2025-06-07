@@ -1,0 +1,99 @@
+﻿@model IEnumerable<HMS.WebClient.ViewModels.DoctorViewModel>
+@{
+    ViewData["Title"] = "Find Doctors";
+}
+
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-header bg-primary text-white">
+            <h2>Our Doctors</h2>
+        </div>
+        <div class="card-body">
+            <!-- Search and filter controls -->
+            <div class="row mb-4">
+                <div class="col-md-6 mb-3 mb-md-0">
+                    <div class="input-group">
+                        <input type="text" id="searchInput" class="form-control" placeholder="Search by name...">
+                        <button class="btn btn-outline-secondary" type="button" id="searchButton">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <select id="departmentFilter" class="form-select">
+                        <option value="">All Departments</option>
+                        <option value="Cardiology">Cardiology</option>
+                        <option value="Neurology">Neurology</option>
+                        <option value="Pediatrics">Pediatrics</option>
+                        <option value="General Surgery">General Surgery</option>
+                        <option value="Orthopedics">Orthopedics</option>
+                        <option value="Ophthalmology">Ophthalmology</option>
+                        <option value="ENT">ENT</option>
+                        <option value="Dermatology">Dermatology</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Doctors grid -->
+            <div class="row" id="doctorsGrid">
+                @if (Model != null && Model.Any())
+                {
+                    foreach (var doctor in Model)
+                    {
+                        <div class="col-md-6 col-lg-4 mb-4 doctor-card" data-department="@doctor.DepartmentName" data-name="@doctor.Name.ToLower()">
+                            <div class="card h-100">
+                                <div class="card-body">
+                                    <h5 class="card-title">@doctor.Name</h5>
+                                    <p class="card-text text-muted">@doctor.DepartmentName</p>
+                                    <p class="card-text">
+                                        <small class="text-muted">@doctor.YearsOfExperience years of experience</small>
+                                    </p>
+                                </div>
+                                <div class="card-footer bg-white border-top-0">
+                                    <a asp-action="Details" asp-route-id="@doctor.Id" class="btn btn-outline-primary w-100">View Profile</a>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                }
+                else
+                {
+                    <div class="col-12">
+                        <div class="alert alert-info">
+                            No doctors found.
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" integrity="sha512-1ycn6IcaQQ40/MKBW2W4Rhis/DbILU74C1vSrLJxCq57o941Ym01SwNsOMqvEBFlcgUa6xLiPY/NS5R+E6ztJQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+    <script>
+        $(document).ready(function() {
+            // Search functionality
+            $("#searchInput, #departmentFilter").on("keyup change", function() {
+                var searchTerm = $("#searchInput").val().toLowerCase();
+                var department = $("#departmentFilter").val();
+
+                $(".doctor-card").each(function() {
+                    var doctorName = $(this).data("name");
+                    var doctorDept = $(this).data("department");
+
+                    // Check if doctor meets search criteria
+                    var nameMatch = doctorName.indexOf(searchTerm) > -1;
+                    var deptMatch = department === "" || doctorDept === department;
+
+                    if (nameMatch && deptMatch) {
+                        $(this).show();
+                    } else {
+                        $(this).hide();
+                    }
+                });
+            });
+        });
+    </script>
+}

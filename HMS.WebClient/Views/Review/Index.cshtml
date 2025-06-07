@@ -1,0 +1,104 @@
+﻿@model HMS.Shared.DTOs.ReviewDto
+@{
+    ViewData["Title"] = "Write a Review";
+    var doctor = ViewBag.Doctor;
+}
+
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+            <h2>Write a Review</h2>
+            <a asp-controller="Doctor" asp-action="Details" asp-route-id="@Model.DoctorId" class="btn btn-light">
+                <i class="fas fa-arrow-left"></i> Back to Doctor Profile
+            </a>
+        </div>
+        <div class="card-body">
+            @if (doctor != null)
+            {
+                <div class="mb-4">
+                    <h4>Review for @doctor.Name</h4>
+                    <p class="text-muted">@doctor.DepartmentName</p>
+                </div>
+
+                <form asp-action="Create" method="post">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                    <input type="hidden" asp-for="DoctorId" />
+
+                    <div class="form-group mb-4">
+                        <label class="form-label">Rating</label>
+                        <div class="star-rating">
+                            <div class="rating-group">
+                                <input class="rating__input rating__input--none" name="Value" id="rating-0" value="0" type="radio" checked>
+                                <label aria-label="0 stars" class="rating__label" for="rating-0">&nbsp;</label>
+
+                                @for (int i = 1; i <= 5; i++)
+                                {
+                                    <input class="rating__input" name="Value" id="rating-@i" value="@i" type="radio">
+                                    <label aria-label="@i stars" class="rating__label" for="rating-@i">
+                                        <i class="rating__icon rating__icon--star fa fa-star"></i>
+                                    </label>
+                                }
+                            </div>
+                        </div>
+                        <span asp-validation-for="Value" class="text-danger"></span>
+                    </div>
+
+                    <div class="text-center mt-4">
+                        <button type="submit" class="btn btn-primary px-5">Submit Review</button>
+                    </div>
+                </form>
+            }
+            else
+            {
+                <div class="alert alert-warning">
+                    Doctor not found.
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" integrity="sha512-1ycn6IcaQQ40/MKBW2W4Rhis/DbILU74C1vSrLJxCq57o941Ym01SwNsOMqvEBFlcgUa6xLiPY/NS5R+E6ztJQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+    <style>
+        .rating-group {
+            display: inline-flex;
+        }
+
+        .rating__input {
+            position: absolute !important;
+            left: -9999px !important;
+        }
+
+        .rating__label {
+            cursor: pointer;
+            padding: 0 0.1em;
+            font-size: 2rem;
+        }
+
+        .rating__icon--star {
+            color: #ddd;
+        }
+
+        .rating__input:checked ~ .rating__label .rating__icon--star {
+            color: #ddd;
+        }
+
+        .rating-group:hover .rating__label .rating__icon--star {
+            color: orange;
+        }
+
+        .rating__input:hover ~ .rating__label .rating__icon--star {
+            color: #ddd;
+        }
+
+        .rating__input:checked + .rating__label .rating__icon--star {
+            color: orange;
+        }
+    </style>
+
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

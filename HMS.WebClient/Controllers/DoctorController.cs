@@ -11,10 +11,10 @@ using HMS.WebClient.Attributes;
 using HMS.Shared.Enums;
 using System.Text.Json;
 using Microsoft.Extensions.Logging;
-
+using Microsoft.AspNetCore.Authorization;
+using AuthorizeAttribute = HMS.WebClient.Attributes.AuthorizeAttribute;
 namespace HMS.WebClient.Controllers
 {
-    [Authorize(UserRole.Doctor)]
     public class DoctorController : Controller
     {
         private readonly DoctorService _doctorService;
@@ -43,8 +43,14 @@ namespace HMS.WebClient.Controllers
             _logger = logger;
         }
 
-        public IActionResult Index() => RedirectToAction(nameof(Profile));
+        [Authorize(UserRole.Patient)]
+        public async Task<IActionResult> Index()
+        {
+            var doctors = await _doctorService.GetAllDoctorsAsync();
+            return View(doctors);
+        }
 
+        [Authorize(UserRole.Doctor)]
         public async Task<IActionResult> Profile()
         {
             try
@@ -67,6 +73,7 @@ namespace HMS.WebClient.Controllers
             }
         }
 
+        [Authorize(UserRole.Doctor)]
         [HttpGet]
         public async Task<IActionResult> Edit(int id)
         {
@@ -78,6 +85,7 @@ namespace HMS.WebClient.Controllers
             return doctorViewModel == null ? NotFound() : View(doctorViewModel);
         }
 
+        [Authorize(UserRole.Doctor)]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(DoctorViewModel doctorViewModel, string scheduleIdsJson, string reviewIdsJson, string appointmentIdsJson)
@@ -123,6 +131,7 @@ namespace HMS.WebClient.Controllers
             }
         }
 
+        [Authorize(UserRole.Doctor)]
         public async Task<IActionResult> MedicalHistory()
         {
             try
@@ -190,6 +199,9 @@ namespace HMS.WebClient.Controllers
             }
         }
 
+
+
+        [Authorize(UserRole.Doctor)]
         public async Task<IActionResult> ViewRecord(int id)
         {
             try
@@ -211,6 +223,7 @@ namespace HMS.WebClient.Controllers
                 if (procedure != null)
                     ViewData["ProcedureName"] = procedure.Name;
 
+                // Since record.DoctorId is int (not nullable), just pass it directly
                 var doctor = await _doctorService.GetDoctorByIdAsync(record.DoctorId);
                 if (doctor != null)
                 {

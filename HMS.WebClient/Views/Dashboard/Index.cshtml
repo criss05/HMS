@@ -1,0 +1,177 @@
+﻿@model HMS.WebClient.ViewModels.PatientDashboardViewModel
+@{
+    ViewData["Title"] = "Patient Dashboard";
+}
+
+<div class="container mt-4">
+    <!-- Header section -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card bg-primary text-white">
+                <div class="card-body">
+                    <h2 class="mb-0">Welcome to your Patient Dashboard</h2>
+                    <p class="mb-0">Manage your appointments, view medical records, and more</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notifications section -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-light">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0"><i class="fas fa-bell me-2"></i> Recent Notifications</h5>
+                        <a asp-controller="Notification" asp-action="Index" class="btn btn-sm btn-outline-primary">View All</a>
+                    </div>
+                </div>
+                <div class="card-body p-0">
+                    @if (Model.Notifications != null && Model.Notifications.Any())
+                    {
+                        <ul class="list-group list-group-flush">
+                            @foreach (var notification in Model.Notifications)
+                            {
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <p class="mb-1">@notification.Message</p>
+                                        <small class="text-muted">@notification.DeliveryDateTime.ToString("MMM dd, yyyy HH:mm")</small>
+                                    </div>
+                                    <form asp-controller="Notification" asp-action="MarkAsRead" method="post">
+                                        <input type="hidden" name="id" value="@notification.Id" />
+                                        <button type="submit" class="btn btn-sm btn-outline-secondary">Mark as Read</button>
+                                    </form>
+                                </li>
+                            }
+                        </ul>
+                    }
+                    else
+                    {
+                        <div class="p-4 text-center">
+                            <p class="mb-0">No new notifications</p>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Upcoming appointments section -->
+        <div class="col-md-6 mb-4">
+            <div class="card h-100">
+                <div class="card-header bg-light">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0"><i class="fas fa-calendar-check me-2"></i> Upcoming Appointments</h5>
+                        <a asp-controller="Appointment" asp-action="Index" class="btn btn-sm btn-outline-primary">View All</a>
+                    </div>
+                </div>
+                <div class="card-body p-0">
+                    @if (Model.UpcomingAppointments != null && Model.UpcomingAppointments.Any())
+                    {
+                        <ul class="list-group list-group-flush">
+                            @foreach (var appointment in Model.UpcomingAppointments)
+                            {
+                                <li class="list-group-item">
+                                    <h6>@appointment.DateTime.ToString("MMMM dd, yyyy HH:mm")</h6>
+                                    <p class="mb-1">Doctor #@appointment.DoctorId</p>
+                                    <p class="mb-1">Procedure #@appointment.ProcedureId</p>
+                                    <p class="mb-0">Room: #@appointment.RoomId</p>
+                                </li>
+                            }
+                        </ul>
+                    }
+                    else
+                    {
+                        <div class="p-4 text-center">
+                            <p>No upcoming appointments</p>
+                            <a asp-controller="Appointment" asp-action="Book" class="btn btn-primary">Book Appointment</a>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent medical records section -->
+        <div class="col-md-6 mb-4">
+            <div class="card h-100">
+                <div class="card-header bg-light">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0"><i class="fas fa-file-medical me-2"></i> Recent Medical Records</h5>
+                        <a asp-controller="MedicalRecord" asp-action="Index" class="btn btn-sm btn-outline-primary">View All</a>
+                    </div>
+                </div>
+                <div class="card-body p-0">
+                    @if (Model.RecentMedicalRecords != null && Model.RecentMedicalRecords.Any())
+                    {
+                        <ul class="list-group list-group-flush">
+                            @foreach (var record in Model.RecentMedicalRecords)
+                            {
+                                <li class="list-group-item">
+                                    <h6>@(record.CreatedAt?.ToString("MMMM dd, yyyy") ?? "Unknown Date")</h6>
+                                    <p class="mb-1">Doctor #@record.DoctorId</p>
+                                    <p class="mb-1">Procedure #@record.ProcedureId</p>
+                                    <p class="mb-0">
+                                        <span class="text-muted">Diagnosis:</span>
+                                        @(string.IsNullOrEmpty(record.Diagnosis) ? "No diagnosis provided" : record.Diagnosis)
+                                    </p>
+                                    <a asp-controller="MedicalRecord" asp-action="Details" asp-route-id="@record.Id" class="btn btn-sm btn-outline-secondary mt-2">View Details</a>
+                                </li>
+                            }
+                        </ul>
+                    }
+                    else
+                    {
+                        <div class="p-4 text-center">
+                            <p>No medical records found</p>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick links section -->
+    <div class="row">
+        <div class="col-md-4 mb-4">
+            <div class="card text-center h-100">
+                <div class="card-body">
+                    <div class="mb-3">
+                        <i class="fas fa-calendar-plus fa-3x text-primary"></i>
+                    </div>
+                    <h5 class="card-title">Book Appointment</h5>
+                    <p class="card-text">Schedule a new appointment with one of our specialists</p>
+                    <a asp-controller="Appointment" asp-action="Book" class="btn btn-primary">Book Now</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card text-center h-100">
+                <div class="card-body">
+                    <div class="mb-3">
+                        <i class="fas fa-user-md fa-3x text-primary"></i>
+                    </div>
+                    <h5 class="card-title">Find a Doctor</h5>
+                    <p class="card-text">Search for doctors by specialization or name</p>
+                    <a asp-controller="Doctor" asp-action="Index" class="btn btn-primary">Find Doctors</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card text-center h-100">
+                <div class="card-body">
+                    <div class="mb-3">
+                        <i class="fas fa-user-edit fa-3x text-primary"></i>
+                    </div>
+                    <h5 class="card-title">Update Profile</h5>
+                    <p class="card-text">Update your personal and medical information</p>
+                    <a asp-controller="Patient" asp-action="Edit" class="btn btn-primary">Edit Profile</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" integrity="sha512-1ycn6IcaQQ40/MKBW2W4Rhis/DbILU74C1vSrLJxCq57o941Ym01SwNsOMqvEBFlcgUa6xLiPY/NS5R+E6ztJQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+}

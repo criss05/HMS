@@ -1,11 +1,10 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using HMS.Shared.Repositories.Interfaces;
-using HMS.Shared.DTOs.Patient;
-using System;
-using System.Threading.Tasks;
+﻿using HMS.Shared.DTOs.Patient;
 using HMS.WebClient.Services;
+using HMS.WebClient.Attributes; // Import your attributes namespace
+using Microsoft.AspNetCore.Mvc;
+using System.Threading.Tasks;
 using HMS.Shared.Enums;
-using HMS.WebClient.Attributes;
+
 
 namespace HMS.WebClient.Controllers
 {
@@ -15,45 +14,67 @@ namespace HMS.WebClient.Controllers
         private readonly PatientService _patientService;
         private readonly AuthService _authService;
 
-        public PatientController(
-            PatientService patientService,
-            AuthService authService)
+        public PatientController(PatientService patientService, AuthService authService)
         {
             _patientService = patientService;
             _authService = authService;
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            return RedirectToAction(nameof(Profile));
+            var currentUser = _authService.GetCurrentUser();
+            if (currentUser == null)
+            {
+                return RedirectToAction("Login", "Account");
+            }
+
+            // Redirect to profile page since this is only for patients
+            return RedirectToAction("Profile");
         }
 
-        // View profile information
+        [HttpGet]
         public async Task<IActionResult> Profile()
         {
-            try
+            var currentUser = _authService.GetCurrentUser();
+            if (currentUser == null)
             {
-                var patientId = _authService.GetUserId();
-                if (patientId == null)
-                {
-                    return RedirectToAction("Login", "Account");
-                }
+                return RedirectToAction("Login", "Account");
+            }
 
-                var patient = await _patientService.GetPatientByIdAsync(patientId.Value);
-                return View(patient);
-            }
-            catch (KeyNotFoundException)
-            {
-                return NotFound("Patient not found. Please make sure you are logged in with a valid patient account.");
-            }
-            catch (Exception ex)
-            {
-                ModelState.AddModelError("", $"An error occurred while loading the profile: {ex.Message}");
-                return View(new PatientDto());
-            }
+            var patient = await _patientService.GetPatientByIdAsync(currentUser.Id);
+            return View(patient);
         }
 
-        // Display edit form
+        [HttpPost]
+        public async Task<IActionResult> Profile(PatientUpdateDto model)
+        {
+            var currentUser = _authService.GetCurrentUser();
+            if (currentUser == null)
+            {
+                return RedirectToAction("Login", "Account");
+            }
+
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
+            model.Id = currentUser.Id;
+            var success = await _patientService.UpdatePatientAsync(model);
+
+            if (success)
+            {
+                TempData["SuccessMessage"] = "Profile updated successfully";
+            }
+            else
+            {
+                TempData["ErrorMessage"] = "Failed to update profile";
+            }
+
+            return RedirectToAction("Profile");
+        }
+
+        [HttpGet]
         public async Task<IActionResult> Edit()
         {
             try
@@ -159,6 +180,34 @@ namespace HMS.WebClient.Controllers
                 ModelState.AddModelError("", $"An error occurred: {ex.Message}");
                 return View(model);
             }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> MedicalRecords()
+        {
+            var currentUser = _authService.GetCurrentUser();
+            if (currentUser == null)
+            {
+                return RedirectToAction("Login", "Account");
+            }
+
+            // This will be implemented when we add medical records functionality
+            // For now, just return a view with a message
+            return View();
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Appointments()
+        {
+            var currentUser = _authService.GetCurrentUser();
+            if (currentUser == null)
+            {
+                return RedirectToAction("Login", "Account");
+            }
+
+            // This will be implemented when we add appointments functionality
+            // For now, just return a view with a message
+            return View();
         }
     }
 }

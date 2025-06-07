@@ -1,7 +1,17 @@
 ﻿@using HMS.WebClient.Services
-@inject AuthService AuthService
+@inject HMS.WebClient.Services.AuthService AuthService
+@inject HMS.WebClient.Services.NotificationService NotificationService
 @{
     var currentUser = AuthService.GetCurrentUser();
+    int notificationCount = 0;
+
+    if (currentUser != null)
+    {
+        // Asynchronously get the unread notification count
+        // Since _Layout.cshtml doesn't support await directly, we use GetAwaiter().GetResult()
+        notificationCount = NotificationService.GetUnreadNotificationsCountAsync(currentUser.Id)
+            .GetAwaiter().GetResult();
+    }
 }
 <!DOCTYPE html>
 <html lang="en">
@@ -28,13 +38,37 @@
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Doctor" asp-action="Index">Doctors</a>
-                        </li>
+                        @if (currentUser?.Role == HMS.Shared.Enums.UserRole.Doctor)
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Doctor" asp-action="Index">Doctors</a>
+                            </li>
+                        }
                         @if (currentUser?.Role == HMS.Shared.Enums.UserRole.Patient)
                         {
                             <li class="nav-item">
+                                <a class="nav-link text-dark" asp-controller="Dashboard" asp-action="Index">Dashboard</a>
+                            </li>
+                            <li class="nav-item">
                                 <a class="nav-link text-dark" asp-controller="Patient" asp-action="Profile">My Profile</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-controller="MedicalRecord" asp-action="Index">Medical Records</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-controller="Appointment" asp-action="Index">My Appointments</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-controller="Doctor" asp-action="Index">Find Doctors</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-controller="Notification" asp-action="Index">
+                                    Notifications
+                                    @if (notificationCount > 0)
+                                    {
+                                        <span class="badge bg-danger">@notificationCount</span>
+                                    }
+                                </a>
                             </li>
                         }
                         <li class="nav-item">
