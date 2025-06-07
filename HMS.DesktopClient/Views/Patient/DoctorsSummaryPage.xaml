@@ -11,7 +11,7 @@
 
     <Grid Padding="20">
         <TextBlock Text="Doctors" FontSize="24" FontWeight="Bold" Margin="0,0,0,20"/>
-        <ListView x:Name="DoctorsListView" Margin="0,40,0,0">
+        <ListView x:Name="DoctorsListView" ItemsSource="{Binding Doctors}" Margin="0,40,0,0">
             <ListView.ItemTemplate>
                 <DataTemplate x:DataType="dto:DoctorListItemDto" xmlns:dto="using:HMS.Shared.DTOs.Doctor">
                     <StackPanel Orientation="Horizontal" Spacing="20">
