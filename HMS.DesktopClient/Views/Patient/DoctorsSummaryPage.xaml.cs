@@ -27,34 +27,16 @@ namespace HMS.DesktopClient.Views.Patient
     /// </summary>
     public sealed partial class DoctorsSummaryPage : Page
     {
-        private readonly DoctorSummaryViewModel _viewModel;
+        public DoctorSummaryViewModel ViewModel;
 
         public DoctorsSummaryPage()
         {
             this.InitializeComponent();
 
-            this._viewModel = new DoctorSummaryViewModel(new DoctorService(new DoctorProxy(App.CurrentUser.Token)));
-            _ = LoadDoctorsAsync();
-        }
+            this.ViewModel = new DoctorSummaryViewModel(new DoctorService(new DoctorProxy(App.CurrentUser.Token)));
+            this.DataContext = ViewModel;
 
-        private async Task LoadDoctorsAsync()
-        {
-            try
-            {
-                var doctors = await _viewModel.LoadDoctorsSummary();
-                DoctorsListView.ItemsSource = doctors;
-            }
-            catch (Exception ex)
-            {
-                var dialog = new ContentDialog()
-                {
-                    Title = "Error loading doctors",
-                    Content = ex.Message,
-                    CloseButtonText = "OK",
-                    XamlRoot = this.XamlRoot
-                };
-                await dialog.ShowAsync();
-            }
+            _ = ViewModel.LoadDoctorsSummary();
         }
     }
 }
