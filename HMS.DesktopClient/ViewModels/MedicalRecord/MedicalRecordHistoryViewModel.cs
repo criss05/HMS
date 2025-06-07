@@ -42,10 +42,9 @@ namespace HMS.DesktopClient.ViewModels
         /// Upon initialization, this constructor triggers the asynchronous loading of medical records
         /// for the specified patient.
         /// </remarks>
-        public MedicalRecordHistoryViewModel(int patientId, MedicalRecordProxy medicalRecordProxy)
+        public MedicalRecordHistoryViewModel(MedicalRecordProxy medicalRecordProxy)
         {
             _medicalRecordProxy = medicalRecordProxy;
-            InitializeAsync(patientId);
         }
 
         /// <summary>
@@ -58,7 +57,7 @@ namespace HMS.DesktopClient.ViewModels
         /// and populates the <see cref="MedicalRecords"/> collection with the results.
         /// Error handling is implemented to prevent application crashes.
         /// </remarks>
-        private async Task InitializeAsync(int patientId)
+        private async Task InitializeTask(int patientId)
         {
             try
             {
@@ -74,5 +73,42 @@ namespace HMS.DesktopClient.ViewModels
                 Console.WriteLine($"Error loading medical records: {ex.Message}");
             }
         }
+
+        /// <summary>
+        /// Loads records for a specific patient.
+        /// </summary>
+        public async Task LoadRecordsForPatientAsync(int patientId)
+        {
+            await LoadAndFilterRecordsAsync(r => r.PatientId == patientId);
+        }
+
+        /// <summary>
+        /// Loads records for a specific doctor (i.e., all records where they treated patients).
+        /// </summary>
+        public async Task LoadRecordsForDoctorAsync(int doctorId)
+        {
+            await LoadAndFilterRecordsAsync(r => r.DoctorId == doctorId);
+        }
+
+        /// <summary>
+        /// Shared method to load records and filter them.
+        /// </summary>
+        private async Task LoadAndFilterRecordsAsync(Func<MedicalRecordDto, bool> predicate)
+        {
+            try
+            {
+                MedicalRecords.Clear();
+                var records = await _medicalRecordProxy.GetAllAsync();
+                foreach (var record in records.Where(predicate))
+                {
+                    MedicalRecords.Add(record);
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error loading medical records: {ex.Message}");
+            }
+        }
+
     }
 }

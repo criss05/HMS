@@ -1,3 +1,4 @@
+using HMS.DesktopClient.Utils;
 using HMS.DesktopClient.ViewModels;
 using HMS.Shared.Proxies.Implementations;
 using Microsoft.UI.Xaml;
@@ -15,14 +16,32 @@ namespace HMS.DesktopClient.Views
             this.InitializeComponent();
         }
 
-        protected override void OnNavigatedTo(NavigationEventArgs e)
+        protected override async void OnNavigatedTo(NavigationEventArgs e)
         {
             base.OnNavigatedTo(e);
 
             if (e.Parameter is int patientId)
             {
                 var proxy = new MedicalRecordProxy(App.CurrentUser!.Token);
-                ViewModel = new MedicalRecordHistoryViewModel(patientId, proxy);
+                ViewModel = new MedicalRecordHistoryViewModel(proxy);
+                RecordsGrid.DataContext = ViewModel;
+            }
+
+            if (e.Parameter is MedicalRecordPageParameter param)
+            {
+                var proxy = new MedicalRecordProxy(App.CurrentUser!.Token);
+
+                if (param.UserType == "Patient")
+                {
+                    ViewModel = new MedicalRecordHistoryViewModel(proxy);
+                    await ViewModel.LoadRecordsForPatientAsync(param.UserId); // You implement this
+                }
+                else if (param.UserType == "Doctor")
+                {
+                    ViewModel = new MedicalRecordHistoryViewModel(proxy);
+                    await ViewModel.LoadRecordsForDoctorAsync(param.UserId); // You implement this
+                }
+
                 RecordsGrid.DataContext = ViewModel;
             }
         }

@@ -1,3 +1,4 @@
+using HMS.DesktopClient.Utils;
 using HMS.DesktopClient.Views.Patient;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
@@ -42,8 +43,11 @@ namespace HMS.DesktopClient.Views.Doctor
 
         private void MedicalRecords_Click(object sender, RoutedEventArgs e)
         {
-            var doctorId = App.CurrentUser!.Id;
-            MainFrame.Navigate(typeof(MedicalRecordsPage), doctorId);
+            MainFrame.Navigate(typeof(MedicalRecordsPage), new MedicalRecordPageParameter
+            {
+                UserId = App.CurrentUser.Id,
+                UserType = "Doctor"
+            });
         }
 
         private void Patients_Click(object sender, RoutedEventArgs e)
