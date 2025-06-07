@@ -8,5 +8,7 @@
         public string Type { get; set; }
         public int Stock { get; set; }
         public List<int> RoomIds { get; set; }
+
+        public string RoomIdsDisplay => RoomIds != null ? string.Join(", ", RoomIds) : "None";
     }
 }

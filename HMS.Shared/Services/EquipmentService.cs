@@ -14,7 +14,7 @@ namespace HMS.Shared.Services
             _equipmentProxy = equipmentProxy;
         }
 
-        public async Task<List<EquipmentDto>> GetAllAsync()
+        public async Task<IEnumerable<EquipmentDto>> GetAllAsync()
         {
             return await _equipmentProxy.GetAllAsync();
         }

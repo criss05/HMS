@@ -14,7 +14,7 @@ namespace HMS.Shared.Repositories.Interfaces
         /// Gets all equipments.
         /// </summary>
         /// <returns>List of Equipment DTOs.</returns>
-        Task<List<EquipmentDto>> GetAllAsync();
+        Task<IEnumerable<EquipmentDto>> GetAllAsync();
 
         /// <summary>
         /// Gets equipment by id.

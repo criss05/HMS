@@ -92,13 +92,7 @@ namespace HMS.DesktopClient.Views.Doctor
 
         private void Equipments_Click(object sender, RoutedEventArgs e)
         {
-            ContentDialog dialog = new ContentDialog
-            {
-                Title = "Equipments",
-                Content = "Equipments button clicked.",
-                CloseButtonText = "OK",
-                XamlRoot = this.Content.XamlRoot
-            };
+            MainFrame.Navigate(typeof(EquipmentPage));
         }
 
         private void Rooms_Click(object sender, RoutedEventArgs e)
