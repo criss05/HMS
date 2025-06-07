@@ -37,11 +37,15 @@ public class RoomProxy : IRoomRepository
             response.EnsureSuccessStatusCode();
 
             string responseBody = await response.Content.ReadAsStringAsync();
-            return JsonSerializer.Deserialize<List<RoomDto>>(responseBody, new JsonSerializerOptions
+
+            var wrapper = JsonSerializer.Deserialize<RoomResponseDto>(responseBody, new JsonSerializerOptions
             {
                 PropertyNameCaseInsensitive = true,
                 Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) }
             })!;
+
+            return wrapper?.Values ?? new List<RoomDto>();
+
         }
         catch (Exception ex)
         {
