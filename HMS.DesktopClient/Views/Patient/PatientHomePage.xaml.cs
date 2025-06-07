@@ -7,6 +7,7 @@ using HMS.DesktopClient.ViewModels.Notification;
 using HMS.Shared.Repositories.Interfaces;
 using HMS.Shared.Proxies.Implementations;
 using System.Threading.Tasks;
+using HMS.DesktopClient.Utils;
 
 namespace HMS.DesktopClient.Views.Patient
 {
@@ -31,8 +32,11 @@ namespace HMS.DesktopClient.Views.Patient
 
         private void MedicalRecords_Click(object sender, RoutedEventArgs e)
         {
-            var patientId = App.CurrentUser!.Id;
-            MainFrame.Navigate(typeof(MedicalRecordsPage), patientId);
+            MainFrame.Navigate(typeof(MedicalRecordsPage), new MedicalRecordPageParameter
+            {
+                UserId = App.CurrentUser.Id,
+                UserType = "Patient"
+            });
         }
 
         private async void Appointments_Click(object sender, RoutedEventArgs e)
