@@ -60,7 +60,7 @@
                             <TextBlock Text="Years of Experience" Grid.Column="2" FontWeight="Bold" FontSize="16" Foreground="#B71C1C" TextAlignment="Center"/>
                         </Grid>
 
-                        <ListView x:Name="DoctorsListView" Margin="0,0,0,0" Foreground="Black">
+                        <ListView x:Name="DoctorsListView" Margin="0,0,0,0" Foreground="Black" ItemsSource="{x:Bind ViewModel.Doctors, Mode=OneWay}">
                             <ListView.ItemTemplate>
                                 <DataTemplate x:DataType="dto:DoctorListItemDto">
                                     <Grid Margin="16,8">
