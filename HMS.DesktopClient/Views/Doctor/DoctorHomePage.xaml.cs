@@ -67,13 +67,7 @@ namespace HMS.DesktopClient.Views.Doctor
 
         private void Appointments_Click(object sender, RoutedEventArgs e)
         {
-            ContentDialog dialog = new ContentDialog
-            {
-                Title = "Appointments",
-                Content = "Appointments button clicked.",
-                CloseButtonText = "OK",
-                XamlRoot = this.Content.XamlRoot
-            };
+            MainFrame.Navigate(typeof(AppointmentsPage));
         }
 
         private void MedicalRecords_Click(object sender, RoutedEventArgs e)

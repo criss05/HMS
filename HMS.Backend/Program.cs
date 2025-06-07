@@ -8,6 +8,7 @@ using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using Microsoft.Extensions.Hosting;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -32,6 +33,7 @@ Console.WriteLine($"[DEBUG] Final connection string: {connectionString}");
 // Use connection string for DbContext
 builder.Services.AddDbContext<MyDbContext>(options =>
     options.UseSqlServer(connectionString));
+
 
 // Other services
 builder.Services.AddEndpointsApiExplorer();
@@ -73,6 +75,13 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     });
 
 var app = builder.Build();
+
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<MyDbContext>();
+    db.Database.Migrate();
+}
+
 
 if (app.Environment.IsDevelopment())
 {
