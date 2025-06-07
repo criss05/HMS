@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using HMS.Shared.DTOs;
 using HMS.Shared.Proxies.Implementations;
 using System.Linq;
+using HMS.Shared.Entities;
 
 namespace HMS.DesktopClient.ViewModels
 {
@@ -23,6 +24,9 @@ namespace HMS.DesktopClient.ViewModels
         /// Handles all API calls related to retrieving medical record data.
         /// </remarks>
         private readonly MedicalRecordProxy _medicalRecordProxy;
+        private readonly DoctorProxy _doctorProxy;
+        private readonly PatientProxy _patientProxy;
+        private readonly ProcedureProxy _procedureProxy;
 
         /// <summary>
         /// Gets the collection of medical records for the specified patient.
@@ -31,7 +35,7 @@ namespace HMS.DesktopClient.ViewModels
         /// This observable collection is bound to UI elements to display the patient's medical history.
         /// It automatically notifies the UI when records are added, removed, or modified.
         /// </remarks>
-        public ObservableCollection<MedicalRecordDto> MedicalRecords { get; } = new();
+        public ObservableCollection<EnrichedMedicalRecordDto> MedicalRecords { get; } = new();
 
         /// <summary>
         /// Initializes a new instance of the <see cref="MedicalRecordHistoryViewModel"/> class.
@@ -42,35 +46,72 @@ namespace HMS.DesktopClient.ViewModels
         /// Upon initialization, this constructor triggers the asynchronous loading of medical records
         /// for the specified patient.
         /// </remarks>
-        public MedicalRecordHistoryViewModel(int patientId, MedicalRecordProxy medicalRecordProxy)
+        public MedicalRecordHistoryViewModel(MedicalRecordProxy medicalRecordProxy, DoctorProxy doctorProxy, PatientProxy patientProxy, ProcedureProxy procedureProxy)
         {
             _medicalRecordProxy = medicalRecordProxy;
-            InitializeAsync(patientId);
+            _doctorProxy = doctorProxy;
+            _patientProxy = patientProxy;
+            _procedureProxy = procedureProxy;
         }
 
+
         /// <summary>
-        /// Loads all medical records for the specified patient.
+        /// Loads records for a specific patient.
         /// </summary>
-        /// <param name="patientId">The unique identifier of the patient whose records to retrieve.</param>
-        /// <returns>A task representing the asynchronous operation.</returns>
-        /// <remarks>
-        /// This method fetches all medical records from the server, filters them by patient ID,
-        /// and populates the <see cref="MedicalRecords"/> collection with the results.
-        /// Error handling is implemented to prevent application crashes.
-        /// </remarks>
-        private async Task InitializeAsync(int patientId)
+        public async Task LoadRecordsForPatientAsync(int patientId)
         {
             try
             {
+                MedicalRecords.Clear();
                 var records = await _medicalRecordProxy.GetAllAsync();
-                foreach (var record in records.Where(r => r.PatientId == patientId))
+                var filteredRecords = records.Where(r => r.PatientId == patientId);
+                foreach (var record in filteredRecords)
                 {
-                    MedicalRecords.Add(record);
+                    var doctor = await _doctorProxy.GetByIdAsync(record.DoctorId);
+                    var procedure = await _procedureProxy.GetByIdAsync(record.ProcedureId);
+                    MedicalRecords.Add(new EnrichedMedicalRecordDto
+                    {
+                        Id = record.Id,
+                        Name = doctor?.Name ?? "Unknown Doctor",
+                        ProcedureName = procedure?.Name ?? "Unknown Procedure",
+                        Diagnosis = record.Diagnosis,
+                        CreatedAt = record.CreatedAt ?? DateTime.Now
+                    });
                 }
             }
             catch (Exception ex)
             {
-                // Handle error appropriately (e.g., logging, UI notification)
+                Console.WriteLine($"Error loading medical records: {ex.Message}");
+            }
+        }
+
+        /// <summary>
+        /// Loads records for a specific doctor (i.e., all records where they treated patients).
+        /// </summary>
+        public async Task LoadRecordsForDoctorAsync(int doctorId)
+        {
+            try
+            {
+                MedicalRecords.Clear();
+                var records = await _medicalRecordProxy.GetAllAsync();
+                var filteredRecords = records.Where(r => r.DoctorId == doctorId);
+                foreach (var record in filteredRecords)
+                {
+                    var patient = await _patientProxy.GetByIdAsync(record.PatientId);
+                    var procedure = await _procedureProxy.GetByIdAsync(record.ProcedureId);
+
+                    MedicalRecords.Add(new EnrichedMedicalRecordDto
+                    {
+                        Id = record.Id,
+                        Name = patient?.Name ?? "Unknown Patient",
+                        ProcedureName = procedure?.Name ?? "Unknown Procedure",
+                        Diagnosis = record.Diagnosis,
+                        CreatedAt = record.CreatedAt ?? DateTime.Now
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
                 Console.WriteLine($"Error loading medical records: {ex.Message}");
             }
         }

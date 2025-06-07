@@ -1,4 +1,8 @@
+using HMS.DesktopClient.Utils;
+using HMS.DesktopClient.ViewModels.Notification;
 using HMS.DesktopClient.Views.Patient;
+using HMS.Shared.Proxies.Implementations;
+using HMS.Shared.Services;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
@@ -11,6 +15,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
+using System.Threading.Tasks;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 
@@ -24,12 +29,43 @@ namespace HMS.DesktopClient.Views.Doctor
     /// </summary>
     public sealed partial class DoctorHomePage : Window
     {
+        private readonly NotificationViewModel _notificationViewModel;
+        private int _currentUserId = App.CurrentUser.Id;
+        private string _token = App.CurrentUser.Token;
+
         public DoctorHomePage()
         {
             this.InitializeComponent();
+            _notificationViewModel = new NotificationViewModel(new NotificationService(new NotificationProxy(_token)));
+            LoadNotificationsAsync();
+        }
+        private async void LoadNotificationsAsync()
+        {
+            try
+            {
+                var notifications = await _notificationViewModel.GetNotificationsByUserIdAsync(_currentUserId);
+                NotificationsList.ItemsSource = notifications;
+            }
+            catch (Exception ex)
+            {
+                await ShowErrorDialogAsync("Failed to load notifications: " + ex.Message);
+            }
         }
 
-       private void Appointments_Click(object sender, RoutedEventArgs e)
+        private async Task ShowErrorDialogAsync(string message)
+        {
+            var dialog = new ContentDialog
+            {
+                Title = "Error",
+                Content = message,
+                CloseButtonText = "OK",
+                XamlRoot = this.Content.XamlRoot // Important!
+            };
+
+            await dialog.ShowAsync();
+        }
+
+        private void Appointments_Click(object sender, RoutedEventArgs e)
         {
             ContentDialog dialog = new ContentDialog
             {
@@ -42,8 +78,11 @@ namespace HMS.DesktopClient.Views.Doctor
 
         private void MedicalRecords_Click(object sender, RoutedEventArgs e)
         {
-            var doctorId = App.CurrentUser!.Id;
-            MainFrame.Navigate(typeof(MedicalRecordsPage), doctorId);
+            MainFrame.Navigate(typeof(MedicalRecordsPage), new MedicalRecordPageParameter
+            {
+                UserId = App.CurrentUser.Id,
+                UserType = "Doctor"
+            });
         }
 
         private void Patients_Click(object sender, RoutedEventArgs e)
