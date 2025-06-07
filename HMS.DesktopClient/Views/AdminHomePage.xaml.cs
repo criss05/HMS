@@ -74,11 +74,6 @@ namespace HMS.DesktopClient.Views
             // MainFrame.Navigate(typeof(SchedulesDisplayPage));
         }
 
-        private async void Shifts_Click(object sender, RoutedEventArgs e)
-        {
-            // MainFrame.Navigate(typeof(ShiftsDisplayPage));
-        }
-
         private async void MedicalRecords_Click(object sender, RoutedEventArgs e)
         {
             MainFrame.Navigate(typeof(MedicalRecordsPage));
