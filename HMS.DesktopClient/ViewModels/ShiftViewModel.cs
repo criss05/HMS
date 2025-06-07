@@ -320,7 +320,7 @@ namespace HMS.DesktopClient.ViewModels
         public async Task AddShiftAsync()
         {
             if (!CanAddShift()) return;
-            try
+
             {
                 DateOnly date = DateOnly.FromDateTime(InputShiftDate!.Value.Date);
                 TimeOnly startTime = TimeOnly.ParseExact(InputShiftStartTimeString, "HH:mm", CultureInfo.InvariantCulture);
@@ -347,14 +347,7 @@ namespace HMS.DesktopClient.ViewModels
                 Shifts.Add(addedShift);
                 ClearInputFields();
             }
-            catch (HttpRequestException httpEx)
-            {
-                Console.WriteLine($"HTTP request error adding shift: {httpEx.Message}");
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"An error occurred adding shift: {ex.Message}");
-            }
+            
         }
 
         /// <summary>
@@ -368,8 +361,7 @@ namespace HMS.DesktopClient.ViewModels
         public async Task UpdateShiftAsync()
         {
             if (!CanUpdateDeleteShift() || SelectedShift == null) return;
-            try
-            {
+
                 bool success = await _shiftProxy.UpdateAsync(SelectedShift);
 
                 if (success)
@@ -380,15 +372,7 @@ namespace HMS.DesktopClient.ViewModels
                 {
                     Console.WriteLine($"Update failed for shift with ID {SelectedShift.Id} on backend.");
                 }
-            }
-            catch (HttpRequestException httpEx)
-            {
-                Console.WriteLine($"HTTP request error updating shift: {httpEx.Message}");
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"An error occurred updating shift: {ex.Message}");
-            }
+            
         }
 
         /// <summary>
@@ -402,8 +386,7 @@ namespace HMS.DesktopClient.ViewModels
         public async Task DeleteShiftAsync()
         {
             if (!CanUpdateDeleteShift() || SelectedShift == null) return;
-            try
-            {
+          
                 int shiftIdToDelete = SelectedShift.Id;
                 bool success = await _shiftProxy.DeleteAsync(shiftIdToDelete);
 
@@ -416,15 +399,8 @@ namespace HMS.DesktopClient.ViewModels
                 {
                     Console.WriteLine($"Deletion failed for shift {shiftIdToDelete} on backend.");
                 }
-            }
-            catch (HttpRequestException httpEx)
-            {
-                Console.WriteLine($"HTTP request error deleting shift: {httpEx.Message}");
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"An error occurred deleting shift: {ex.Message}");
-            }
+            
+
         }
     }
 }

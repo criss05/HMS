@@ -89,7 +89,7 @@ public class ShiftProxy : IShiftRepository
         string shiftJson = JsonSerializer.Serialize(shift, _jsonOptions);
         StringContent content = new StringContent(shiftJson, Encoding.UTF8, "application/json");
 
-        HttpResponseMessage response = await _httpClient.PutAsync(_baseUrl + $"shift/{shift.Date}", content);
+        HttpResponseMessage response = await _httpClient.PutAsync(_baseUrl + $"shift/{shift.Id}", content);
 
         if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
             return false;
