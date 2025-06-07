@@ -64,7 +64,7 @@
                             Foreground="#333"
                             RequestedTheme="Light">
                             <controls:DataGrid.Columns>
-                                <controls:DataGridTextColumn Header="ID" Binding="{Binding Id}" IsReadOnly="True" Width="*"/>
+                                <controls:DataGridTextColumn Header="Name" Binding="{Binding Name}" IsReadOnly="True" Width="*"/>
                                 <controls:DataGridTextColumn Header="Blood Type" Binding="{Binding BloodType}" Width="*" />
                                 <controls:DataGridTextColumn Header="Emergency Contact" Binding="{Binding EmergencyContact}" Width="*" />
                                 <controls:DataGridTextColumn Header="Allergies" Binding="{Binding Allergies}" Width="*" />
