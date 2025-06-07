@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <Window
     x:Class="HMS.DesktopClient.Views.Patient.PatientHomePage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
@@ -12,7 +13,7 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-        
+
         <Image Source="D:\HMSFinal\HMS\HMS.DesktopClient\ViewResources\registerPage.png" Stretch="Fill" IsHitTestVisible="False" Grid.Row="2"></Image>
 
         <!-- Top Navigation -->
@@ -46,43 +47,61 @@
             </Grid>
         </Border>
 
-        <!-- Notification Panel (centered card) -->
-        <Border
-            Grid.Row="1"
-            HorizontalAlignment="Center"
-            VerticalAlignment="Top"
-            Width="900"
-            Height="600"
-            Margin="0,40,0,0"
-            Background="White"
-            CornerRadius="16"
-            BorderBrush="#FFCDD2"
-            BorderThickness="1"
-            Padding="0,0,0,24" Translation="0,0,52">
-            <Border.Shadow>
-                <ThemeShadow/>
-            </Border.Shadow>
+        <!-- Scrollable Content -->
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
             <StackPanel>
-                <Border Background="#D32F2F" CornerRadius="16,16,0,0" Padding="20,12">
-                    <TextBlock Text="Notifications" Foreground="White" FontWeight="Bold" FontSize="20"/>
+                <!-- Welcome Text -->
+                <StackPanel Margin="0,20,0,0">
+                    <TextBlock Text="WELCOME BACK!" 
+                               FontSize="36" 
+                               FontWeight="Bold" 
+                               Foreground="White" 
+                               HorizontalAlignment="Center"
+                               Margin="0,0,0,10"/>
+                    <TextBlock Text="We're here to help you manage your health journey" 
+                               FontSize="18" 
+                               Foreground="LightGray" 
+                               HorizontalAlignment="Center"
+                               Margin="0,0,0,20"/>
+                </StackPanel>
+
+                <!-- Notification Panel (centered card) -->
+                <Border
+                    HorizontalAlignment="Center"
+                    Width="900"
+                    Height="600"
+                    Margin="0,20,0,40"
+                    Background="White"
+                    CornerRadius="16"
+                    BorderBrush="#FFCDD2"
+                    BorderThickness="1"
+                    Padding="0,0,0,24" Translation="0,0,52">
+                    <Border.Shadow>
+                        <ThemeShadow/>
+                    </Border.Shadow>
+                    <StackPanel>
+                        <Border Background="#D32F2F" CornerRadius="16,16,0,0" Padding="20,12">
+                            <TextBlock Text="Notifications" Foreground="White" FontWeight="Bold" FontSize="20"/>
+                        </Border>
+                        <ScrollViewer Height="200" Padding="20,10,20,10">
+                            <ItemsControl x:Name="NotificationsList">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border BorderThickness="0,0,0,1" BorderBrush="#EEE" Padding="8,8,8,8" Margin="0,0,0,8">
+                                            <StackPanel>
+                                                <TextBlock Text="{Binding Title}" FontWeight="Bold" FontSize="15" Foreground="#B71C1C"/>
+                                                <TextBlock Text="{Binding Message}" TextWrapping="Wrap" FontSize="13" Margin="0,2,0,0"/>
+                                                <TextBlock Text="{Binding Date}" FontStyle="Italic" FontSize="11" Foreground="Gray" Margin="0,2,0,0"/>
+                                            </StackPanel>
+                                        </Border>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </ScrollViewer>
+                    </StackPanel>
                 </Border>
-                <ScrollViewer Height="200" Padding="20,10,20,10">
-                    <ItemsControl x:Name="NotificationsList">
-                        <ItemsControl.ItemTemplate>
-                            <DataTemplate>
-                                <Border BorderThickness="0,0,0,1" BorderBrush="#EEE" Padding="8,8,8,8" Margin="0,0,0,8">
-                                    <StackPanel>
-                                        <TextBlock Text="{Binding Title}" FontWeight="Bold" FontSize="15" Foreground="#B71C1C"/>
-                                        <TextBlock Text="{Binding Message}" TextWrapping="Wrap" FontSize="13" Margin="0,2,0,0"/>
-                                        <TextBlock Text="{Binding Date}" FontStyle="Italic" FontSize="11" Foreground="Gray" Margin="0,2,0,0"/>
-                                    </StackPanel>
-                                </Border>
-                            </DataTemplate>
-                        </ItemsControl.ItemTemplate>
-                    </ItemsControl>
-                </ScrollViewer>
             </StackPanel>
-        </Border>
+        </ScrollViewer>
 
         <!-- Frame for View Navigation -->
         <Frame x:Name="MainFrame" Grid.Row="1"/>

@@ -23,6 +23,8 @@ namespace HMS.Shared.Repositories.Interfaces
         /// <returns>The medical record DTO if found, otherwise null.</returns>
         Task<MedicalRecordDto?> GetByIdAsync(int id);
 
+        Task<IEnumerable<MedicalRecordSummaryDto>> GetMedicalRecordsWithDetailsAsync();
+
         /// <summary>
         /// Adds a new medical record asynchronously.
         /// </summary>
