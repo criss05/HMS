@@ -1,0 +1,144 @@
+<Page
+    x:Class="HMS.DesktopClient.Views.AppointmentsPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:HMS.DesktopClient.Views"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:controls="using:CommunityToolkit.WinUI.UI.Controls" xmlns:viewmodels="using:HMS.DesktopClient.ViewModels" 
+    d:DataContext="{d:DesignInstance Type=viewmodels:AppointmentsCalendarViewModel}"
+    mc:Ignorable="d"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="400"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- Calendar on the Left -->
+        <CalendarView Grid.Column="0"
+                      x:Name="DoctorCalendar"
+                      SelectionMode="Single"
+                      SelectedDatesChanged="DoctorCalendar_SelectedDatesChanged"
+                      CalendarViewDayItemChanging="DoctorCalendar_CalendarViewDayItemChanging"/>
+
+        <!-- Right Content (Appointments table + inputs + buttons) -->
+        <ScrollViewer Grid.Column="1"
+                      VerticalScrollBarVisibility="Auto"
+                      Background="Transparent"
+                      Padding="20">
+            <StackPanel Spacing="24">
+                <!-- Selected Date Text -->
+                <TextBlock x:Name="SelectedDateText" FontSize="20" Margin="0,0,0,10"/>
+
+                <!-- Appointment DataGrid -->
+                <Border HorizontalAlignment="Stretch">
+                    <Border.Shadow>
+                        <ThemeShadow />
+                    </Border.Shadow>
+                    <controls:DataGrid
+                        x:Name="AppointmentsGrid"
+                        ItemsSource="{Binding Appointments}"
+                        AutoGenerateColumns="False" 
+                        SelectedItem="{Binding SelectedAppointment, Mode=TwoWay}"
+                        SelectionMode="Single"
+                        HeadersVisibility="Column"
+                        GridLinesVisibility="None"
+                        RowHeight="56"
+                        ColumnHeaderHeight="48"
+                        BorderThickness="0"
+                        Background="White"
+                        HorizontalAlignment="Stretch"
+                        FontSize="16"
+                        Foreground="#333"
+                        RequestedTheme="Light">
+                        <controls:DataGrid.Columns>
+                            <controls:DataGridTextColumn Header="Time" Binding="{Binding TimeOnly}" />
+                            <controls:DataGridTextColumn Header="Patient" Binding="{Binding PatientId}" />
+                            <controls:DataGridTextColumn Header="Procedure" Binding="{Binding ProcedureId}" />
+                            <controls:DataGridTextColumn Header="Room" Binding="{Binding RoomId}" />
+                        </controls:DataGrid.Columns>
+                    </controls:DataGrid>
+                </Border>
+
+                <!-- Input Section -->
+                <Border HorizontalAlignment="Stretch"
+                    Background="White"
+                    Padding="24"
+                    CornerRadius="16"
+                    BorderBrush="#FFCDD2"
+                    BorderThickness="1">
+                    <Border.Shadow>
+                        <ThemeShadow />
+                    </Border.Shadow>
+                    <StackPanel Spacing="24">
+                        <TextBlock Text="Appointment Details"
+                   FontSize="24"
+                   FontWeight="Bold"
+                   Foreground="#B71C1C"/>
+
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="0.6*"/>
+                                <ColumnDefinition Width="1*"/>
+                                <ColumnDefinition Width="1*"/>
+                                <ColumnDefinition Width="1*"/>
+                            </Grid.ColumnDefinitions>
+
+                            <!-- Time Picker -->
+                            <StackPanel Grid.Column="0" Margin="0,0,16,0">
+                                <TextBlock Text="Time" Foreground="#B71C1C" Margin="0,0,0,8"/>
+                                <TimePicker SelectedTime="{Binding InputAppointmentTime, Mode=TwoWay}" Foreground="#333"/>
+                            </StackPanel>
+
+                            <!-- Patient -->
+                            <StackPanel Grid.Column="1" Margin="0,0,16,0">
+                                <TextBlock Text="Patient" Foreground="#B71C1C" Margin="0,0,0,8"/>
+                                <ComboBox
+                    ItemsSource="{Binding AvailablePatients}"
+                    SelectedItem="{Binding SelectedPatients[0], Mode=TwoWay}"
+                    DisplayMemberPath="Name"
+                    PlaceholderText="Select patient"
+                    Foreground="#333"/>
+                            </StackPanel>
+
+                            <!-- Procedure -->
+                            <StackPanel Grid.Column="2" Margin="0,0,16,0">
+                                <TextBlock Text="Procedure" Foreground="#B71C1C" Margin="0,0,0,8"/>
+                                <ComboBox
+                    ItemsSource="{Binding AvailableProcedures}"
+                    SelectedItem="{Binding SelectedProcs[0], Mode=TwoWay}"
+                    DisplayMemberPath="Name"
+                    PlaceholderText="Select procedure"
+                    Foreground="#333"/>
+                            </StackPanel>
+
+                            <!-- Room -->
+                            <StackPanel Grid.Column="3">
+                                <TextBlock Text="Room" Foreground="#B71C1C" Margin="0,0,0,8"/>
+                                <ComboBox
+                    ItemsSource="{Binding AvailableRooms}"
+                    SelectedItem="{Binding SelectedRooms[0], Mode=TwoWay}"
+                    DisplayMemberPath="Name"
+                    PlaceholderText="Select room"
+                    Foreground="#333"/>
+                            </StackPanel>
+                        </Grid>
+                    </StackPanel>
+                </Border>
+
+
+                <!-- Action Buttons -->
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="16">
+                    <Button Content="Add Appointment" Command="{Binding AddAppointmentCommand}" 
+                            Padding="24,12" Background="#D32F2F" Foreground="White" FontWeight="Bold" BorderThickness="0" CornerRadius="8"/>
+                    <Button Content="Update Selected" Command="{Binding UpdateAppointentCommand}" 
+                            Padding="24,12" Background="#B71C1C" Foreground="White" FontWeight="Bold" BorderThickness="0" CornerRadius="8"/>
+                    <Button Content="Delete Selected" Command="{Binding DeleteAppointmentCommand}"
+                            Padding="24,12" Background="#FF5252" Foreground="White" FontWeight="Bold" BorderThickness="0" CornerRadius="8"/>
+                </StackPanel>
+            </StackPanel>
+        </ScrollViewer>
+    </Grid>
+</Page>
