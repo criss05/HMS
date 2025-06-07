@@ -14,29 +14,29 @@ using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Navigation;
 using HMS.DesktopClient.ViewModels.Doctor;
 using HMS.Shared.Proxies.Implementations;
+using HMS.DesktopClient.ViewModels.Equipment;
 using HMS.Shared.Services;
-using System.Threading.Tasks;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
 
-namespace HMS.DesktopClient.Views.Patient
+namespace HMS.DesktopClient.Views.Doctor
 {
     /// <summary>
     /// An empty page that can be used on its own or navigated to within a Frame.
     /// </summary>
-    public sealed partial class DoctorsSummaryPage : Page
+    public sealed partial class EquipmentPage : Page
     {
-        public DoctorSummaryViewModel ViewModel;
+        public EquipmentAllViewModel ViewModel;
 
-        public DoctorsSummaryPage()
+        public EquipmentPage()
         {
             this.InitializeComponent();
 
-            this.ViewModel = new DoctorSummaryViewModel(new DoctorService(new DoctorProxy(App.CurrentUser.Token)));
+            this.ViewModel = new EquipmentAllViewModel(new EquipmentService(new EquipmentProxy(App.CurrentUser.Token)));
             this.DataContext = ViewModel;
 
-            _ = ViewModel.LoadDoctorsSummary();
+            _ = ViewModel.LoadAllEquipment();
         }
     }
 }

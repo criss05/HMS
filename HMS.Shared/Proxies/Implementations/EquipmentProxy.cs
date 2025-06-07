@@ -45,14 +45,14 @@ public class EquipmentProxy : IEquipmentRepository
             new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", _token);
     }
 
-    public async Task<List<EquipmentDto>> GetAllAsync()
+    public async Task<IEnumerable<EquipmentDto>> GetAllAsync()
     {
         AddAuthorizationHeader();
         HttpResponseMessage response = await _httpClient.GetAsync(_baseUrl + "equipment");
         response.EnsureSuccessStatusCode();
 
         string responseBody = await response.Content.ReadAsStringAsync();
-        return JsonSerializer.Deserialize<List<EquipmentDto>>(responseBody, _jsonOptions)!;
+        return JsonSerializer.Deserialize<IEnumerable<EquipmentDto>>(responseBody, _jsonOptions)!;
     }
 
     public async Task<EquipmentDto?> GetByIdAsync(int id)

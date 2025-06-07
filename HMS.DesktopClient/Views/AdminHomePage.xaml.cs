@@ -61,7 +61,7 @@ namespace HMS.DesktopClient.Views
 
         private void Users_Click(object sender, RoutedEventArgs e)
         {
-            //MainFrame.Navigate(typeof(UsersDisplayPage));
+            MainFrame.Navigate(typeof(UsersDisplayPage));
         }
 
         private async void Appointments_Click(object sender, RoutedEventArgs e)
@@ -72,11 +72,6 @@ namespace HMS.DesktopClient.Views
         private async void Schedules_Click(object sender, RoutedEventArgs e)
         {
             // MainFrame.Navigate(typeof(SchedulesDisplayPage));
-        }
-
-        private async void Shifts_Click(object sender, RoutedEventArgs e)
-        {
-            // MainFrame.Navigate(typeof(ShiftsDisplayPage));
         }
 
         private async void MedicalRecords_Click(object sender, RoutedEventArgs e)

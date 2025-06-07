@@ -1,4 +1,4 @@
-﻿using HMS.Shared.DTOs.Doctor;
+﻿using HMS.Shared.DTOs;
 using HMS.Shared.Services;
 using System;
 using System.Collections.Generic;
@@ -9,28 +9,27 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace HMS.DesktopClient.ViewModels.Doctor
+namespace HMS.DesktopClient.ViewModels.Equipment
 {
-    public class DoctorSummaryViewModel : INotifyPropertyChanged
+    public class EquipmentAllViewModel : INotifyPropertyChanged
     {
-        private DoctorService _doctorService;
-        public ObservableCollection<DoctorListItemDto> Doctors { get; } = new();
+        private EquipmentService _equipmentService;
+        public ObservableCollection<EquipmentDto> EquipmentList { get; } = new();
 
-
-        public DoctorSummaryViewModel(DoctorService doctorService)
+        public EquipmentAllViewModel(EquipmentService equipmentService)
         {
-            _doctorService = doctorService;
+            this._equipmentService = equipmentService;
         }
 
-        public async Task LoadDoctorsSummary()
+        public async Task LoadAllEquipment()
         {
             try
             {
-                Doctors.Clear();
-                var doctors = await _doctorService.GetDoctorsSummaryAsync();
-                foreach (var doctor in doctors)
+                EquipmentList.Clear();
+                var equipments = await _equipmentService.GetAllAsync();
+                foreach (var equipment in equipments)
                 {
-                    Doctors.Add(doctor);
+                    EquipmentList.Add(equipment);
                 }
             }
             catch (Exception ex)

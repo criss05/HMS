@@ -26,9 +26,7 @@
                 <TextBlock Text="HMS" Foreground="Red" FontWeight="ExtraBlack" FontSize="20" VerticalAlignment="Center" Margin="20,0,0,0"/>
                 <!-- All Navigation Buttons, HOME, and Profile Icon together -->
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center" Grid.Column="1" Margin="0,0,20,0">
-                  <Button x:Name="Logs" Grid.Row="8" Grid.Column="0" Grid.ColumnSpan="2" 
-                Content="Logs page" Click="LogsButton_Click" 
-                HorizontalAlignment="Left" Margin="0,20,0,0"/>
+                    <Button Content="Logs" Background="Transparent" BorderThickness="0" FontSize="14" Foreground="Black" Click="LogsButton_Click" />
                     <Button Content="Procedures" Background="Transparent" BorderThickness="0" FontSize="14" Foreground="Black" Click="Procedures_Click"/>
                     <Button Content="Rooms" Background="Transparent" BorderThickness="0" FontSize="14" Foreground="Black" Click="Rooms_Click"/>
                     <Button Content="Equipments" Background="Transparent" BorderThickness="0" FontSize="14" Foreground="Black" Click="Equipments_Click"/>

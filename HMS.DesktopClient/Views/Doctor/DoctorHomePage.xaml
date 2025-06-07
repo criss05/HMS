@@ -49,6 +49,44 @@
             </Grid>
         </Border>
 
+        <!-- Notification Panel (centered card) -->
+        <Border
+        Grid.Row="1"
+        HorizontalAlignment="Center"
+        VerticalAlignment="Top"
+        Width="900"
+        Height="600"
+        Margin="0,40,0,0"
+        Background="White"
+        CornerRadius="16"
+        BorderBrush="#FFCDD2"
+        BorderThickness="1"
+        Padding="0,0,0,24" Translation="0,0,52">
+            <Border.Shadow>
+                <ThemeShadow/>
+            </Border.Shadow>
+            <StackPanel>
+                <Border Background="#D32F2F" CornerRadius="16,16,0,0" Padding="20,12">
+                    <TextBlock Text="Notifications" Foreground="White" FontWeight="Bold" FontSize="20"/>
+                </Border>
+                <ScrollViewer Height="200" Padding="20,10,20,10">
+                    <ItemsControl x:Name="NotificationsList">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Border BorderThickness="0,0,0,1" BorderBrush="#EEE" Padding="8,8,8,8" Margin="0,0,0,8">
+                                    <StackPanel>
+                                        <TextBlock Text="{Binding Title}" FontWeight="Bold" FontSize="15" Foreground="#B71C1C"/>
+                                        <TextBlock Text="{Binding Message}" TextWrapping="Wrap" FontSize="13" Margin="0,2,0,0"/>
+                                        <TextBlock Text="{Binding Date}" FontStyle="Italic" FontSize="11" Foreground="Gray" Margin="0,2,0,0"/>
+                                    </StackPanel>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </ScrollViewer>
+            </StackPanel>
+        </Border>
+
         <!-- Frame for View Navigation -->
         <Frame x:Name="MainFrame" Grid.Row="1"/>
     </Grid>
