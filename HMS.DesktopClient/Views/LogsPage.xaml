@@ -4,120 +4,151 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:controls="using:CommunityToolkit.WinUI.UI.Controls"
     mc:Ignorable="d"
-    Title="Logs Page">
+    Title="System Logs">
 
-    <Grid Margin="20">
+    <Grid Background="#FAFAFA">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <TextBlock Grid.Row="0" Text="Logs Page" FontSize="24" FontWeight="Bold" Margin="0,0,0,20"/>
+        <!-- Hospital Red Accent Bar -->
+        <Border Grid.Row="0" Height="8" Background="#D32F2F" CornerRadius="0,0,8,8" HorizontalAlignment="Stretch" VerticalAlignment="Top"/>
 
-        <!-- Content area that will display the logs -->
-        <Grid Grid.Row="1" x:Name="ContentArea">
-            <!-- Logs Panel -->
-            <Grid x:Name="LogsPanel">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="*"/>
-                </Grid.RowDefinitions>
+        <!-- Title -->
+        <TextBlock
+            Text="SYSTEM LOGS"
+            FontSize="32"
+            FontWeight="Bold"
+            Margin="0,24,0,24"
+            HorizontalAlignment="Center"
+            Foreground="#B71C1C"
+            Grid.Row="0"
+            VerticalAlignment="Bottom"/>
 
-                <TextBlock Grid.Row="0" Text="System Logs" FontSize="20" FontWeight="SemiBold" Margin="0,0,0,10"/>
-
-                <!-- Filtering Controls -->
-                <Grid Grid.Row="1" Margin="0,0,0,10">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="*"/>
-                    </Grid.ColumnDefinitions>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
-                    </Grid.RowDefinitions>
-
-                    <TextBlock Grid.Row="0" Grid.Column="0" Text="User ID:" VerticalAlignment="Center" Margin="0,0,5,0"/>
-                    <TextBox Grid.Row="0" Grid.Column="1" x:Name="UserIdTextBox" Width="100" Margin="0,0,10,0"/>
-
-                    <TextBlock Grid.Row="0" Grid.Column="2" Text="Action Type:" VerticalAlignment="Center" Margin="0,0,5,0"/>
-                    <ComboBox Grid.Row="0" Grid.Column="3" x:Name="ActionTypeComboBox" Width="120" Margin="0,0,10,0"/>
-
-                    <TextBlock Grid.Row="1" Grid.Column="0" Text="Date:" VerticalAlignment="Center" Margin="0,10,5,0"/>
-                    <DatePicker Grid.Row="1" Grid.Column="1" x:Name="TimestampDatePicker" Margin="0,10,10,0"/>
-
-                    <StackPanel Grid.Row="1" Grid.Column="2" Grid.ColumnSpan="2" Orientation="Horizontal" Margin="0,10,0,0">
-                        <Button x:Name="LoadAllLogsButton" Content="Load All" Margin="0,0,5,0"/>
-                        <Button x:Name="LoadLogsByUserIdButton" Content="By User ID" Margin="0,0,5,0" IsEnabled="True"/>
-                        <Button x:Name="LoadLogsByActionTypeButton" Content="By Action" Margin="0,0,5,0" IsEnabled="True"/>
-                        <Button x:Name="LoadLogsBeforeTimestampButton" Content="By Date" Margin="0,0,5,0" IsEnabled="True"/>
-                        <Button x:Name="ApplyFiltersButton" Content="Apply All Filters" Margin="0,0,5,0"/>
+        <!-- Scrollable Content -->
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" Background="Transparent">
+            <StackPanel>
+                <!-- Card Container for DataGrid -->
+                <Border
+                    HorizontalAlignment="Center"
+                    Width="1100"
+                    Padding="0,24"
+                    Background="White"
+                    CornerRadius="16"
+                    BorderBrush="#FFCDD2"
+                    BorderThickness="1"
+                    Margin="0,0,0,24" Translation="0,0,52">
+                    <Border.Shadow>
+                        <ThemeShadow></ThemeShadow>
+                    </Border.Shadow>
+                    <StackPanel>
+                        <controls:DataGrid 
+                            x:Name="LogsG"
+                            AutoGenerateColumns="False" 
+                            SelectionMode="Single"
+                            HeadersVisibility="Column"
+                            GridLinesVisibility="None"
+                            RowHeight="56"
+                            ColumnHeaderHeight="48"
+                            BorderThickness="0"
+                            Background="White"
+                            HorizontalAlignment="Stretch"
+                            FontSize="16"
+                            Foreground="#333"
+                            RequestedTheme="Light">
+                            <controls:DataGrid.Columns>
+                                <controls:DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="70"/>
+                                <controls:DataGridTextColumn Header="User ID" Binding="{Binding UserId}" Width="100"/>
+                                <controls:DataGridTextColumn Header="Action" Binding="{Binding Action}" Width="*"/>
+                                <controls:DataGridTextColumn Header="Timestamp" Binding="{Binding CreatedAt}" Width="200"/>
+                            </controls:DataGrid.Columns>
+                        </controls:DataGrid>
                     </StackPanel>
-                </Grid>
-
-                <!-- Logs ListView with Headers -->
-                <Border Grid.Row="2" BorderThickness="1" BorderBrush="LightGray">
-                    <Grid>
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="*"/>
-                        </Grid.RowDefinitions>
-
-                        <!-- Column Headers -->
-                        <Grid Grid.Row="0" Background="LightGray">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="70"/>
-                                <ColumnDefinition Width="100"/>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="200"/>
-                            </Grid.ColumnDefinitions>
-                            <TextBlock Grid.Column="0" Text="ID" FontWeight="Bold" Padding="12,8" VerticalAlignment="Center"/>
-                            <TextBlock Grid.Column="1" Text="User ID" FontWeight="Bold" Padding="12,8" VerticalAlignment="Center"/>
-                            <TextBlock Grid.Column="2" Text="Action" FontWeight="Bold" Padding="12,8" VerticalAlignment="Center"/>
-                            <TextBlock Grid.Column="3" Text="Timestamp" FontWeight="Bold" Padding="12,8" VerticalAlignment="Center"/>
-                        </Grid>
-
-                        <!-- Logs ListView -->
-                        <ListView Grid.Row="1" x:Name="LogListView" 
-                                  ScrollViewer.HorizontalScrollBarVisibility="Auto"
-                                  ScrollViewer.VerticalScrollBarVisibility="Auto"
-                                  BorderThickness="0"
-                                  Padding="0"
-                                  Margin="0">
-                            <ListView.ItemContainerStyle>
-                                <Style TargetType="ListViewItem">
-                                    <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
-                                    <Setter Property="Padding" Value="0"/>
-                                </Style>
-                            </ListView.ItemContainerStyle>
-                            <ListView.ItemTemplate>
-                                <DataTemplate>
-                                    <Grid>
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="70"/>
-                                            <ColumnDefinition Width="100"/>
-                                            <ColumnDefinition Width="*"/>
-                                            <ColumnDefinition Width="200"/>
-                                        </Grid.ColumnDefinitions>
-                                        <TextBlock Grid.Column="0" Text="{Binding Id}" Padding="12,8" TextTrimming="CharacterEllipsis"/>
-                                        <TextBlock Grid.Column="1" Text="{Binding UserId}" Padding="12,8" TextTrimming="CharacterEllipsis"/>
-                                        <TextBlock Grid.Column="2" Text="{Binding Action}" Padding="12,8" TextTrimming="CharacterEllipsis" ToolTipService.ToolTip="{Binding Action}"/>
-                                        <TextBlock Grid.Column="3" Text="{Binding CreatedAt}" Padding="12,8" TextTrimming="CharacterEllipsis"/>
-                                    </Grid>
-                                </DataTemplate>
-                            </ListView.ItemTemplate>
-                        </ListView>
-                    </Grid>
                 </Border>
-            </Grid>
-        </Grid>
 
-        <!-- Back button -->
-        <Button Grid.Row="2" Content="Back" Click="BackButton_Click" HorizontalAlignment="Left" Margin="0,10,0,0"/>
+                <!-- Card Container for Filter Section -->
+                <Border
+                    HorizontalAlignment="Center"
+                    Width="1100"
+                    Padding="24"
+                    Background="White"
+                    CornerRadius="16"
+                    BorderBrush="#FFCDD2"
+                    BorderThickness="1"
+                    Margin="0,0,0,24" Translation="0,0,52">
+                    <Border.Shadow>
+                        <ThemeShadow></ThemeShadow>
+                    </Border.Shadow>
+                    <StackPanel>
+                        <TextBlock 
+                            Text="Filter Logs" 
+                            FontSize="24" 
+                            FontWeight="Bold" 
+                            Foreground="#B71C1C"
+                            Margin="0,0,0,24"/>
+
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="1*"/>
+                                <ColumnDefinition Width="1*"/>
+                                <ColumnDefinition Width="1*"/>
+                                <ColumnDefinition Width="2*"/>
+                            </Grid.ColumnDefinitions>
+
+                            <StackPanel Grid.Column="0" Margin="0,0,16,0">
+                                <TextBlock Text="User ID" Foreground="#B71C1C" Margin="0,0,0,8"/>
+                                <TextBox x:Name="UserIdTextBox" PlaceholderText="Enter User ID" Foreground="#333"/>
+                            </StackPanel>
+
+                            <StackPanel Grid.Column="1" Margin="0,0,16,0">
+                                <TextBlock Text="Action Type" Foreground="#B71C1C" Margin="0,0,0,8"/>
+                                <ComboBox x:Name="ActionTypeComboBox" PlaceholderText="Select Action" Foreground="#333"/>
+                            </StackPanel>
+
+                            <StackPanel Grid.Column="2" Margin="0,0,16,0">
+                                <TextBlock Text="Date" Foreground="#B71C1C" Margin="0,0,0,8"/>
+                                <DatePicker x:Name="TimestampDatePicker" Foreground="#333"/>
+                            </StackPanel>
+
+                            <StackPanel Grid.Column="3" Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8">
+                                <Button x:Name="LoadAllLogsButton" Content="Load All" 
+                                        Padding="16,8" Background="#D32F2F" Foreground="White" 
+                                        FontWeight="Bold" BorderThickness="0" CornerRadius="8"/>
+                                <Button x:Name="LoadLogsByUserIdButton" Content="By User ID" 
+                                        Padding="16,8" Background="#B71C1C" Foreground="White" 
+                                        FontWeight="Bold" BorderThickness="0" CornerRadius="8"/>
+                                <Button x:Name="LoadLogsByActionTypeButton" Content="By Action" 
+                                        Padding="16,8" Background="#B71C1C" Foreground="White" 
+                                        FontWeight="Bold" BorderThickness="0" CornerRadius="8"/>
+                                <Button x:Name="LoadLogsBeforeTimestampButton" Content="By Date" 
+                                        Padding="16,8" Background="#B71C1C" Foreground="White" 
+                                        FontWeight="Bold" BorderThickness="0" CornerRadius="8"/>
+                                <Button x:Name="ApplyFiltersButton" Content="Apply Filters" 
+                                        Padding="16,8" Background="#B71C1C" Foreground="White" 
+                                        FontWeight="Bold" BorderThickness="0" CornerRadius="8"/>
+                            </StackPanel>
+                        </Grid>
+                    </StackPanel>
+                </Border>
+            </StackPanel>
+        </ScrollViewer>
+
+        <!-- Fixed Button Section -->
+        <Border
+            Grid.Row="2"
+            Background="White"
+            BorderBrush="#FFCDD2"
+            BorderThickness="0,1,0,0"
+            Padding="24">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="16">
+                <Button Content="Back" Click="BackButton_Click"
+                        Padding="24,12" Background="#D32F2F" Foreground="White" 
+                        FontWeight="Bold" BorderThickness="0" CornerRadius="8"/>
+            </StackPanel>
+        </Border>
     </Grid>
 </Window>

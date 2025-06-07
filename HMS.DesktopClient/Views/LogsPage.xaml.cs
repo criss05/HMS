@@ -57,7 +57,7 @@ namespace HMS.DesktopClient.Views
         private void ConfigureLoggerUI()
         {
             // Set the item source for ListView
-            LogListView.ItemsSource = _loggerViewModel.logs;
+            LogsG.ItemsSource = _loggerViewModel.logs;
 
             // Set up ComboBox for action types
             ActionTypeComboBox.ItemsSource = _loggerViewModel.actionTypes;

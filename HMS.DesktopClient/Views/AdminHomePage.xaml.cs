@@ -49,14 +49,10 @@ namespace HMS.DesktopClient.Views
             //MainFrame.Navigate(typeof(ProceduresDisplayPage));
         }
 
-        private async void Rooms_Click(object sender, RoutedEventArgs e)
-        {
-            // MainFrame.Navigate(typeof(RoomsDisplayPage));
-        }
-
         private async void Equipments_Click(object sender, RoutedEventArgs e)
         {
-            // MainFrame.Navigate(typeof(EquipmentDisplayPage));
+            var equipmentView = new EquipmentView(App.CurrentUser);
+            equipmentView.Activate();
         }
 
         private void Users_Click(object sender, RoutedEventArgs e)
@@ -67,11 +63,6 @@ namespace HMS.DesktopClient.Views
         private async void Appointments_Click(object sender, RoutedEventArgs e)
         {
             // MainFrame.Navigate(typeof(AppointmentsDisplayPage));
-        }
-
-        private async void Schedules_Click(object sender, RoutedEventArgs e)
-        {
-            // MainFrame.Navigate(typeof(SchedulesDisplayPage));
         }
 
         private async void MedicalRecords_Click(object sender, RoutedEventArgs e)
