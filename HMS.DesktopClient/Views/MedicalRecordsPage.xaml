@@ -67,37 +67,12 @@
                                 <controls:DataGridTextColumn Header="Procedure ID" Binding="{Binding ProcedureId}" Width="*"/>
                                 <controls:DataGridTextColumn Header="Diagnosis" Binding="{Binding Diagnosis}" Width="*"/>
                                 <controls:DataGridTextColumn Header="Created At" Binding="{Binding CreatedAt}" Width="*"/>
-                                <!-- Delete Icon Column -->
-                                <controls:DataGridTemplateColumn Header="Delete" Width="80">
-                                    <controls:DataGridTemplateColumn.CellTemplate>
-                                        <DataTemplate>
-                                            <Button Background="Transparent" BorderThickness="0" HorizontalAlignment="Center" VerticalAlignment="Center">
-                                                <FontIcon Glyph="&#xE74D;" Foreground="#D32F2F" FontSize="28"/>
-                                            </Button>
-                                        </DataTemplate>
-                                    </controls:DataGridTemplateColumn.CellTemplate>
-                                </controls:DataGridTemplateColumn>
+
                             </controls:DataGrid.Columns>
                         </controls:DataGrid>
                     </StackPanel>
                 </Border>
             </StackPanel>
         </ScrollViewer>
-
-        <!-- Fixed Button Section -->
-        <Border Grid.Row="2" Background="White" BorderBrush="#FFCDD2" BorderThickness="0,1,0,0" Padding="24">
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="16">
-                <Button
-                    Content="Add new"
-                    Width="200"
-                    Height="44"
-                    Background="#D32F2F"
-                    Foreground="White"
-                    FontWeight="Bold"
-                    BorderThickness="0"
-                    CornerRadius="10"
-                    FontSize="16"/>
-            </StackPanel>
-        </Border>
     </Grid>
 </Page>

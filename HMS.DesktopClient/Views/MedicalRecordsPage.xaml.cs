@@ -34,12 +34,14 @@ namespace HMS.DesktopClient.Views
                 if (param.UserType == "Patient")
                 {
                     ViewModel = new MedicalRecordHistoryViewModel(proxy);
-                    await ViewModel.LoadRecordsForPatientAsync(param.UserId); // You implement this
+                    RecordsGrid.Columns[1].Header = "Patient ID";
+                    await ViewModel.LoadRecordsForPatientAsync(param.UserId);
                 }
                 else if (param.UserType == "Doctor")
                 {
                     ViewModel = new MedicalRecordHistoryViewModel(proxy);
-                    await ViewModel.LoadRecordsForDoctorAsync(param.UserId); // You implement this
+                    RecordsGrid.Columns[1].Header = "Doctor ID";
+                    await ViewModel.LoadRecordsForDoctorAsync(param.UserId);
                 }
 
                 RecordsGrid.DataContext = ViewModel;
