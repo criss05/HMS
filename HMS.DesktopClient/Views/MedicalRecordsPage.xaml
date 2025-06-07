@@ -63,8 +63,8 @@
                                 Foreground="#333">
                             <controls:DataGrid.Columns>
                                 <controls:DataGridTextColumn Header="ID" Binding="{Binding Id}" IsReadOnly="True" Width="*"/>
-                                <controls:DataGridTextColumn Header="Patient ID" Binding="{Binding PatientId}" Width="*"/>
-                                <controls:DataGridTextColumn Header="Procedure ID" Binding="{Binding ProcedureId}" Width="*"/>
+                                <controls:DataGridTextColumn Header="Name" Binding="{Binding Name}" Width="*"/>
+                                <controls:DataGridTextColumn Header="Procedure" Binding="{Binding ProcedureName}" Width="*"/>
                                 <controls:DataGridTextColumn Header="Diagnosis" Binding="{Binding Diagnosis}" Width="*"/>
                                 <controls:DataGridTextColumn Header="Created At" Binding="{Binding CreatedAt}" Width="*"/>
 
