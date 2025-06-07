@@ -26,11 +26,20 @@ namespace HMS.Backend.Controllers
         /// <response code="200">Returns the list of equipment</response>
         [HttpGet]
         [Authorize]
-        [ProducesResponseType(typeof(IEnumerable<Equipment>), 200)]
+        [ProducesResponseType(typeof(IEnumerable<EquipmentDto>), 200)]
         public async Task<IActionResult> GetAll()
         {
             var equipment = await _equipmentRepository.GetAllAsync();
-            return Ok(equipment);
+            var equipmentDtos = equipment.Select(e => new EquipmentDto
+            {
+                Id = e.Id,
+                Name = e.Name,
+                Specification = e.Specification,
+                Type = e.Type,
+                Stock = e.Stock,
+                RoomIds = e.Rooms.Select(r => r.Id).ToList()
+            });
+            return Ok(equipmentDtos);
         }
 
         /// <summary>
