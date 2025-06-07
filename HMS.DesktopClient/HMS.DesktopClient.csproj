@@ -61,6 +61,11 @@
     <ProjectReference Include="..\HMS.Shared\HMS.Shared.csproj" />
   </ItemGroup>
   <ItemGroup>
+    <Page Update="Views\UsersDisplayPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
     <Page Update="Views\Patient\DoctorsSummaryPage.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>

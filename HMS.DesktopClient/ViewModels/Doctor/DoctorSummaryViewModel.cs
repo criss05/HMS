@@ -2,8 +2,10 @@
 using HMS.Shared.Services;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -12,17 +14,24 @@ namespace HMS.DesktopClient.ViewModels.Doctor
     public class DoctorSummaryViewModel : INotifyPropertyChanged
     {
         private DoctorService _doctorService;
+        public ObservableCollection<DoctorListItemDto> Doctors { get; } = new();
+
 
         public DoctorSummaryViewModel(DoctorService doctorService)
         {
             _doctorService = doctorService;
         }
 
-        public async Task<IEnumerable<DoctorListItemDto>> LoadDoctorsSummary()
+        public async Task LoadDoctorsSummary()
         {
             try
             {
-                return await _doctorService.GetDoctorsSummaryAsync();
+                Doctors.Clear();
+                var doctors = await _doctorService.GetDoctorsSummaryAsync();
+                foreach (var doctor in doctors)
+                {
+                    Doctors.Add(doctor);
+                }
             }
             catch (Exception ex)
             {
@@ -31,5 +40,7 @@ namespace HMS.DesktopClient.ViewModels.Doctor
         }
 
         public event PropertyChangedEventHandler? PropertyChanged;
+        protected void OnPropertyChanged([CallerMemberName] string? name = null)
+            => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
     }
 }
