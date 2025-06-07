@@ -120,7 +120,7 @@
                                 <ComboBox
                     ItemsSource="{Binding AvailableRooms}"
                     SelectedItem="{Binding SelectedRooms[0], Mode=TwoWay}"
-                    DisplayMemberPath="Name"
+                    DisplayMemberPath="Id"
                     PlaceholderText="Select room"
                     Foreground="#333"/>
                             </StackPanel>
