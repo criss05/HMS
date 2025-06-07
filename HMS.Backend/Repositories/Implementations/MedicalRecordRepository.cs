@@ -1,5 +1,6 @@
 ﻿using HMS.Backend.Data;
 using HMS.Backend.Repositories.Interfaces;
+using HMS.Shared.DTOs;
 using HMS.Shared.Entities;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
@@ -86,6 +87,27 @@ namespace HMS.Backend.Repositories.Implementations
             _context.MedicalRecords.Remove(record);
             await _context.SaveChangesAsync();
             return true;
+        }
+
+        public async Task<IEnumerable<MedicalRecordSummaryDto>> GetMedicalRecordsWithDetailsAsync()
+        {
+            return await _context.MedicalRecords
+                .Include(m => m.Patient)
+                .Include(m => m.Doctor)
+                .Include(m => m.Procedure)
+                .Select(m => new MedicalRecordSummaryDto
+                {
+                    Id = m.Id,
+                    PatientId = m.PatientId,
+                    PatientName = m.Patient.Name,
+                    DoctorId = m.DoctorId,
+                    DoctorName = m.Doctor.Name,
+                    ProcedureId = m.ProcedureId,
+                    ProcedureName = m.Procedure.Name,
+                    Diagnosis = m.Diagnosis,
+                    CreatedAt = m.CreatedAt
+                })
+                .ToListAsync();
         }
     }
 }

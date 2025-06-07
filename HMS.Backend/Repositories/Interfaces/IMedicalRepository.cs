@@ -1,4 +1,5 @@
-﻿using HMS.Shared.Entities;
+﻿using HMS.Shared.DTOs;
+using HMS.Shared.Entities;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -21,6 +22,8 @@ namespace HMS.Backend.Repositories.Interfaces
         /// <param name="id">The unique identifier of the medical record.</param>
         /// <returns>The medical record if found, otherwise null.</returns>
         Task<MedicalRecord?> GetByIdAsync(int id);
+
+        Task<IEnumerable<MedicalRecordSummaryDto>> GetMedicalRecordsWithDetailsAsync();
 
         /// <summary>
         /// Adds a new medical record asynchronously.

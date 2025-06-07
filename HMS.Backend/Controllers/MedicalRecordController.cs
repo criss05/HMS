@@ -100,6 +100,15 @@ namespace HMS.Backend.Controllers
             });
         }
 
+        [HttpGet("details")]
+        [Authorize]
+        [ProducesResponseType(typeof(IEnumerable<MedicalRecordSummaryDto>), 200)]
+        public async Task<ActionResult<IEnumerable<MedicalRecordSummaryDto>>> GetMedicalRecordsWithDetailsAsync()
+        {
+            var records = await _medicalRecordRepository.GetMedicalRecordsWithDetailsAsync();
+            return Ok(records);
+        }
+
         /// <summary>
         /// Creates a new medical record.
         /// </summary>

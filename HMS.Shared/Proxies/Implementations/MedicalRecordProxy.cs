@@ -3,6 +3,7 @@ using HMS.Shared.Entities;
 using HMS.Shared.Repositories.Interfaces;
 using System;
 using System.Collections.Generic;
+using System.Net.Http.Json;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -120,6 +121,24 @@ namespace HMS.Shared.Proxies.Implementations
 
             response.EnsureSuccessStatusCode();
             return true;
+        }
+
+        public async Task<IEnumerable<MedicalRecordSummaryDto>> GetMedicalRecordsWithDetailsAsync()
+        {
+            try
+            {
+                AddAuthorizationHeader();
+                HttpResponseMessage response = await _httpClient.GetAsync(_baseUrl + "medicalrecord/details");
+                response.EnsureSuccessStatusCode();
+
+                string json = await response.Content.ReadAsStringAsync();
+                return JsonSerializer.Deserialize<IEnumerable<MedicalRecordSummaryDto>>(json, _jsonOptions) ?? new List<MedicalRecordSummaryDto>();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error getting medical records: {ex.Message}");
+                throw;
+            }
         }
     }
 } 
